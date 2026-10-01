@@ -1,0 +1,15 @@
+{
+  "name": "OpenShelf: Learning made easy. Open to all.",
+  "short_name": "OpenShelf",
+  "description": "Free step-by-step math, SAT practice and college planning, in English and Bangla.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EEF1F6",
+  "theme_color": "#172033",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
