@@ -71,6 +71,11 @@ button,input{font:inherit;color:inherit}
 }
 .mc-head{display:flex;gap:10px;align-items:end}
 .mc-out{margin-top:12px}
+.mc-other[hidden], .mc-tiers[hidden]{display:none !important}
+.contactmail{font-size:1.15rem;margin:0 0 12px;word-break:break-all}
+a.btn{text-decoration:none}
+.mc-how{margin:8px 0 6px;padding-left:22px} .mc-how li{margin:4px 0}
+.mc-more summary{cursor:pointer;font-size:.85rem;margin-top:8px;color:var(--accent)} .mc-more p{font-size:.85rem;margin:6px 0 0}
 .mc-note{font-size:.875rem;margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--paper)}
 .mc-tag{display:inline-block;font-size:.75rem;font-weight:700;padding:1px 8px;border-radius:999px;border:1px solid currentColor;margin-right:4px}
 .mc-need{color:var(--c-warn)} .mc-auto{color:var(--c-ok)} .mc-apply{color:var(--c-apply)} .mc-few{color:var(--muted)}
@@ -1536,6 +1541,10 @@ const BN = {
   "Pace":"গতি", "This week":"এই সপ্তাহ", "Official practice tests":"অফিশিয়াল প্র্যাকটিস টেস্ট",
   "Log scores from full-length practice tests in College Board's free Bluebook app. These are the most reliable way to track real SAT progress.":"College Board-এর বিনামূল্যের Bluebook অ্যাপে দেওয়া পূর্ণ প্র্যাকটিস টেস্টের স্কোর এখানে লিখে রাখুন। প্রকৃত SAT অগ্রগতি বোঝার সবচেয়ে নির্ভরযোগ্য উপায় এটিই।",
   "Beta":"বেটা",
+  "Questions, suggestions, or a mistake to report? We'd love to hear from you.":"প্রশ্ন, পরামর্শ, বা কোনো ভুল জানাতে চান? আপনার কথা শুনতে আমরা আগ্রহী।",
+  "Email":"ইমেইল", "Email us":"আমাদের ইমেইল করুন", "Copy email address":"ইমেইল ঠিকানা কপি করুন",
+  "If “Email us” doesn't open your email app, which can happen inside apps like Messenger or WhatsApp, use “Open in Gmail,” or copy the address and paste it into any email app.":"“আমাদের ইমেইল করুন” চাপলে যদি ইমেইল অ্যাপ না খোলে (Messenger বা WhatsApp-এর ভেতরে এমন হতে পারে), “Gmail-এ খুলুন” ব্যবহার করুন, অথবা ঠিকানাটি কপি করে যেকোনো ইমেইল অ্যাপে পেস্ট করুন।", "Open in Gmail ↗":"Gmail-এ খুলুন ↗",
+  "Found a mistake in a question?":"কোনো প্রশ্নে ভুল পেয়েছেন?", "What to expect":"কী আশা করবেন",
   "Merit aid calculator":"মেধা বৃত্তি ক্যালকুলেটর", "See how close a score is to the next scholarship step, and what a retake could be worth.":"স্কোর পরের বৃত্তির ধাপ থেকে কত দূরে, আর আবার পরীক্ষা দিলে কত টাকা পাওয়া যেতে পারে, তা দেখুন।",
   "That's an assignment code, not a progress code. Students enter it in Practice, under “Have an assignment code from your tutor?”":"এটি অ্যাসাইনমেন্ট কোড, অগ্রগতি কোড নয়। শিক্ষার্থীরা এটি Practice-এ “টিউটরের কাছ থেকে অ্যাসাইনমেন্ট কোড পেয়েছেন?” অংশে লেখে।",
   "That's a progress code, not an assignment code. Import it in Tutor & family view.":"এটি অগ্রগতি কোড, অ্যাসাইনমেন্ট কোড নয়। এটি Tutor & family view-এ ইমপোর্ট করুন।",
@@ -8217,7 +8226,7 @@ const SITE = {
   name: "OpenShelf",
   domain: "myopenshelf.org",
   owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-  email: "",            // e.g. "hello@yourdomain.com"
+  email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
   updated: "September 2026",
   builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
 };
@@ -8325,6 +8334,30 @@ function deleteAllData(){
   Object.keys(mem).forEach(k => delete mem[k]);
 }
 const PAGES = {
+  contact: { title:"Contact", render: el => {
+    const mail = SITE.email;
+    el.innerHTML = `
+      <h1>Contact</h1>
+      <p>Questions, suggestions, or a mistake to report? We'd love to hear from you.</p>
+      ${mail ? `<div class="box"><h2>Email</h2>
+        <p class="contactmail"><strong>${esc(mail)}</strong></p>
+        <div class="ractions"><a class="btn" href="mailto:${mail}?subject=${encodeURIComponent(SITE.name + " question")}">Email us</a><a class="btn ghost" href="https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(mail)}&su=${encodeURIComponent(SITE.name + " question")}" target="_blank" rel="noopener" id="gmLink">Open in Gmail ↗</a><button class="btn ghost" id="cpEmail">Copy email address</button></div>
+        <p class="small muted" style="margin-top:10px">If “Email us” doesn't open your email app, which can happen inside apps like Messenger or WhatsApp, use “Open in Gmail,” or copy the address and paste it into any email app.</p></div>` : `<p class="muted">Contact details coming soon.</p>`}
+      <div class="box"><h2>Found a mistake in a question?</h2>
+        <p>Tap <strong>Report a problem</strong> under that question. It opens an email that already includes the question number, so the mistake can be found and fixed quickly.</p></div>
+      <div class="box"><h2>What to expect</h2>
+        <p>${SITE.name} is a small, free project in beta, so replies may take a few days. Please don't include personal details you don't need to share, like a student's full name or school.</p></div>`;
+    const gm = el.querySelector("#gmLink"); if(gm) gm.addEventListener("click", () => track("contact-gmail"));
+    const cp = el.querySelector("#cpEmail");
+    if(cp) cp.onclick = async () => {
+      let ok = false;
+      try{ await navigator.clipboard.writeText(mail); ok = true; }catch(e){
+        try{ const t = document.createElement("textarea"); t.value = mail; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0"; document.body.appendChild(t); t.select(); ok = document.execCommand("copy"); t.remove(); }catch(e2){}
+      }
+      cp.textContent = ok ? "Copied ✓" : mail; track("contact-copy", { ok });
+      toast(ok ? "Email address copied." : "Copy didn't work here. Press and hold the address to copy it.");
+    };
+  } },
   about: { title:"About", render: el => {
     el.innerHTML = `
       <h1>About ${SITE.name}</h1>
@@ -8452,6 +8485,12 @@ function meritLookup(name){
   return MERIT_TOP.find(c => new RegExp(`(^| )(${c.re})( |$)`).test(s) && !(c.not && new RegExp(c.not).test(s))) || null;
 }
 
+/* Names offered in the calculator's dropdown. Each must be recognized by meritLookup (tested). */
+const MERIT_PICK = {
+  ivy: ["Brown University", "Columbia University", "Cornell University", "Dartmouth College", "Harvard University", "Princeton University", "University of Pennsylvania", "Yale University"],
+  top: ["Duke University", "Georgetown University", "Georgia Tech", "Johns Hopkins University", "MIT", "New York University (NYU)", "Northwestern University", "Ohio State University", "Purdue University", "Rice University", "Stanford University", "University of Chicago", "University of Illinois Urbana-Champaign", "University of Maryland, College Park", "University of Michigan", "UNC Chapel Hill", "University of Southern California (USC)", "University of Virginia", "University of Wisconsin–Madison", "Vanderbilt University"]
+};
+const MERIT_PICK_ALL = MERIT_PICK.ivy.concat(MERIT_PICK.top);
 const MERIT_EXAMPLE = { name:"Example University (made-up numbers)", tiers:[{ min:1200, gpa:"", amt:4000 }, { min:1300, gpa:"", amt:8000 }, { min:1400, gpa:"", amt:13000 }, { min:1500, gpa:"", amt:18000 }] };
 function meritBest(){ /* best total from logged practice tests, if any */
   try{ const d = getPD(activeProf().id); const t = (d.tests || []).map(x => (+x.math || 0) + (+x.rw || 0)).filter(x => x >= 400 && x <= 1600); return t.length ? Math.max(...t) : null; }catch(e){ return null; }
@@ -8476,32 +8515,46 @@ function renderMeritCalc(el){
   const S = store.get("os_merit", null) || { score:"", gpa:"", years:4, schools:[{ name:"", tiers:[{ min:"", gpa:"", amt:"" }, { min:"", gpa:"", amt:"" }] }] };
   if(S.score === "" && meritBest()) S.score = String(meritBest());
   const save = () => store.set("os_merit", S);
+  const otherOn = sc => !!sc.other || (!!(sc.name || "").trim() && !MERIT_PICK_ALL.includes(sc.name));
 
   const tierRow = (si, ti, t) => `<div class="mc-tier" data-si="${si}" data-ti="${ti}">
-      <label class="fld"><span>${tx("Minimum SAT", "ন্যূনতম SAT")}</span><input inputmode="numeric" maxlength="4" data-f="min" value="${esc(t.min)}" placeholder="${ti === 0 ? tx("e.g. 1400", "যেমন 1400") : ""}"></label>
-      <label class="fld"><span>${tx("Min. GPA (optional)", "ন্যূনতম GPA (ঐচ্ছিক)")}</span><input inputmode="decimal" maxlength="4" data-f="gpa" value="${esc(t.gpa)}" placeholder="${ti === 0 ? tx("e.g. 3.5", "যেমন 3.5") : ""}"></label>
-      <label class="fld"><span>${tx("Award per year ($)", "প্রতি বছরের বৃত্তি ($)")}</span><input inputmode="numeric" maxlength="7" data-f="amt" value="${esc(t.amt)}" placeholder="${ti === 0 ? tx("e.g. 13000", "যেমন 13000") : ""}"></label>
+      <label class="fld">${ti === 0 ? `<span>${tx("Minimum SAT", "ন্যূনতম SAT")}</span>` : ""}<input inputmode="numeric" maxlength="4" data-f="min" value="${esc(t.min)}" aria-label="${tx("Minimum SAT", "ন্যূনতম SAT")}" placeholder="${ti === 0 ? tx("e.g. 1400", "যেমন 1400") : tx("Min SAT", "ন্যূনতম SAT")}"></label>
+      <label class="fld">${ti === 0 ? `<span>${tx("Min. GPA (optional)", "ন্যূনতম GPA (ঐচ্ছিক)")}</span>` : ""}<input inputmode="decimal" maxlength="4" data-f="gpa" value="${esc(t.gpa)}" aria-label="${tx("Min. GPA (optional)", "ন্যূনতম GPA (ঐচ্ছিক)")}" placeholder="${ti === 0 ? tx("e.g. 3.5", "যেমন 3.5") : tx("Min GPA", "ন্যূনতম GPA")}"></label>
+      <label class="fld">${ti === 0 ? `<span>${tx("Award per year ($)", "প্রতি বছরের বৃত্তি ($)")}</span>` : ""}<input inputmode="numeric" maxlength="7" data-f="amt" value="${esc(t.amt)}" aria-label="${tx("Award per year ($)", "প্রতি বছরের বৃত্তি ($)")}" placeholder="${ti === 0 ? tx("e.g. 13000", "যেমন 13000") : tx("Award $/yr", "বৃত্তি $/বছর")}"></label>
       <button class="linkbtn mc-del" data-delt="${si}:${ti}" aria-label="${tx("Remove this step", "এই ধাপটি মুছুন")}">✕</button></div>`;
 
   const draw = () => {
     el.innerHTML = `
-      <p class="muted" style="margin-top:0">${tx("Merit scholarships often come in steps: crossing a score boundary can add thousands of dollars, while points within a step add nothing. Enter each college's current chart to see whether a retake is worth it.", "মেধা বৃত্তি প্রায়ই ধাপে ধাপে আসে: একটি স্কোরের সীমা পার হলে হাজার হাজার ডলার বাড়তে পারে, আবার ধাপের ভেতরের পয়েন্টে কিছুই বাড়ে না। আবার পরীক্ষা দেওয়া লাভজনক কিনা দেখতে প্রতিটি কলেজের বর্তমান চার্ট লিখুন।")}
-        <button class="linkbtn" id="mcGuide">${tx("How merit scholarships work", "মেধা বৃত্তি কীভাবে কাজ করে")}</button></p>
+      <p class="muted" style="margin-top:0">${tx("Some colleges publish a merit scholarship chart, for example \"SAT 1400 or higher: $13,000 a year.\" This calculator shows how close a student is to the next level and what reaching it is worth, so you can decide whether a retake pays off.", "কিছু কলেজ মেধা বৃত্তির চার্ট প্রকাশ করে, যেমন \"SAT 1400 বা তার বেশি: বছরে $13,000।\" শিক্ষার্থী পরের ধাপ থেকে কত দূরে আর সেখানে পৌঁছালে কত টাকা পাওয়া যাবে, এই ক্যালকুলেটর তা দেখায়, যাতে বোঝা যায় আবার পরীক্ষা দেওয়া লাভজনক কিনা।")} <button class="linkbtn" id="mcGuide">${tx("How merit scholarships work", "মেধা বৃত্তি কীভাবে কাজ করে")}</button></p>
+      <ol class="mc-how">
+        <li>${tx("Enter the student's SAT score, and GPA if the chart uses it.", "শিক্ষার্থীর SAT স্কোর লিখুন, আর চার্টে GPA লাগলে সেটিও।")}</li>
+        <li>${tx("Type a college's name. For well-known selective colleges, the calculator tells you whether a chart exists.", "একটি কলেজের নাম লিখুন। পরিচিত প্রতিযোগিতামূলক কলেজের ক্ষেত্রে ক্যালকুলেটর জানাবে চার্ট আছে কিনা।")}</li>
+        <li>${tx("If the college has a chart, copy each step into the boxes: the minimum score and the award per year.", "কলেজের চার্ট থাকলে প্রতিটি ধাপ ঘরে লিখুন: ন্যূনতম স্কোর ও প্রতি বছরের বৃত্তি।")}</li>
+      </ol>
+      <p class="small muted">${tx("Charts are most common at some public universities and smaller private colleges. Most highly selective colleges don't publish one.", "চার্ট সবচেয়ে বেশি দেখা যায় কিছু সরকারি বিশ্ববিদ্যালয় ও ছোট বেসরকারি কলেজে। বেশিরভাগ অত্যন্ত প্রতিযোগিতামূলক কলেজ চার্ট প্রকাশ করে না।")}</p>
       <div class="box"><h2>${tx("Your student", "আপনার শিক্ষার্থী")}</h2>
         <div class="form-row">
           <label class="fld"><span>${tx("SAT score", "SAT স্কোর")}</span><input id="mcScore" inputmode="numeric" maxlength="4" value="${esc(S.score)}" placeholder="${tx("e.g. 1390", "যেমন 1390")}"></label>
           <label class="fld"><span>${tx("GPA (optional)", "GPA (ঐচ্ছিক)")}</span><input id="mcGpa" inputmode="decimal" maxlength="4" value="${esc(S.gpa)}" placeholder="${tx("e.g. 3.8", "যেমন 3.8")}"></label>
-          <label class="fld"><span>${tx("Years of college", "কলেজের বছর")}</span><input id="mcYears" inputmode="numeric" maxlength="1" value="${esc(S.years)}"></label>
+          <label class="fld"><span>${tx("Years the award lasts", "বৃত্তি কত বছর চলবে")} <span class="muted" style="font-weight:400">${tx("(usually 4)", "(সাধারণত ৪)")}</span></span><input id="mcYears" inputmode="numeric" maxlength="1" value="${esc(S.years)}"></label>
         </div>
         ${meritBest() && String(meritBest()) === String(S.score) ? `<p class="small muted" style="margin:6px 0 0">${tx("Filled in from the best practice test logged on My progress.", "আমার অগ্রগতিতে লেখা সেরা প্র্যাকটিস টেস্টের স্কোর বসানো হয়েছে।")}</p>` : ""}
         <div class="err" id="mcErr" role="alert"></div></div>
       ${S.schools.map((sc, si) => `<div class="box mc-school">
-        <div class="mc-head"><label class="fld" style="flex:1"><span>${tx("College", "কলেজ")} ${si + 1} <span class="muted" style="font-weight:400">${tx("(name optional, for your comparison)", "(নাম ঐচ্ছিক, তুলনার জন্য)")}</span></span><input data-name="${si}" maxlength="60" value="${esc(sc.name)}" placeholder="${tx("College name", "কলেজের নাম")}"></label>
+        <div class="mc-head"><label class="fld" style="flex:1"><span>${tx("College", "কলেজ")} ${si + 1}</span>
+          <select data-pick="${si}">
+            <option value="">${tx("Choose a college…", "একটি কলেজ বেছে নিন…")}</option>
+            <optgroup label="${tx("Ivy League", "আইভি লিগ")}">${MERIT_PICK.ivy.map(n => `<option${sc.name === n ? " selected" : ""}>${esc(n)}</option>`).join("")}</optgroup>
+            <optgroup label="${tx("Other top colleges", "অন্যান্য শীর্ষ কলেজ")}">${MERIT_PICK.top.map(n => `<option${sc.name === n ? " selected" : ""}>${esc(n)}</option>`).join("")}</optgroup>
+            <option value="__other"${otherOn(sc) ? " selected" : ""}>${tx("Another college (type its name)", "অন্য কলেজ (নাম লিখুন)")}</option>
+          </select></label>
           ${S.schools.length > 1 ? `<button class="linkbtn" data-dels="${si}">${tx("Remove", "মুছুন")}</button>` : ""}</div>
+        <label class="fld mc-other" id="mcOther${si}"${otherOn(sc) ? "" : " hidden"} style="margin-top:8px"><span>${tx("College name", "কলেজের নাম")} <span class="muted" style="font-weight:400">${tx("(optional, for your comparison)", "(ঐচ্ছিক, তুলনার জন্য)")}</span></span><input data-name="${si}" maxlength="60" value="${esc(sc.name)}" placeholder="${tx("Type the college's name", "কলেজের নাম লিখুন")}"></label>
         <div class="mc-info" id="mcInfo${si}"></div>
+        <div class="mc-tiers" id="mcTiers${si}">
         <p class="small muted" style="margin:10px 0 4px">${tx("One row per step in the college's merit chart.", "কলেজের চার্টের প্রতিটি ধাপের জন্য একটি সারি।")}</p>
         ${sc.tiers.map((t, ti) => tierRow(si, ti, t)).join("")}
-        <button class="btn small ghost" data-addt="${si}">${tx("Add a step", "আরেকটি ধাপ যোগ করুন")}</button>
+        <button class="btn small ghost" data-addt="${si}">${tx("Add a step", "আরেকটি ধাপ যোগ করুন")}</button></div>
         <div class="mc-out" id="mcOut${si}" aria-live="polite"></div></div>`).join("")}
       <div class="ractions">
         ${S.schools.length < 3 ? `<button class="btn ghost" id="mcAdd">${tx("Add another college", "আরেকটি কলেজ যোগ করুন")}</button>` : ""}
@@ -8516,11 +8569,24 @@ function renderMeritCalc(el){
   };
 
   const info = si => {
-    const box = $("#mcInfo" + si); if(!box) return;
-    const name = (S.schools[si].name || "").trim(), c = meritLookup(name);
+    const sc = S.schools[si], box = $("#mcInfo" + si), rows = $("#mcTiers" + si); if(!box) return;
+    const name = (sc.name || "").trim(), c = meritLookup(name);
+    if(rows) rows.hidden = !!c && !sc.force;
     if(c){
-      const chart = tx("This college doesn't publish an automatic score chart, so there are no steps to enter.", "এই কলেজ কোনো স্বয়ংক্রিয় স্কোর চার্ট প্রকাশ করে না, তাই কোনো ধাপ লেখার নেই।");
-      box.innerHTML = `<p class="mc-note"><span class="mc-tag mc-${c.k}">${bn ? MERIT_KIND[c.k].bn : MERIT_KIND[c.k].en}</span> ${esc(bn ? c.bn : c.en)} ${chart}${c.url ? ` <a href="${c.url}" target="_blank" rel="noopener">${tx("Official page", "অফিসিয়াল পেজ")} ↗</a>` : ""}</p>`;
+      const head = {
+        need: tx("This college gives need-based aid only. It has no merit scholarships, so there's no chart to enter.", "এই কলেজ শুধু প্রয়োজনভিত্তিক সহায়তা দেয়। কোনো মেধা বৃত্তি নেই, তাই কোনো চার্ট লেখার নেই।"),
+        auto: tx("This college doesn't publish a score chart. Its merit awards are decided by reviewing the whole application.", "এই কলেজ কোনো স্কোর চার্ট প্রকাশ করে না। পুরো আবেদন মূল্যায়ন করে মেধা বৃত্তি দেওয়া হয়।"),
+        apply: tx("This college doesn't publish a score chart. Its biggest awards need a separate application or nomination.", "এই কলেজ কোনো স্কোর চার্ট প্রকাশ করে না। এর সবচেয়ে বড় বৃত্তির জন্য আলাদা আবেদন বা মনোনয়ন লাগে।"),
+        few: tx("This college doesn't publish a score chart and offers very little merit aid.", "এই কলেজ কোনো স্কোর চার্ট প্রকাশ করে না এবং খুব কম মেধা বৃত্তি দেয়।")
+      }[c.k];
+      const nov = /November 1/.test(c.en) ? `<br>${tx("Apply by November 1 to be considered.", "বিবেচিত হতে ১ নভেম্বরের মধ্যে আবেদন করুন।")}` : "";
+      box.innerHTML = `<div class="mc-note"><span class="mc-tag mc-${c.k}">${bn ? MERIT_KIND[c.k].bn : MERIT_KIND[c.k].en}</span>
+        <p style="margin:6px 0 0"><strong>${head}${nov}</strong></p>
+        <details class="mc-more"><summary>${tx("Details", "বিস্তারিত")}</summary><p>${esc(bn ? c.bn : c.en)}${c.url ? ` <a href="${c.url}" target="_blank" rel="noopener">${tx("Official page", "অফিসিয়াল পেজ")} ↗</a>` : ""}</p></details>
+        <p class="small" style="margin:8px 0 0">${sc.force ? `${tx("You're entering a chart anyway.", "আপনি তবুও চার্ট লিখছেন।")} <button class="linkbtn" data-unforce="1">${tx("Hide the chart boxes", "চার্টের ঘরগুলো লুকান")}</button>` : `<button class="linkbtn" data-force="1">${tx("This college has a chart? Enter it anyway", "এই কলেজের চার্ট আছে? তবুও লিখুন")}</button>`}</p></div>`;
+      const fb = box.querySelector("[data-force]"), ub = box.querySelector("[data-unforce]");
+      if(fb) fb.onclick = () => { sc.force = true; save(); calc(); };
+      if(ub) ub.onclick = () => { sc.force = false; save(); calc(); };
     } else if(name.length >= 3){
       box.innerHTML = `<p class="small" style="margin:8px 0 0"><a href="https://www.google.com/search?q=${encodeURIComponent(name + " automatic merit scholarship chart")}" target="_blank" rel="noopener">${tx("Find this college's merit chart", "এই কলেজের মেধা বৃত্তির চার্ট খুঁজুন")} ↗</a> <span class="muted">${tx("Use the college's own website, not a third-party list.", "তৃতীয় পক্ষের তালিকা নয়, কলেজের নিজস্ব ওয়েবসাইট ব্যবহার করুন।")}</span></p>`;
     } else box.innerHTML = "";
@@ -8535,6 +8601,7 @@ function renderMeritCalc(el){
     const best = [];
     S.schools.forEach((sc, si) => {
       const out = $("#mcOut" + si); if(!out) return;
+      if(meritLookup(sc.name) && !sc.force){ out.innerHTML = ""; return; }
       const name = sc.name.trim() || tx(`College ${si + 1}`, `কলেজ ${si + 1}`);
       if(!ok){ out.innerHTML = ""; return; }
       const r = meritCalc(sc, score, gpa, years);
@@ -8567,6 +8634,14 @@ function renderMeritCalc(el){
     $("#mcGpa").oninput = e => { e.target.value = num(e.target.value, 1); S.gpa = e.target.value; save(); calc(); };
     $("#mcYears").oninput = e => { e.target.value = num(e.target.value); S.years = e.target.value; save(); calc(); };
     el.querySelectorAll("[data-name]").forEach(i => i.oninput = () => { S.schools[+i.dataset.name].name = i.value; save(); calc(); });
+    el.querySelectorAll("[data-pick]").forEach(sel => sel.onchange = () => {
+      const si = +sel.dataset.pick, sc = S.schools[si], box = $("#mcOther" + si), inp = box && box.querySelector("input"), v = sel.value;
+      sc.force = false;
+      if(v === "__other"){ sc.other = true; if(MERIT_PICK_ALL.includes(sc.name)) sc.name = ""; if(box){ box.hidden = false; inp.value = sc.name; inp.focus(); } }
+      else { sc.other = false; sc.name = v; if(box){ box.hidden = true; inp.value = v; } }
+      track("merit-pick", { college: v === "__other" ? "other" : v ? "listed" : "none" });
+      save(); calc();
+    });
     el.querySelectorAll(".mc-tier input").forEach(i => i.oninput = () => {
       const row = i.closest(".mc-tier"), f = i.dataset.f; i.value = num(i.value, f === "gpa");
       S.schools[+row.dataset.si].tiers[+row.dataset.ti][f] = i.value; save(); calc(); });
@@ -8600,7 +8675,8 @@ function wireFooter(){
   }
   document.querySelectorAll("[data-page]").forEach(b => b.onclick = () => openPage(b.dataset.page, b));
   const fc = document.getElementById("footContact");
-  if(fc) fc.innerHTML = SITE.email ? `<a class="linkbtn" href="mailto:${SITE.email}">Contact</a>` : "";
+  if(fc && !fc.dataset.wired){ fc.dataset.wired = "1"; fc.innerHTML = `<button class="linkbtn" data-page="contact">Contact</button>`;
+    const b = fc.querySelector("button"); b.onclick = () => openPage("contact", b); }
 }
 let firstRender = true;
 const FEATURED = [
