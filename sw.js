@@ -2,7 +2,7 @@
    Network first: visitors always get the newest version when they're online,
    and the last saved copy when they're offline or on a weak connection.
    When you upload a new index.html, change VERSION below so old saved copies are cleared. */
-const VERSION = "openshelf-v1";
+const VERSION = "openshelf-v19";
 const FILES = ["./", "index.html", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png"];
 
 self.addEventListener("install", e => {
