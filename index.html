@@ -4,17 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OpenShelf: step-by-step math, SAT practice and college planning</title>
-<meta name="description" content="Free step-by-step practice for Algebra 1, Geometry, Algebra 2 and the SAT, with an instructor that guides every problem, plus progress reports and college admissions planning tools. No sign-up.">
+<meta name="description" content="Free SAT practice and mock tests, step-by-step math from Algebra 1 to Statistics, and college planning tools for students and parents. No sign-up.">
 <meta name="theme-color" content="#172033">
 <link rel="canonical" href="https://myopenshelf.org/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="OpenShelf">
 <meta property="og:title" content="OpenShelf: Learning made easy. Open to all.">
-<meta property="og:description" content="Free step-by-step practice for Algebra 1, Geometry, Algebra 2 and the SAT, with an instructor that guides every problem, plus progress reports and college admissions planning tools. No sign-up.">
+<meta property="og:description" content="Free SAT practice and mock tests, step-by-step math from Algebra 1 to Statistics, and college planning tools for students and parents. No sign-up.">
 <meta property="og:url" content="https://myopenshelf.org/">
 <meta property="og:image" content="https://myopenshelf.org/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="OpenShelf logo with the words: Learning made easy. Open to all. Free SAT practice, step-by-step math and college planning.">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -73,6 +74,19 @@ button,input{font:inherit;color:inherit}
 .mc-out{margin-top:12px}
 .mc-other[hidden], .mc-tiers[hidden]{display:none !important}
 .contactmail{font-size:1.15rem;margin:0 0 12px;word-break:break-all}
+.sgtop{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.sgtop .sgicon{color:var(--c-apply);flex:none}
+/* the row under the header: language switch on the left; on phones, the Suggestion box button on the right */
+.sgrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 0}
+.sgrow .langsw{margin:0}
+.sgrow + main .hero{padding-top:14px}
+.sg-narrow{display:none}
+@media (max-width:599px){ .sg-wide{display:none} .sg-narrow{display:inline-flex} .sgrow{margin-top:-4px} .sgrow .sgtop{padding:4px 10px;font-size:.85rem} .sgrow .sgicon{width:16px;height:16px} }
+@media (max-width:374px){ .sgrow{gap:6px} .sgrow .langsw button{padding:5px 9px;font-size:.8rem} .sgrow .sgtop{padding:3px 8px;font-size:.8rem;gap:4px} .sgrow .sgicon{width:14px;height:14px} }
+@media (max-width:339px){ .sgrow{gap:4px} .sgrow .langsw button{padding:5px 7px} .sgrow .sgtop{padding:3px 7px} }
+#footContact{display:contents}   /* its Contact and Suggestion box links space out like the other footer links */
+#sgMsg{width:100%;min-height:150px;padding:11px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);font:inherit;font-size:1rem;line-height:1.5;color:var(--ink);resize:vertical}
+#sgMsg:focus{outline:2px solid var(--accent);outline-offset:1px}
 a.btn{text-decoration:none}
 .mc-how{margin:8px 0 6px;padding-left:22px} .mc-how li{margin:4px 0}
 .mc-more summary{cursor:pointer;font-size:.85rem;margin-top:8px;color:var(--accent)} .mc-more p{font-size:.85rem;margin:6px 0 0}
@@ -300,7 +314,8 @@ details.more summary{cursor:pointer;font-weight:650}
 .stepin input{flex:1;min-width:0;padding:11px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);font-size:1.0625rem}
 .stepin input:focus{outline:none;border-color:var(--accent)}
 .fb{font-size:.9375rem;margin-top:8px;min-height:1.2em}
-.steptools{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px}
+.steptools{display:flex;gap:6px 16px;flex-wrap:wrap;margin-top:10px;font-size:.95rem}
+.qlabel{margin:0 0 4px;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .qopt.sel{box-shadow:inset 0 0 0 2px var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--paper))}
 .tiplist{margin:6px 0 10px;padding-left:20px}
 .tiplist li{margin-bottom:6px}
@@ -659,14 +674,15 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
       <span class="logo-name">OpenShelf<span class="beta">Beta</span></span>
     </button>
     <div class="hright">
+      <button class="btn ghost small sgtop sg-wide" aria-label="Suggestion box: send us an idea or question"><svg class="sgicon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2V17h5v-1.2c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3z"/></svg><span>Suggestion box</span></button>
       <button class="btn ghost small tsize" id="tsize"><span class="a1" aria-hidden="true">A</span><span class="a2" aria-hidden="true">A</span></button>
       <div id="headerAct"></div>
     </div>
   </header>
+  <div class="sgrow"><div class="langsw" role="group" aria-label="Language" data-noi18n><button data-lang="en" lang="en">English</button><button data-lang="bn" lang="bn">বাংলা</button></div><button class="btn ghost small sgtop sg-narrow" aria-label="Suggestion box: send us an idea or question"><svg class="sgicon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2V17h5v-1.2c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3z"/></svg><span>Suggestion box</span></button></div>
 
   <main>
     <section class="hero">
-      <div class="langsw" role="group" aria-label="Language" data-noi18n><button data-lang="en" lang="en">English</button><button data-lang="bn" lang="bn">বাংলা</button></div>
       <h1>Learning made easy. <span class="h1b">Open to all.</span></h1>
       <p class="subhead"><span class="sh sh-math">Math</span><span class="shdot" aria-hidden="true">•</span><span class="sh sh-sat">SAT practice</span><span class="shdot" aria-hidden="true">•</span><span class="sh sh-col">College planning</span></p>
       <div class="qticker" id="qticker"></div>
@@ -1541,6 +1557,16 @@ const BN = {
   "Pace":"গতি", "This week":"এই সপ্তাহ", "Official practice tests":"অফিশিয়াল প্র্যাকটিস টেস্ট",
   "Log scores from full-length practice tests in College Board's free Bluebook app. These are the most reliable way to track real SAT progress.":"College Board-এর বিনামূল্যের Bluebook অ্যাপে দেওয়া পূর্ণ প্র্যাকটিস টেস্টের স্কোর এখানে লিখে রাখুন। প্রকৃত SAT অগ্রগতি বোঝার সবচেয়ে নির্ভরযোগ্য উপায় এটিই।",
   "Beta":"বেটা",
+  "Suggestion box":"পরামর্শ বাক্স", "Ideas, questions, or something that isn't working? Tell us here. We read every message.":"কোনো ধারণা, প্রশ্ন, বা কিছু কাজ করছে না? এখানে জানান। আমরা প্রতিটি বার্তা পড়ি।",
+  "What kind of message is this?":"এটি কী ধরনের বার্তা?", "Suggestion":"পরামর্শ", "Other":"অন্যান্য",
+  "I'm a…":"আমি একজন…", "Prefer not to say":"বলতে চাই না", "Student":"শিক্ষার্থী", "Parent":"অভিভাবক", "Tutor or teacher":"টিউটর বা শিক্ষক",
+  "Your message":"আপনার বার্তা", "Your email":"আপনার ইমেইল", "Send with my email app":"আমার ইমেইল অ্যাপ দিয়ে পাঠান", "Send with Gmail ↗":"Gmail দিয়ে পাঠান ↗", "Copy message":"বার্তা কপি করুন",
+  "Have an idea or a question?":"কোনো ধারণা বা প্রশ্ন আছে?",
+  "Please write a short message first.":"আগে একটি ছোট বার্তা লিখুন।",
+  "That email address doesn't look complete. Fix it or leave it blank.":"ইমেইল ঠিকানাটি সম্পূর্ণ মনে হচ্ছে না। ঠিক করুন বা খালি রাখুন।",
+  "Hint":"ইঙ্গিত", "Show step":"ধাপটি দেখান", "Explain (shows answer)":"ব্যাখ্যা (উত্তরসহ)", "Skip to choices":"সরাসরি উত্তর বাছাইয়ে যান",
+  "Solve it one step at a time: type your answer and tap Check.":"এক ধাপ এক ধাপ করে সমাধান করুন: উত্তর লিখে Check চাপুন।",
+  "Question":"প্রশ্ন", "· unlock after the steps":"· ধাপগুলো শেষ হলে খুলবে",
   "Questions, suggestions, or a mistake to report? We'd love to hear from you.":"প্রশ্ন, পরামর্শ, বা কোনো ভুল জানাতে চান? আপনার কথা শুনতে আমরা আগ্রহী।",
   "Email":"ইমেইল", "Email us":"আমাদের ইমেইল করুন", "Copy email address":"ইমেইল ঠিকানা কপি করুন",
   "If “Email us” doesn't open your email app, which can happen inside apps like Messenger or WhatsApp, use “Open in Gmail,” or copy the address and paste it into any email app.":"“আমাদের ইমেইল করুন” চাপলে যদি ইমেইল অ্যাপ না খোলে (Messenger বা WhatsApp-এর ভেতরে এমন হতে পারে), “Gmail-এ খুলুন” ব্যবহার করুন, অথবা ঠিকানাটি কপি করে যেকোনো ইমেইল অ্যাপে পেস্ট করুন।", "Open in Gmail ↗":"Gmail-এ খুলুন ↗",
@@ -6143,6 +6169,7 @@ function renderPractice(el){
     const it = sess.items[sess.i], q = localQ(it.q, it), N = sess.items.length;
     if(!it.t0) it.t0 = Date.now();
     const guidedMath = sess.mode === "guided" && isStepSec(q.sec) && !!(q.steps && q.steps.length);
+    if(guidedMath && (sess.i > 0 || it.stepLog.length || it.locked)) store.set("os_gpIntro", 1);   /* the welcome line has been seen */
     const guidedRW = sess.mode === "guided" && q.sec === "rw";
     const choicesOpen = !guidedMath || it.stepsDone || it.skipped;
     const instantCheck = sess.mode === "guided" && !guidedMath;          /* Reading & Writing (and any math without steps) */
@@ -6154,6 +6181,8 @@ function renderPractice(el){
       ? `<div class="ideabar"><button class="btn ghost small" id="probIdea" aria-expanded="${!!it.idea}" aria-controls="ideaCard">${it.idea ? "Hide the explanation" : `<span>📘 Explain this problem</span><span class="ideaskill">${it.locked ? "Full walkthrough, including why each choice is right or wrong" : "Full walkthrough with the answer. Opening it now counts as help."}</span>`}</button></div>${it.idea ? mathProblemHTML(it.q, it) : ""}`
       : sess.mode === "guided" && MATH_CARDS[mskill]
       ? `<div class="ideabar"><button class="btn ghost small" id="rwIdea" aria-expanded="${!!it.idea}" aria-controls="ideaCard">${it.idea ? "Hide the idea" : `<span>📘 Explain the idea</span><span class="ideaskill">${MATH_SKILL_NAMES[mskill]}</span>`}</button></div>${it.idea ? rwCardHTML(mskill) : ""}` : "";
+    /* While solving, "Explain this problem" is a short link in the help row; the full card opens below when tapped. */
+    const explainLink = pcard && !it.locked && !it.idea ? `<button class="linkbtn" id="probIdea" aria-expanded="false" aria-controls="ideaCard">Explain (shows answer)</button>` : "";
     let coach = "";
     if(guidedMath && !it.locked){
       const done = it.stepLog.map((st, k) => {
@@ -6169,8 +6198,7 @@ function renderPractice(el){
           : `<div class="qopts" style="margin-top:8px">${s.c.map((c, j) => `<button class="qopt stepopt" data-j="${j}">${c}</button>`).join("")}</div>`;
         current = `<div class="step now"><p class="small" style="margin:0"><strong>Step ${it.si+1} of ${q.steps.length}</strong></p><p style="margin:4px 0 0">${s.p}</p>${input}
           <div id="stepFb" class="fb" aria-live="polite">${it.fb}</div>
-          <div class="steptools"><button class="linkbtn" id="stepHint">Give me a hint</button><button class="linkbtn" id="stepShow">Show me this step</button></div></div>
-          <p style="margin:12px 0 0"><button class="linkbtn" id="stepSkip">I can solve it myself; take me to the answer choices</button></p>`;
+          <div class="steptools"><button class="linkbtn" id="stepHint">Hint</button><button class="linkbtn" id="stepShow">Show step</button>${explainLink}<button class="linkbtn" id="stepSkip">Skip to choices</button></div></div>`;
       } else if(it.stepsDone){
         current = `<p class="coachsay" style="margin-top:12px">${it.stepLog.every(x => x === "solved") ? "Excellent, you solved every step on your own!" : "Nice work getting through every step."} Now pick the answer choice that matches your result.</p>`;
       } else {
@@ -6178,8 +6206,8 @@ function renderPractice(el){
       }
       coach = `<div class="coach" aria-label="Instructor">
         <div class="coach-h"><span class="coach-av" aria-hidden="true">✎</span><strong>Your instructor</strong></div>
-        ${it.si === 0 && !it.stepLog.length && !it.skipped ? `<p class="coachsay">Let's solve this together, one step at a time. Type your answer for each step and tap Check. Stuck? Ask for a hint.</p>` : ""}
-        ${done}${current}${mathIdea}</div>`;
+        ${it.si === 0 && !it.stepLog.length && !it.skipped && !store.get("os_gpIntro", 0) ? `<p class="coachsay">Solve it one step at a time: type your answer and tap Check.</p>` : ""}
+        ${done}${current}${explainLink && (it.stepsDone || it.skipped) ? `<div class="steptools">${explainLink}</div>` : ""}${explainLink ? "" : mathIdea}</div>`;
     }
 
     let rwCoach = "";
@@ -6213,10 +6241,10 @@ function renderPractice(el){
       <div class="pqhead"><span class="small muted">${sess.label ? esc(sess.label) + " · " : ""}Question ${sess.i + 1} of ${N}${(sess.streak || 0) >= 2 && sess.mode === "guided" ? ` <span class="streak" title="Correct answers in a row">🔥 ${sess.streak} in a row</span>` : ""}</span><span class="pqtools">${soundBtn("gpSound")}<button class="linkbtn" id="gpEnd">End and see results</button></span></div>
       <div class="bar" style="margin:6px 0 16px"><i style="width:${sess.i / N * 100}%;background:var(--c-sat)"></i></div>
       <div class="meta"><span class="mcat" style="color:var(--c-sat)">${SEC_SHORT[q.sec] || "Math"}</span><span>${PQ_DOMAINS[q.dom]}</span>${isCourse(q.sec) ? "" : `<span class="diff-${q.diff.toLowerCase()}">${q.diff}</span>`}</div>
-      ${it.q.bn ? (() => { const cur = it.lang || qLang(); return `<div class="qlangsw" role="group" aria-label="Question language" data-noi18n><span class="qlangl" aria-hidden="true">${cur === "bn" ? "প্রশ্নের ভাষা" : "Question language"}</span><button data-ql="en" lang="en" aria-pressed="${cur === "en"}">English</button><button data-ql="bn" lang="bn" aria-pressed="${cur === "bn"}">বাংলা</button></div>`; })() : ""}<div class="pqstem">${q.q}</div>
+      ${it.q.bn ? (() => { const cur = it.lang || qLang(); return `<div class="qlangsw" role="group" aria-label="Question language" data-noi18n><span class="qlangl" aria-hidden="true">${cur === "bn" ? "প্রশ্নের ভাষা" : "Question language"}</span><button data-ql="en" lang="en" aria-pressed="${cur === "en"}">English</button><button data-ql="bn" lang="bn" aria-pressed="${cur === "bn"}">বাংলা</button></div>`; })() : ""}${guidedMath ? `<p class="qlabel">Question</p>` : ""}<div class="pqstem">${q.q}</div>
       ${coach}
       ${rwCoach}
-      ${guidedMath && !choicesOpen ? `<p class="small muted" style="margin:16px 0 6px">Answer choices unlock after the steps.</p>` : `<p class="small" style="margin:16px 0 6px"><strong>Answer choices</strong></p>`}
+      ${guidedMath && !choicesOpen ? `<p class="small" style="margin:16px 0 6px"><strong>Answer choices</strong> <span class="muted">· unlock after the steps</span></p>` : `<p class="small" style="margin:16px 0 6px"><strong>Answer choices</strong></p>`}
       <div class="qopts" role="group" aria-label="Answer choices">${q.o.map((o, j) => {
         let cls = "qopt";
         if(showResult){ if(j === q.a) cls += " right"; else if(j === it.choice) cls += " wrong"; }
@@ -8334,6 +8362,61 @@ function deleteAllData(){
   Object.keys(mem).forEach(k => delete mem[k]);
 }
 const PAGES = {
+  suggest: { title:"Suggestion box", render: el => {
+    /* No server: the form prepares an email to SITE.email that the visitor sends from their own email app or Gmail. */
+    const mail = SITE.email, MAXLEN = 1500;
+    const kinds = [["suggestion", "Suggestion"], ["question", "Question"], ["problem", "Report a problem"], ["other", "Other"]];
+    const roles = [["", "Prefer not to say"], ["student", "Student"], ["parent", "Parent"], ["tutor", "Tutor or teacher"], ["other", "Other"]];
+    const draft = store.get("os_suggest", null) || { kind:"suggestion", role:"", msg:"", reply:"" };
+    el.innerHTML = `
+      <h1>Suggestion box</h1>
+      <p>Ideas, questions, or something that isn't working? Tell us here. We read every message.</p>
+      <div class="box">
+        <p class="small" style="margin:0 0 6px"><strong>What kind of message is this?</strong></p>
+        <div class="chips" role="radiogroup" aria-label="Message type">${kinds.map(([v, l]) => `<button class="chip" role="radio" data-sk="${v}" aria-checked="${draft.kind === v}" aria-pressed="${draft.kind === v}">${l}</button>`).join("")}</div>
+        <label class="fld" style="margin-top:14px"><span>I'm a… <span class="muted" style="font-weight:400">(optional)</span></span>
+          <select id="sgRole">${roles.map(([v, l]) => `<option value="${v}"${draft.role === v ? " selected" : ""}>${l}</option>`).join("")}</select></label>
+        <label class="fld" style="margin-top:14px"><span>Your message</span>
+          <textarea id="sgMsg" rows="6" maxlength="${MAXLEN}" placeholder="Type your suggestion or question here.">${esc(draft.msg)}</textarea></label>
+        <p class="small muted" id="sgCount" style="margin:4px 0 0;text-align:right"></p>
+        <label class="fld" style="margin-top:10px"><span>Your email <span class="muted" style="font-weight:400">(optional, only if you'd like a reply)</span></span>
+          <input id="sgReply" type="email" inputmode="email" autocomplete="email" maxlength="120" value="${esc(draft.reply)}" placeholder="name@example.com"></label>
+        <div class="err" id="sgErr" role="alert"></div>
+        <div class="ractions" style="margin-top:14px">
+          <button class="btn" id="sgMailApp">Send with my email app</button>
+          <button class="btn ghost" id="sgGmail">Send with Gmail ↗</button>
+          <button class="btn ghost" id="sgCopy">Copy message</button>
+        </div>
+        <p class="small muted" style="margin-top:10px">Your email app or Gmail opens with the message ready; just press send. If neither opens, which can happen inside apps like Messenger or WhatsApp, tap “Copy message” and email it to <strong>${esc(mail)}</strong>.</p>
+      </div>
+      <p class="small muted">Please don't include private details like a student's full name, school or progress code. Messages go to ${esc(mail)} and are used only to improve ${SITE.name}.</p>`;
+    const kindOf = () => (el.querySelector('[data-sk][aria-checked="true"]') || {}).dataset?.sk || "suggestion";
+    const save = () => store.set("os_suggest", { kind:kindOf(), role:$("#sgRole").value, msg:$("#sgMsg").value, reply:$("#sgReply").value.trim() });
+    const count = () => { $("#sgCount").textContent = `${$("#sgMsg").value.length} / ${MAXLEN}`; };
+    el.querySelectorAll("[data-sk]").forEach(b => b.onclick = () => { el.querySelectorAll("[data-sk]").forEach(x => { x.setAttribute("aria-checked", x === b); x.setAttribute("aria-pressed", x === b); }); save(); });
+    $("#sgRole").onchange = save; $("#sgMsg").oninput = () => { count(); save(); }; $("#sgReply").oninput = save; count();
+    const compose = () => {
+      const msg = $("#sgMsg").value.trim(), reply = $("#sgReply").value.trim(), err = $("#sgErr"); err.textContent = "";
+      if(msg.length < 5){ err.textContent = "Please write a short message first."; $("#sgMsg").focus(); return null; }
+      if(reply && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(reply)){ err.textContent = "That email address doesn't look complete. Fix it or leave it blank."; $("#sgReply").focus(); return null; }
+      const kindLabel = kinds.find(k => k[0] === kindOf())[1], role = roles.find(r => r[0] === $("#sgRole").value);
+      const subject = `${SITE.name} ${kindLabel.toLowerCase()}`;
+      const body = `${msg}\n\n---\nType: ${kindLabel}${role && role[0] ? `\nFrom: ${role[1]}` : ""}${reply ? `\nReply to: ${reply}` : ""}\nSent from the ${SITE.name} suggestion box`;
+      track("suggest-send", { kind:kindOf() });
+      return { subject, body };
+    };
+    $("#sgMailApp").onclick = () => { const c = compose(); if(c) location.href = `mailto:${mail}?subject=${encodeURIComponent(c.subject)}&body=${encodeURIComponent(c.body)}`; };
+    $("#sgGmail").onclick = () => { const c = compose(); if(c) window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(mail)}&su=${encodeURIComponent(c.subject)}&body=${encodeURIComponent(c.body)}`, "_blank", "noopener"); };
+    $("#sgCopy").onclick = async () => {
+      const c = compose(); if(!c) return;
+      const text = `To: ${mail}\nSubject: ${c.subject}\n\n${c.body}`; let ok = false;
+      try{ await navigator.clipboard.writeText(text); ok = true; }catch(e){
+        try{ const t = document.createElement("textarea"); t.value = text; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0"; document.body.appendChild(t); t.select(); ok = document.execCommand("copy"); t.remove(); }catch(e2){}
+      }
+      $("#sgCopy").textContent = ok ? "Copied ✓" : "Copy message";
+      toast(ok ? `Message copied. Paste it into an email to ${mail}.` : "Copy didn't work here. Select your message and copy it.");
+    };
+  } },
   contact: { title:"Contact", render: el => {
     const mail = SITE.email;
     el.innerHTML = `
@@ -8343,11 +8426,14 @@ const PAGES = {
         <p class="contactmail"><strong>${esc(mail)}</strong></p>
         <div class="ractions"><a class="btn" href="mailto:${mail}?subject=${encodeURIComponent(SITE.name + " question")}">Email us</a><a class="btn ghost" href="https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(mail)}&su=${encodeURIComponent(SITE.name + " question")}" target="_blank" rel="noopener" id="gmLink">Open in Gmail ↗</a><button class="btn ghost" id="cpEmail">Copy email address</button></div>
         <p class="small muted" style="margin-top:10px">If “Email us” doesn't open your email app, which can happen inside apps like Messenger or WhatsApp, use “Open in Gmail,” or copy the address and paste it into any email app.</p></div>` : `<p class="muted">Contact details coming soon.</p>`}
+      <div class="box"><h2>Have an idea or a question?</h2>
+        <p>Use the <button class="linkbtn" id="toSuggest">Suggestion box</button>. It writes the email for you; just press send.</p></div>
       <div class="box"><h2>Found a mistake in a question?</h2>
         <p>Tap <strong>Report a problem</strong> under that question. It opens an email that already includes the question number, so the mistake can be found and fixed quickly.</p></div>
       <div class="box"><h2>What to expect</h2>
         <p>${SITE.name} is a small, free project in beta, so replies may take a few days. Please don't include personal details you don't need to share, like a student's full name or school.</p></div>`;
     const gm = el.querySelector("#gmLink"); if(gm) gm.addEventListener("click", () => track("contact-gmail"));
+    const ts = el.querySelector("#toSuggest"); if(ts) ts.onclick = () => openPage("suggest", ts);
     const cp = el.querySelector("#cpEmail");
     if(cp) cp.onclick = async () => {
       let ok = false;
@@ -8675,8 +8761,8 @@ function wireFooter(){
   }
   document.querySelectorAll("[data-page]").forEach(b => b.onclick = () => openPage(b.dataset.page, b));
   const fc = document.getElementById("footContact");
-  if(fc && !fc.dataset.wired){ fc.dataset.wired = "1"; fc.innerHTML = `<button class="linkbtn" data-page="contact">Contact</button>`;
-    const b = fc.querySelector("button"); b.onclick = () => openPage("contact", b); }
+  if(fc && !fc.dataset.wired){ fc.dataset.wired = "1"; fc.innerHTML = `<button class="linkbtn" data-page="contact">Contact</button><button class="linkbtn" data-page="suggest">Suggestion box</button>`;
+    fc.querySelectorAll("button").forEach(b => b.onclick = () => openPage(b.dataset.page, b)); }
 }
 let firstRender = true;
 const FEATURED = [
@@ -8710,6 +8796,7 @@ function renderFeatured(){
   }).join("");
   row.querySelectorAll("[data-feat]").forEach(b => b.onclick = () => { track("featured-guide", { guide:b.dataset.feat }); openLesson(b.dataset.feat, b); });
 }
+document.addEventListener("click", e => { const b = e.target.closest(".sgtop"); if(b){ track("suggest-open", { from:"header" }); openPage("suggest", b); } });
 function renderAll(){ if(firstRender){ firstRender = false; ANALYTICS.load(); noteVisitDay(); initLanguage(); } wireFooter(); renderFeatured(); renderQTicker(); renderNudges(); storageWorks(); updateStorageNote(); renderHeader(); renderToolsSection(); renderShelf(); renderChips(); renderResults(); renderMember(); }
 renderAll();
 </script>
