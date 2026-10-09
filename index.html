@@ -84,6 +84,8 @@ button,input{font:inherit;color:inherit}
 @media (max-width:339px){ .sgrow{gap:4px} .sgrow .langsw button{padding:5px 7px} .sgrow .sgtop{padding:3px 7px} }
 #footContact{display:contents}
 #printArea{display:none}
+.mockrow{padding:10px 0;border-top:1px solid var(--line)} .mockrow:first-of-type{border-top:0;padding-top:0}
+.mockrow .up{color:var(--c-ok)} .mockrow .down{color:var(--c-warn)}
 .plantabs{display:flex;gap:6px;margin:14px 0 2px;border-bottom:1.5px solid var(--line)}
 .plantab{flex:1;padding:10px 8px;border:0;background:none;font:inherit;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1.5px;cursor:pointer}
 .plantab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--c-sat)}
@@ -699,7 +701,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=39"></script>
+<script src="questions.js?v=42"></script>
 <script>
 const CATS = [
 { id: "schools", label: "Schools & aid",  h: 180 },
@@ -1426,7 +1428,7 @@ const BN = {
 "What kind of message is this?":"এটি কী ধরনের বার্তা?", "Suggestion":"পরামর্শ", "Other":"অন্যান্য",
 "I'm a…":"আমি একজন…", "Prefer not to say":"বলতে চাই না", "Student":"শিক্ষার্থী", "Parent":"অভিভাবক", "Tutor or teacher":"টিউটর বা শিক্ষক",
 "Your message":"আপনার বার্তা", "Your email":"আপনার ইমেইল", "Send with my email app":"আমার ইমেইল অ্যাপ দিয়ে পাঠান", "Send with Gmail ↗":"Gmail দিয়ে পাঠান ↗", "Copy message":"বার্তা কপি করুন",
-"Have an idea or a question?":"কোনো ধারণা বা প্রশ্ন আছে?",
+"Have an idea or a question?":"কোনো ধারণা বা প্রশ্ন আছে?", "Clear form":"ফর্ম মুছুন",
 "Your message is ready":"আপনার বার্তা প্রস্তুত", "To":"প্রাপক", "Subject":"বিষয়", "Message":"বার্তা", "Copy":"কপি",
 "Open your email, then copy each part into the matching field. If a Copy button doesn't work, press and hold the text to select it.":"আপনার ইমেইল খুলুন, তারপর প্রতিটি অংশ কপি করে মিল রেখে ঘরে বসান। কোনো কপি বোতাম কাজ না করলে লেখাটি চেপে ধরে নির্বাচন করুন।",
 "Please write a short message first.":"আগে একটি ছোট বার্তা লিখুন।",
@@ -3111,19 +3113,51 @@ el.dataset.en = want === "en" && I18N.lang === "bn" ? "1" : "";
 el.dataset.bn = want === "bn" && I18N.lang !== "bn" ? "1" : "";
 if(want !== I18N.lang) el.setAttribute("lang", want); else el.removeAttribute("lang");
 }
+const skillOf = q => q.sec === "math" ? mathSkill(q) : q.sec === "rw" ? rwSkill(q) : null;
+const skillName = k => (k && (MATH_SKILL_NAMES[k] || RW_SKILL_NAMES[k])) || "";
 function missedPlan(rows){            /* rows: [{ q, ok }] for answered/blank questions */
 const by = {};
-rows.forEach(r => { const k = r.q.sec + "|" + r.q.dom; const b = by[k] || (by[k] = { sec:r.q.sec, dom:r.q.dom, n:0, missed:0 }); b.n++; if(!r.ok) b.missed++; });
+rows.forEach(r => {
+const k = r.q.sec + "|" + r.q.dom; const b = by[k] || (by[k] = { sec:r.q.sec, dom:r.q.dom, n:0, missed:0, skills:{}, diffs:{} });
+b.n++; if(!r.ok){ b.missed++; b.diffs[r.q.diff] = (b.diffs[r.q.diff] || 0) + 1; }
+const sk = skillOf(r.q); if(sk){ const t = b.skills[sk] || (b.skills[sk] = { n:0, missed:0 }); t.n++; if(!r.ok) t.missed++; }
+});
 return Object.values(by).filter(b => b.missed > 0).sort((a, b) => (b.missed - a.missed) || (a.missed / a.n > b.missed / b.n ? -1 : 1) || a.dom.localeCompare(b.dom));
 }
-function focusSet(sec, dom, n){
+function focusSet(sec, dom, n, target){
 n = n || 10;
 const last = {};
 getPD(activeProf().id).attempts.forEach(x => { if(!last[x.q] || x.t >= last[x.q].t) last[x.q] = x; });
 const rank = q => !last[q.id] ? 1 : credit(last[q.id]) < 1 ? 0 : 2;     /* missed before → new → already mastered */
 const pool = PRACTICE_PQ.filter(q => q.sec === sec && q.dom === dom).map(q => [Math.random(), q]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
-return pool.sort((a, b) => rank(a) - rank(b)).slice(0, n).sort((a, b) => DIFF_ORDER[a.diff] - DIFF_ORDER[b.diff]);
+const byDiff = (a, b) => DIFF_ORDER[a.diff] - DIFF_ORDER[b.diff];
+const missed = target && target.skills ? Object.entries(target.skills).filter(([, v]) => v.missed > 0).sort((a, b) => b[1].missed - a[1].missed) : [];
+if(!missed.length) return pool.sort((a, b) => rank(a) - rank(b)).slice(0, n).sort(byDiff);
+const D = ["Easy", "Medium", "Hard"], band = new Set();
+Object.entries(target.diffs || {}).forEach(([df, c]) => { if(c > 0){ band.add(df); const i = D.indexOf(df); if(i > 0) band.add(D[i - 1]); } });
+if(!band.size) D.forEach(x => band.add(x));
+const knownSkills = new Set(Object.entries(target.skills).filter(([, v]) => v.missed === 0).map(([k]) => k));
+const missedKeys = new Set(missed.map(([k]) => k));
+const score = q => rank(q) * 10 + (band.has(q.diff) ? 0 : 5);          /* lower is better */
+const total = missed.reduce((t, [, v]) => t + v.missed, 0), out = [];
+missed.forEach(([k, v], i) => {
+const slots = Math.max(2, Math.round(n * v.missed / total));
+const cand = pool.filter(q => skillOf(q) === k && !out.includes(q) && rank(q) < 2).sort((a, b) => score(a) - score(b));
+out.push(...cand.slice(0, Math.min(slots, n - out.length)));
+});
+if(out.length < n){                                        /* top up: other missed-skill questions, then untested skills, then known ones, mastered last */
+const fill = q => (rank(q) === 2 ? 100 : 0) + (missedKeys.has(skillOf(q)) ? 0 : knownSkills.has(skillOf(q)) ? 40 : 20) + score(q);
+out.push(...pool.filter(q => !out.includes(q)).sort((a, b) => fill(a) - fill(b)).slice(0, n - out.length));
 }
+return out.slice(0, n).sort(byDiff);
+}
+function mockTarget(sec, dom){
+const mp = getPD(activeProf().id).mockPlan; if(!mp || !mp.items) return null;
+const it = mp.items.find(i => i.sec === sec && i.dom === dom);
+return it && it.skills ? { skills:it.skills, diffs:it.diffs || {} } : null;
+}
+const targetLabel = (dom, t) => { const ks = t && t.skills ? Object.entries(t.skills).filter(([, v]) => v.missed > 0).sort((a, b) => b[1].missed - a[1].missed).map(([k]) => skillName(k)).filter(Boolean) : [];
+return PQ_DOMAINS[dom] + (ks.length ? ": " + ks.slice(0, 2).join(", ") + (ks.length > 2 ? ` and ${ks.length - 2} more` : "") : ""); };
 const MOCK_PLAN_DONE = 10;
 function mockPlanStatus(d){
 const mp = d.mockPlan; if(!mp || !mp.items || !mp.items.length) return null;
@@ -3141,21 +3175,23 @@ if(st.done === st.total) return `<div class="box planbox" data-en="1" id="mockPl
 <p style="margin:0">✓ All done: you've practiced every skill your ${when} mock test showed you missed. Take your next mock test when you're ready.</p>
 <div class="ractions" style="margin-top:10px"><button class="btn small" data-go="mocktest">Take a mock test</button></div></div>`;
 return `<div class="box planbox" data-en="1" id="mockPlanCard"><h2>From your last mock test</h2>
-<p class="muted small" style="margin:0 0 6px">Taken ${when}. Practice the skills you missed, most-missed first. Each skill is done after ${MOCK_PLAN_DONE} practice questions in it.</p>
+<p class="muted small" style="margin:0 0 6px">Taken ${when}. Practice the skills you missed, most-missed first. Each set aims at the specific skills you missed. A skill area is done after ${MOCK_PLAN_DONE} practice questions in it.</p>
 <p class="small" style="margin:0 0 10px"><strong>${st.done} of ${st.total} done</strong></p>
 <ol class="planlist">${st.items.map((b, i) => `<li>
 <span class="planrank" aria-hidden="true">${b.done ? "✓" : i + 1}</span>
-<span class="plantxt"><strong>${PQ_DOMAINS[b.dom]}</strong><small>${both ? secName[b.sec] + " · " : ""}${b.missed} missed of ${b.n} · ${b.done ? "done" : `${b.practiced} of ${MOCK_PLAN_DONE} practiced`}</small></span>
+<span class="plantxt"><strong>${PQ_DOMAINS[b.dom]}</strong><small>${both ? secName[b.sec] + " · " : ""}${b.missed} missed of ${b.n}${missedSkillsText(b)} · ${b.done ? "done" : `${b.practiced} of ${MOCK_PLAN_DONE} practiced`}</small></span>
 ${b.done ? `<span class="small muted">Done</span>` : `<button class="btn small ${st.items.findIndex(x => !x.done) === i ? "" : "ghost"}" data-mpf="${b.sec}|${b.dom}">Practice</button>`}</li>`).join("")}</ol></div>`;
 }
+const missedSkillsText = b => { const ks = b.skills ? Object.entries(b.skills).filter(([, v]) => v.missed > 0).sort((x, y) => y[1].missed - x[1].missed) : [];
+return ks.length ? " · " + ks.map(([k, v]) => `${skillName(k)} (${v.missed})`).join(", ") : ""; };
 function planBox(plan, withSection){
 if(!plan.length) return "";
 const secName = { math:"Math", rw:"Reading &amp; Writing" };
 return `<div class="box planbox"><h2>Practice next</h2>
-<p class="muted small" style="margin:0 0 10px">Skill areas you missed, starting with the most. Each set has 10 guided practice questions, beginning with ones you haven't mastered yet.${withSection === "mock" || withSection === "mock2" ? " This list is saved on <strong>My progress</strong>, so you can come back to it." : ""}</p>
+<p class="muted small" style="margin:0 0 10px">Skill areas you missed, starting with the most. Each set has 10 guided practice questions aimed at the specific skills you missed, at about the difficulty you missed them.${withSection === "mock" || withSection === "mock2" ? " This list is saved on <strong>My progress</strong>, so you can come back to it." : ""}</p>
 <ol class="planlist">${plan.map((b, i) => `<li>
 <span class="planrank" aria-hidden="true">${i + 1}</span>
-<span class="plantxt"><strong>${PQ_DOMAINS[b.dom]}</strong><small>${withSection === true || withSection === "mock2" ? secName[b.sec] + " · " : ""}${b.missed} missed of ${b.n}</small></span>
+<span class="plantxt"><strong>${PQ_DOMAINS[b.dom]}</strong><small>${withSection === true || withSection === "mock2" ? secName[b.sec] + " · " : ""}${b.missed} missed of ${b.n}${missedSkillsText(b)}</small></span>
 <button class="btn small ${i ? "ghost" : ""}" data-focus="${b.sec}|${b.dom}">Practice</button></li>`).join("")}</ol></div>`;
 }
 const SAT_NOTE = `<p class="satnote" role="note"><strong>About these questions:</strong> They were written for OpenShelf to match the format and skills of the digital SAT. They have not been independently reviewed or verified by College Board or any testing organization, and their difficulty levels are our own estimates. For official practice, use College Board's free Bluebook app.</p>`;
@@ -3596,7 +3632,8 @@ $("#gpAgain").onclick = () => { sess = null; drawSetup(); top(); };
 el.querySelectorAll("[data-focus]").forEach(b => b.onclick = () => {
 const [fs, fd] = b.dataset.focus.split("|");
 track("practice-next", { section:fs, skill:fd, from:"practice-report" });
-startSet({ qs: focusSet(fs, fd), sec:fs, mode:"guided", label:`Focus: ${PQ_DOMAINS[fd]}`, source:"practice-next" });
+const tg = missedPlan(sess.items.filter(it => it.choice !== null).map(it => ({ q:it.q, ok:it.choice === it.q.a }))).find(x => x.sec === fs && x.dom === fd);
+startSet({ qs: focusSet(fs, fd, 10, tg), sec:fs, mode:"guided", label:`Focus: ${targetLabel(fd, tg)}`, source:"practice-next" });
 });
 const todoBtn = $("#gpTodo"); if(todoBtn) todoBtn.onclick = () => { const u = sess.unit, n = sess.unitN; startUnit(u, n); };
 const nuBtn = $("#gpNextUnit"); if(nuBtn && nextUnit) nuBtn.onclick = () => startUnit(nextUnit.k, nextUnit.n);
@@ -4065,6 +4102,31 @@ const how = await saveFile(`${SITE.name}-mock-tests-${fileSafe(prof.name)}-${new
 track("mock-history-download", { how, n:mocks.length });
 if(how === "download") toast("Mock test history downloaded."); else if(how === "share") toast("Mock test history saved."); else if(how === "fail") toast("Couldn't save a file here. Try opening the site in Safari or Chrome.");
 }
+function mockResultsBox(d){
+const mocks = (d.mocks || []).slice().sort((a, b) => a.t - b.t);
+if(!mocks.length) return "";
+const pct = m => Math.round(m.right / m.n * 100), day = t => new Date(t).toLocaleDateString(undefined, { month:"short", day:"numeric" });
+const kind = m => m.format === "sat" ? "Full SAT" : m.format === "full" ? "Full section" : m.format === "module" ? "One module" : `${m.n} questions`;
+const SEC = { math:["Math", "var(--c-sat)"], rw:["Reading & Writing", "var(--c-apply)"] };
+const per = ["math", "rw"].map(sec => {
+const ms = mocks.filter(m => m.sec === sec); if(!ms.length) return "";
+const last = ms[ms.length - 1], prev = ms[ms.length - 2], diff = prev ? pct(last) - pct(prev) : null;
+const change = prev == null ? `your first ${SEC[sec][0]} mock test`
+: diff === 0 ? `the same as your previous ${SEC[sec][0]} mock (${day(prev.t)})`
+: `<strong class="${diff > 0 ? "up" : "down"}">${diff > 0 ? "up" : "down"} ${Math.abs(diff)} percentage point${Math.abs(diff) === 1 ? "" : "s"}</strong> from your previous ${SEC[sec][0]} mock (${pct(prev)}% on ${day(prev.t)})`;
+const first = ms[0], overall = ms.length >= 3 ? ` Since your first one (${day(first.t)}): ${pct(last) - pct(first) >= 0 ? "+" : "−"}${Math.abs(pct(last) - pct(first))} percentage points.` : "";
+return `<div class="mockrow"><p style="margin:0"><strong>${SEC[sec][0]}: ${last.right} of ${last.n} (${pct(last)}%)</strong> <span class="muted small">${kind(last)}, ${day(last.t)}</span></p>
+<p class="small" style="margin:2px 0 6px">That's ${change}.${overall}</p>
+${ms.length >= 2 ? lineChart([{ name:SEC[sec][0], color:SEC[sec][1], pts: ms.slice(-10).map(m => ({ label:day(m.t), y:pct(m) })) }], { min:0, max:100, fmt:v => Math.round(v) + "%", label:`${SEC[sec][0]} mock tests, percent correct` }) : ""}</div>`;
+}).join("");
+const recent = mocks.slice(-8).reverse();
+return `<div class="box" data-en="1" id="mockResults"><h2>Mock test results</h2>
+${per}
+<details class="more" style="margin-top:6px"><summary>Recent mock tests (${mocks.length})</summary>
+<div class="tablewrap"><table class="simple"><thead><tr><th>Date</th><th>Section</th><th>Test</th><th>Score</th></tr></thead><tbody>${recent.map(m => `<tr><td>${day(m.t)}</td><td>${m.sec === "math" ? "Math" : "R&amp;W"}</td><td>${kind(m)}${m.route ? ` (${m.route} module 2)` : ""}</td><td>${m.right}/${m.n} · ${pct(m)}%</td></tr>`).join("")}</tbody></table></div></details>
+<p class="small muted" style="margin:10px 0 8px">Compare similar tests: a one-module test and a full section aren't equally hard. Percent correct isn't an SAT score; for a scaled score, take a Bluebook practice test.</p>
+<button class="btn small ghost dlhist">Download mock test history (CSV)</button></div>`;
+}
 function printReport(html){
 let area = document.getElementById("printArea");
 if(!area){ area = document.createElement("div"); area.id = "printArea"; document.body.appendChild(area); }
@@ -4123,7 +4185,7 @@ ${backupDue() ? `<p class="warnbar">It's been a while since your last backup. Sa
 ${storageWorks() ? "" : `<p class="warnbar">This preview can't save to your browser, so this page resets when you close it. Copy your progress code at the bottom to keep your results.</p>`}
 ${pb.html}
 ${mockPlanCard(d)}
-${(d.mocks || []).length ? `<div class="box" data-en="1"><h2>Mock test history</h2><p class="small muted" style="margin-top:0">${d.mocks.length} mock test${d.mocks.length === 1 ? "" : "s"} saved on this device. Download them as a spreadsheet to track progress over time.</p><button class="btn small ghost dlhist">Download mock test history (CSV)</button></div>` : ""}
+${mockResultsBox(d)}
 ${(() => { const p = d.plan; if(!p) return `<div class="box planpromo" data-en="1"><p style="margin:0"><strong>Have a target SAT score?</strong> Get a week-by-week plan built from your weakest skills.</p><button class="btn small" data-go="scoreplan">Make a score plan</button></div>`;
 const wks = planPace(p).weeks, wi = Math.min(wks - 1, Math.max(0, Math.floor((Date.now() - p.created) / (7 * DAY))));
 return `<div class="box planpromo" data-en="1"><p style="margin:0"><strong>SAT score plan: ${p.start} → ${p.target}</strong><br><span class="small muted">Week ${wi + 1} of ${wks} · test on ${fmtDate(p.date)}</span></p><button class="btn small" data-go="scoreplan">Open plan</button></div>`; })()}
@@ -4666,7 +4728,8 @@ pb.wire();
 el.querySelectorAll("[data-ps]").forEach(b => b.onclick = () => {
 const it = wk.items[+b.dataset.ps];
 track("plan-session", { section:it.sec, skill:it.dom });
-startPendingPractice({ qs: focusSet(it.sec, it.dom), sec:it.sec, label:`Plan week ${wi + 1}: ${PQ_DOMAINS[it.dom]}` }, it.mode === "test" ? "test" : "guided");
+const tg = wk.src[it.sec] === "mock" ? mockTarget(it.sec, it.dom) : null;
+startPendingPractice({ qs: focusSet(it.sec, it.dom, 10, tg), sec:it.sec, label:`Plan week ${wi + 1}: ${targetLabel(it.dom, tg)}` }, it.mode === "test" ? "test" : "guided");
 });
 el.querySelectorAll("[data-go]").forEach(b => b.onclick = () => openTool(b.dataset.go));
 el.querySelectorAll("[data-ptab]").forEach(b => b.onclick = () => {
@@ -5086,7 +5149,7 @@ d.mocks = (d.mocks || []).concat([{ t:Date.now(), sec:S.sec, n:all.length, right
 d.mockSeen = [...new Set((d.mockSeen || []).concat(all.map(x => x.q.id)))].slice(-600);
 });
 const missed = missedPlan(sess.completed.flatMap(S => S.modules.flatMap(M => M.items)).map(x => ({ q:x.q, ok:isRight(x) })));
-d.mockPlan = missed.length ? { t:Date.now(), secs:sess.completed.map(S => S.sec), items:missed.map(b => ({ sec:b.sec, dom:b.dom, missed:b.missed, n:b.n })) } : null;
+d.mockPlan = missed.length ? { t:Date.now(), secs:sess.completed.map(S => S.sec), items:missed.map(b => ({ sec:b.sec, dom:b.dom, missed:b.missed, n:b.n, skills:b.skills, diffs:b.diffs })) } : null;
 savePD(prof.id, d);
 const tot = sess.completed.reduce((a, S) => { const all = S.modules.flatMap(M => M.items); return { n:a.n + all.length, r:a.r + all.filter(isRight).length, s:a.s + secs(S) }; }, { n:0, r:0, s:0 });
 protectStorage();
@@ -5120,7 +5183,8 @@ el.querySelectorAll("[data-go]").forEach(b => b.onclick = () => openTool(b.datas
 el.querySelectorAll("[data-focus]").forEach(b => b.onclick = () => {
 const [fs, fd] = b.dataset.focus.split("|");
 track("practice-next", { section:fs, skill:fd, from:"mock-report" });
-startPendingPractice({ qs: focusSet(fs, fd), sec:fs, label:`Focus: ${PQ_DOMAINS[fd]}` }, "guided");
+const tg = mockTarget(fs, fd);
+startPendingPractice({ qs: focusSet(fs, fd, 10, tg), sec:fs, label:`From your mock test: ${targetLabel(fd, tg)}` }, "guided");
 });
 top();
 };
@@ -5385,7 +5449,7 @@ const SITE = {
 name: "OpenShelf",
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 39,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v39")
+version: 42,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v42")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "September 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
@@ -5481,7 +5545,10 @@ suggest: { title:"Suggestion box", render: el => {
 const mail = SITE.email, MAXLEN = 1500;
 const kinds = [["suggestion", "Suggestion"], ["question", "Question"], ["problem", "Report a problem"], ["other", "Other"]];
 const roles = [["", "Prefer not to say"], ["student", "Student"], ["parent", "Parent"], ["tutor", "Tutor or teacher"], ["other", "Other"]];
-const draft = store.get("os_suggest", null) || { kind:"suggestion", role:"", msg:"", reply:"" };
+const BLANK = { kind:"suggestion", role:"", msg:"", reply:"" };
+const saved = store.get("os_suggest", null);
+const lastSent = saved && saved.sent ? saved.last : null;
+const draft = saved && !saved.sent ? saved : BLANK;
 el.innerHTML = `
 <h1>Suggestion box</h1>
 <p>Ideas, questions, or something that isn't working? Tell us here. We read every message.</p>
@@ -5493,6 +5560,7 @@ el.innerHTML = `
 <label class="fld" style="margin-top:14px"><span>Your message</span>
 <textarea id="sgMsg" rows="6" maxlength="${MAXLEN}" placeholder="Type your suggestion or question here.">${esc(draft.msg)}</textarea></label>
 <p class="small muted" id="sgCount" style="margin:4px 0 0;text-align:right"></p>
+${lastSent ? `<p class="small" id="sgRestoreRow" style="margin:6px 0 0">Your last message was handed to your email app. If it didn't go out, <button class="linkbtn" id="sgRestore">restore your last message</button>.</p>` : ""}
 <label class="fld" style="margin-top:10px"><span>Your email <span class="muted" style="font-weight:400">(optional, only if you'd like a reply)</span></span>
 <input id="sgReply" type="email" inputmode="email" autocomplete="email" maxlength="120" value="${esc(draft.reply)}" placeholder="name@example.com"></label>
 <div class="err" id="sgErr" role="alert"></div>
@@ -5500,6 +5568,7 @@ el.innerHTML = `
 <button class="btn" id="sgMailApp">Send with my email app</button>
 <button class="btn ghost" id="sgGmail">Send with Gmail ↗</button>
 <button class="btn ghost" id="sgCopy">Copy message</button>
+<button class="btn ghost" id="sgClear">Clear form</button>
 </div>
 <p class="small muted" style="margin-top:10px">Your email app or Gmail opens with the message ready; just press send. If neither opens, which can happen inside apps like Messenger or WhatsApp, tap “Copy message” and email it to <strong>${esc(mail)}</strong>.</p>
 </div>
@@ -5516,6 +5585,14 @@ const save = () => store.set("os_suggest", { kind:kindOf(), role:$("#sgRole").va
 const count = () => { $("#sgCount").textContent = `${$("#sgMsg").value.length} / ${MAXLEN}`; };
 el.querySelectorAll("[data-sk]").forEach(b => b.onclick = () => { el.querySelectorAll("[data-sk]").forEach(x => { x.setAttribute("aria-checked", x === b); x.setAttribute("aria-pressed", x === b); }); save(); });
 $("#sgRole").onchange = save; $("#sgMsg").oninput = () => { count(); save(); }; $("#sgReply").oninput = save; count();
+const fill = v => {
+el.querySelectorAll("[data-sk]").forEach(x => { const on = x.dataset.sk === (v.kind || "suggestion"); x.setAttribute("aria-checked", on); x.setAttribute("aria-pressed", on); });
+$("#sgRole").value = v.role || ""; $("#sgMsg").value = v.msg || ""; $("#sgReply").value = v.reply || ""; $("#sgErr").textContent = ""; count();
+};
+const markSent = () => store.set("os_suggest", { sent:true, last:{ kind:kindOf(), role:$("#sgRole").value, msg:$("#sgMsg").value, reply:$("#sgReply").value.trim() } });
+const rs = $("#sgRestore");
+if(rs) rs.onclick = () => { fill(lastSent); save(); const row = $("#sgRestoreRow"); if(row) row.remove(); $("#sgMsg").focus(); track("suggest-restore"); };
+$("#sgClear").onclick = () => { fill(BLANK); store.set("os_suggest", null); const row = $("#sgRestoreRow"); if(row) row.remove(); const rd = $("#sgReady"); if(rd) rd.hidden = true; $("#sgCopy").textContent = "Copy message"; $("#sgMsg").focus(); };
 const compose = () => {
 const msg = $("#sgMsg").value.trim(), reply = $("#sgReply").value.trim(), err = $("#sgErr"); err.textContent = "";
 if(msg.length < 5){ err.textContent = "Please write a short message first."; $("#sgMsg").focus(); return null; }
@@ -5526,8 +5603,8 @@ const body = `${msg}\n\n---\nType: ${kindLabel}${role && role[0] ? `\nFrom: ${ro
 track("suggest-send", { kind:kindOf() });
 return { subject, body };
 };
-$("#sgMailApp").onclick = () => { const c = compose(); if(c) location.href = `mailto:${mail}?subject=${encodeURIComponent(c.subject)}&body=${encodeURIComponent(c.body)}`; };
-$("#sgGmail").onclick = () => { const c = compose(); if(c) window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(mail)}&su=${encodeURIComponent(c.subject)}&body=${encodeURIComponent(c.body)}`, "_blank", "noopener"); };
+$("#sgMailApp").onclick = () => { const c = compose(); if(c){ markSent(); location.href = `mailto:${mail}?subject=${encodeURIComponent(c.subject)}&body=${encodeURIComponent(c.body)}`; } };
+$("#sgGmail").onclick = () => { const c = compose(); if(c) markSent(); if(c) window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(mail)}&su=${encodeURIComponent(c.subject)}&body=${encodeURIComponent(c.body)}`, "_blank", "noopener"); };
 const showReady = c => {
 $("#sgTo").textContent = mail; $("#sgSub").textContent = c.subject; $("#sgBody").textContent = c.body;
 const box = $("#sgReady"); box.hidden = false;
@@ -5538,7 +5615,7 @@ b.textContent = ok ? "Copied ✓" : "Copy"; if(!ok) toast("Copy didn't work here
 };
 $("#sgCopy").onclick = async () => {
 const c = compose(); if(!c) return;
-showReady(c);
+markSent(); showReady(c);
 const ok = await copyPlain(c.body);
 $("#sgCopy").textContent = ok ? "Copied ✓" : "Copy message";
 toast(ok ? `Message copied. In your email, send it to ${mail}.` : "Copy didn't work here. Press and hold the message below to select it.");
@@ -5929,7 +6006,8 @@ document.addEventListener("click", e => { if(e.target.closest(".dlhist")) downlo
 document.addEventListener("click", e => {
 const b = e.target.closest("[data-mpf]"); if(!b) return;
 const [fs, fd] = b.dataset.mpf.split("|"); track("mock-plan-practice", { dom:fd });
-startPendingPractice({ qs:focusSet(fs, fd), sec:fs, label:`From your mock test: ${PQ_DOMAINS[fd]}` }, "guided");
+const tg = mockTarget(fs, fd);
+startPendingPractice({ qs:focusSet(fs, fd, 10, tg), sec:fs, label:`From your mock test: ${targetLabel(fd, tg)}` }, "guided");
 });
 function renderAll(){
 if(firstRender){ firstRender = false; safeRun("analytics", () => ANALYTICS.load()); safeRun("visit", noteVisitDay); safeRun("language", initLanguage); }
