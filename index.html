@@ -90,6 +90,7 @@ button,input{font:inherit;color:inherit}
 .plantab{flex:1;padding:10px 8px;border:0;background:none;font:inherit;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1.5px;cursor:pointer}
 .plantab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--c-sat)}
 .planpanel[hidden]{display:none !important}
+.planall li[hidden]{display:none !important}
 .planweeks{margin-top:10px;padding:0;border:0;background:none}
 @media print{ body.printing-report > *:not(#printArea){display:none !important} body.printing-report #printArea{display:block !important} body.printing-report{background:#fff !important} }
 .crashbar{margin:14px 0;padding:12px 14px;border-radius:12px;border:1.5px solid var(--c-warn);background:var(--surface)}
@@ -701,7 +702,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=42"></script>
+<script src="questions.js?v=43"></script>
 <script>
 const CATS = [
 { id: "schools", label: "Schools & aid",  h: 180 },
@@ -3175,7 +3176,7 @@ if(st.done === st.total) return `<div class="box planbox" data-en="1" id="mockPl
 <p style="margin:0">✓ All done: you've practiced every skill your ${when} mock test showed you missed. Take your next mock test when you're ready.</p>
 <div class="ractions" style="margin-top:10px"><button class="btn small" data-go="mocktest">Take a mock test</button></div></div>`;
 return `<div class="box planbox" data-en="1" id="mockPlanCard"><h2>From your last mock test</h2>
-<p class="muted small" style="margin:0 0 6px">Taken ${when}. Practice the skills you missed, most-missed first. Each set aims at the specific skills you missed. A skill area is done after ${MOCK_PLAN_DONE} practice questions in it.</p>
+<p class="muted small" style="margin:0 0 6px">Taken ${when}. Practice the skills you missed, most-missed first. Each area starts with a ${MOCK_PLAN_DONE}-question set aimed at the specific skills you missed. ${MOCK_PLAN_DONE} questions marks it done, but practice as much as you like.</p>
 <p class="small" style="margin:0 0 10px"><strong>${st.done} of ${st.total} done</strong></p>
 <ol class="planlist">${st.items.map((b, i) => `<li>
 <span class="planrank" aria-hidden="true">${b.done ? "✓" : i + 1}</span>
@@ -3188,7 +3189,7 @@ function planBox(plan, withSection){
 if(!plan.length) return "";
 const secName = { math:"Math", rw:"Reading &amp; Writing" };
 return `<div class="box planbox"><h2>Practice next</h2>
-<p class="muted small" style="margin:0 0 10px">Skill areas you missed, starting with the most. Each set has 10 guided practice questions aimed at the specific skills you missed, at about the difficulty you missed them.${withSection === "mock" || withSection === "mock2" ? " This list is saved on <strong>My progress</strong>, so you can come back to it." : ""}</p>
+<p class="muted small" style="margin:0 0 10px">Skill areas you missed, starting with the most. Each area starts with a 10-question guided set aimed at the specific skills you missed, at about the difficulty you missed them. Practice as much as you like.${withSection === "mock" || withSection === "mock2" ? " This list is saved on <strong>My progress</strong>, so you can come back to it." : ""}</p>
 <ol class="planlist">${plan.map((b, i) => `<li>
 <span class="planrank" aria-hidden="true">${i + 1}</span>
 <span class="plantxt"><strong>${PQ_DOMAINS[b.dom]}</strong><small>${withSection === true || withSection === "mock2" ? secName[b.sec] + " · " : ""}${b.missed} missed of ${b.n}${missedSkillsText(b)}</small></span>
@@ -4626,6 +4627,7 @@ const has = { math: recent.some(x => qOf(x).sec === "math"), rw: recent.some(x =
 const cur = Math.floor((Date.now() - p.created) / (7 * DAY));
 const fresh = mp && mp.t > Date.now() - 21 * DAY ? mp.items.filter(i => !i.done) : [];
 const mockM = (fresh.find(i => i.sec === "math") || {}).dom, mockR = (fresh.find(i => i.sec === "rw") || {}).dom;
+const mockList = { math: fresh.filter(i => i.sec === "math").map(i => i.dom), rw: fresh.filter(i => i.sec === "rw").map(i => i.dom) };
 const sets = p.mins >= 60 ? 2 : 1;
 const which = scope === "math" ? "Math" : scope === "rw" ? "Reading & Writing" : null;
 const fullMock = scope === "both" ? ["Take a full SAT mock test to find your starting point", "2 h 14 min, with the 10-minute break"]
@@ -4644,12 +4646,24 @@ items.push({ k:"mock", t: scope === "both" ? "Take a final full mock test at lea
 items.push({ k:"light", t:"Keep practice light: retry questions you've missed before", d:"Rest the day before the test" });
 }
 const days = last ? Math.max(2, Math.min(3, p.days)) : p.days;
+const secOf = d => scope !== "both" ? scope : d % 2 === 0 ? (p.focus === "rw" ? "rw" : "math") : (p.focus === "rw" ? "math" : "rw");
+const perWeek = { math:0, rw:0 }; for(let d = 0; d < days; d++) perWeek[secOf(d)]++;
+const fromList = (sec, k) => {
+const L = mockList[sec]; if(!L.length) return null;
+if(w === cur) return L[k % L.length];
+if(w === cur + 1 && perWeek[sec] + k < L.length) return L[perWeek[sec] + k];      /* only what's left; no wrapping around */
+return null;
+};
+const seen = { math:0, rw:0 }, focusList = { math:[], rw:[] };
 for(let d = 0; d < days; d++){
-const sec = scope !== "both" ? scope : d % 2 === 0 ? (p.focus === "rw" ? "rw" : "math") : (p.focus === "rw" ? "math" : "rw");
-const dom = sec === "math" ? fm : fr;
+const sec = secOf(d), k = seen[sec]++;
+const dom = fromList(sec, k) || (sec === "math" ? fm : fr);
+if(!focusList[sec].includes(dom)) focusList[sec].push(dom);
 items.push({ k:"set", sec, dom, sets, t:`${sec === "math" ? "Math" : "Reading & Writing"}: ${PQ_DOMAINS[dom]}`, d: sets === 2 ? "A guided set of 10, then a test-mode set of 10" : (w % 2 ? "A test-mode set of 10, no hints" : "A guided set of 10") , mode: sets === 2 ? "both" : (w % 2 ? "test" : "guided") });
 }
-out.push({ w, start: p.created + w * 7 * DAY, items, focus:[fm, fr], src, scope });
+["math", "rw"].forEach(sec => { if(fromList(sec, 0)) src[sec] = w === cur ? "mock" : "mocknext"; });
+const listLen = { math: mockList.math.length, rw: mockList.rw.length };
+out.push({ w, start: p.created + w * 7 * DAY, items, focus:[focusList.math[0] || fm, focusList.rw[0] || fr], focusList, src, scope, listLen, perWeek });
 }
 return out;
 }
@@ -4701,25 +4715,33 @@ ${tg ? `<p class="small muted" style="margin:6px 0 0">Aim for about <strong>Math
 <p class="small muted" style="margin:0 0 6px">${fmtDate(new Date(wk.start).toISOString().slice(0,10))} to ${fmtDate(new Date(wkEnd - DAY).toISOString().slice(0,10))}</p>
 ${(() => { const tests = wk.items.filter(it => it.k !== "set"); return tests.length ? `<ol class="planweek">${tests.map(it => { const dn = doneFor(it); return `<li class="${dn ? "done" : ""}">
 <span class="pwmark" aria-hidden="true">${dn ? "✓" : "●"}</span>
-<span class="pwtxt"><strong>${esc(it.t)}</strong><small>${esc(it.d)}${dn ? " · done" : esc(partMock(it))}</small></span>
+<span class="pwtxt"><strong>${esc(it.t)}</strong><small>${esc(it.d)}${dn ? " · done" : esc(partMock(it))}${!dn && it.k === "mock" && mocksThisWeek.some(m => m.format !== "full" && m.format !== "sat") ? " · A one-module test doesn't count for this; take a full section (both modules)." : ""}</small></span>
 ${it.k === "mock" || it.k === "check" ? (scope === "both" ? `<button class="btn small ghost" data-go="mocktest">Open</button>` : `<button class="btn small ghost" data-mocksec="${scope}" data-mockfmt="${it.k === "mock" ? "full" : "module"}">Open</button>`) : it.k === "bluebook" ? `<button class="btn small ghost" data-go="dashboard">Log score</button>` : ""}</li>`; }).join("")}</ol>` : ""; })()}
 ${secsList.length > 1 ? `<div class="plantabs" role="tablist" aria-label="Plan by section">${secsList.map(x => `<button class="plantab" role="tab" id="pt-${x}" data-ptab="${x}" aria-selected="${tab === x}" aria-controls="pp-${x}">${secLabel(x)}</button>`).join("")}</div>`
 : `<p class="small muted" style="margin:12px 0 0">This plan covers <strong>${secLabel(scope)}</strong> only. <button class="linkbtn" id="plEdit2">Change</button></p>`}
 ${secsList.map(x => {
 const k = x === "math" ? 0 : 1, dom = wk.focus[k], src = wk.src[x];
+const names = (wk.focusList && wk.focusList[x].length ? wk.focusList[x] : [dom]).map(f => PQ_DOMAINS[f]).join(" and ");
 const why = src === "mock" ? "missed on your last mock test" : src === "weak" ? `your weakest ${secLabel(x)} area in recent practice` : src === "untried" ? "you haven't practiced this skill recently" : `no ${secLabel(x)} results yet, so starting with the biggest skill area`;
+const cover = src === "mock" && wk.listLen ? (wk.listLen[x] > wk.perWeek[x]
+? `This week covers ${wk.perWeek[x]} of your ${wk.listLen[x]} missed ${secLabel(x)} areas; the rest continue next week.`
+: wk.listLen[x] === 1 ? `This week covers your one missed ${secLabel(x)} area.` : `This week covers all ${wk.listLen[x]} of your missed ${secLabel(x)} areas.`) : "";
 const sess = wk.items.map((it, i) => [it, i]).filter(([it]) => it.k === "set" && it.sec === x);
 const planned = sess.reduce((t, [it]) => t + it.sets * 10, 0), done = satAns.filter(a => qOf(a).sec === x).length;
 return `<div class="planpanel" role="tabpanel" id="pp-${x}" aria-labelledby="pt-${x}"${secsList.length > 1 && tab !== x ? " hidden" : ""}>
-<p class="small" style="margin:12px 0 6px"><strong>${secLabel(x)} focus this week: ${PQ_DOMAINS[dom]}</strong> <span class="muted">(${why})</span></p>
+<p class="small" style="margin:12px 0 6px"><strong>${secLabel(x)} focus this week: ${names}</strong> <span class="muted">(${why})</span></p>
+${cover ? `<p class="small muted" style="margin:0 0 6px">${cover} Each set is aimed at the specific skills you missed.</p>` : ""}
 ${src === "nodata" ? `<div class="note" style="margin:8px 0"><p style="margin:0 0 8px">Take the ${secLabel(x)} section of a mock test to find your real weak spots. Until then, this part of the plan is a starting point, not personalized.</p><button class="btn small" data-mocksec="${x}" data-mockfmt="full">Take a ${secLabel(x)} mock test</button></div>` : ""}
 ${planned ? `<div class="bar-l small" style="margin-top:10px"><span>${secLabel(x)} practice questions this week</span><span class="muted">${Math.min(done, planned)} of ${planned}</span></div><div class="bar"><i style="width:${Math.min(100, done / planned * 100)}%;background:var(--c-ok)"></i></div>` : ""}
 <ol class="planweek">${sess.map(([it, i]) => `<li><span class="pwmark" aria-hidden="true">▸</span><span class="pwtxt"><strong>${esc(it.t)}</strong><small>${esc(it.d)}</small></span><button class="btn small" data-ps="${i}">Start</button></li>`).join("")}</ol>
-<details class="more planweeks"><summary>All ${weeks.length} weeks: ${secLabel(x)}</summary>
-<ol class="planall">${weeks.map(y => { const n = y.items.filter(it => it.k === "set" && it.sec === x).length, tests = y.items.filter(it => it.k !== "set").map(it => esc(it.t));
-return `<li class="${y.w === wi ? "cur" : y.w < wi ? "past" : ""}"><strong>Week ${y.w + 1}</strong> <span class="muted small">from ${fmtDate(new Date(y.start).toISOString().slice(0,10))}</span><br>
-<span class="small">${n} ${secLabel(x)} session${n === 1 ? "" : "s"}: ${PQ_DOMAINS[y.focus[k]]}${tests.length ? " · " + tests.join(" · ") : ""}</span></li>`; }).join("")}</ol>
-<p class="small muted">Future weeks' focus skills are estimates; they're recalculated from your answers each week.</p></details>
+<details class="more planweeks"><summary>Coming weeks: ${secLabel(x)} (preview)</summary>
+<p class="small muted" style="margin:6px 0">Future weeks open when they start. Their focus is a preview that updates from your answers. To practice ahead, use any Practice button above.</p>
+<ol class="planall">${weeks.filter(y => y.w >= wi).map((y, idx) => {
+const n = y.items.filter(it => it.k === "set" && it.sec === x).length, tests = y.items.filter(it => it.k !== "set").map(it => esc(it.t));
+const areas = (y.focusList && y.focusList[x].length ? y.focusList[x] : [y.focus[k]]).map(f => PQ_DOMAINS[f]).join(", ");
+return `<li class="${y.w === wi ? "cur" : ""}${idx >= 4 ? " wkmore" : ""}"${idx >= 4 ? " hidden" : ""}><strong>Week ${y.w + 1}</strong> <span class="muted small">${y.w === wi ? "this week, shown above" : "from " + fmtDate(new Date(y.start).toISOString().slice(0,10))}</span><br>
+<span class="small">${n} ${secLabel(x)} session${n === 1 ? "" : "s"}: ${areas}${y.src[x] === "mocknext" ? " (continuing your mock test list)" : ""}${tests.length ? " · " + tests.join(" · ") : ""}</span></li>`; }).join("")}</ol>
+${weeks.length - wi > 4 ? `<button class="linkbtn" data-allweeks="${x}">Show all ${weeks.length - wi} weeks</button>` : ""}</details>
 </div>`; }).join("")}
 <p class="small muted" style="margin-top:10px">Practice sets start with questions you've missed before. The weekly focus updates as your answers change.</p></div>
 <div class="ractions"><button class="btn ghost" id="plEdit">Edit plan</button><button class="btn ghost" id="plDel">Start over</button></div>
@@ -4732,6 +4754,7 @@ const tg = wk.src[it.sec] === "mock" ? mockTarget(it.sec, it.dom) : null;
 startPendingPractice({ qs: focusSet(it.sec, it.dom, 10, tg), sec:it.sec, label:`Plan week ${wi + 1}: ${targetLabel(it.dom, tg)}` }, it.mode === "test" ? "test" : "guided");
 });
 el.querySelectorAll("[data-go]").forEach(b => b.onclick = () => openTool(b.dataset.go));
+el.querySelectorAll("[data-allweeks]").forEach(b => b.onclick = () => { b.closest(".planpanel").querySelectorAll(".wkmore").forEach(li => li.hidden = false); b.remove(); });
 el.querySelectorAll("[data-ptab]").forEach(b => b.onclick = () => {
 const x = b.dataset.ptab; store.set("os_planTab", x); track("plan-tab", { section:x });
 el.querySelectorAll("[data-ptab]").forEach(t => t.setAttribute("aria-selected", String(t === b)));
@@ -5449,7 +5472,7 @@ const SITE = {
 name: "OpenShelf",
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 42,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v42")
+version: 43,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v43")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "September 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
