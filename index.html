@@ -702,7 +702,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=43"></script>
+<script src="questions.js?v=44"></script>
 <script>
 const CATS = [
 { id: "schools", label: "Schools & aid",  h: 180 },
@@ -3168,6 +3168,14 @@ return Object.assign({}, it, { practiced:Math.min(k, MOCK_PLAN_DONE), done:k >= 
 });
 return { t:mp.t, items, done:items.filter(i => i.done).length, total:items.length };
 }
+function mockPlanLine(d){
+const st = mockPlanStatus(d); if(!st) return "";
+const secs = [...new Set(st.items.map(i => i.sec))].map(x => x === "math" ? "Math" : "Reading &amp; Writing").join(" and ");
+return `<p class="note" data-en="1" id="mockPlanLine" style="margin:0 0 14px">${st.done === st.total
+? `Your last mock test: ✓ all ${st.total} ${secs} area${st.total === 1 ? "" : "s"} practiced. Take your next mock test when you're ready.`
+: `<strong>Your last mock test:</strong> ${st.total} ${secs} area${st.total === 1 ? "" : "s"} to practice, ${st.done} of ${st.total} done. They're scheduled in this week's plan below.`}
+<button class="linkbtn" data-go="dashboard">See the full list</button></p>`;
+}
 function mockPlanCard(d){
 const st = mockPlanStatus(d); if(!st) return "";
 const when = new Date(st.t).toLocaleDateString("en-US", { month:"short", day:"numeric" });
@@ -4703,7 +4711,7 @@ const pctTime = Math.min(100, Math.max(0, (now - p.created) / (testDay - p.creat
 el.innerHTML = `
 <h1>SAT score plan</h1>
 ${pb.html}
-${mockPlanCard(d)}
+${mockPlanLine(d)}
 <div class="box planhead">
 <p class="planscore"><span>${p.start}</span><span class="arrow" aria-hidden="true">→</span><strong>${p.target}</strong></p>
 <p class="small" style="margin:0">SAT on <strong>${fmtDate(p.date)}</strong> · ${daysLeft > 0 ? `${daysLeft} days to go` : daysLeft === 0 ? "today!" : "test date passed"} · Week ${wi + 1} of ${weeks.length}</p>
@@ -4743,7 +4751,7 @@ return `<li class="${y.w === wi ? "cur" : ""}${idx >= 4 ? " wkmore" : ""}"${idx 
 <span class="small">${n} ${secLabel(x)} session${n === 1 ? "" : "s"}: ${areas}${y.src[x] === "mocknext" ? " (continuing your mock test list)" : ""}${tests.length ? " · " + tests.join(" · ") : ""}</span></li>`; }).join("")}</ol>
 ${weeks.length - wi > 4 ? `<button class="linkbtn" data-allweeks="${x}">Show all ${weeks.length - wi} weeks</button>` : ""}</details>
 </div>`; }).join("")}
-<p class="small muted" style="margin-top:10px">Practice sets start with questions you've missed before. The weekly focus updates as your answers change.</p></div>
+<p class="small muted" style="margin-top:10px">Practice sets aim at the specific skills you missed, starting with questions you've gotten wrong before. The weekly focus updates as your answers change.</p></div>
 <div class="ractions"><button class="btn ghost" id="plEdit">Edit plan</button><button class="btn ghost" id="plDel">Start over</button></div>
 <p class="note">Plans and pace checks are general guidance, not a promise of a score. Official Bluebook practice tests give the best estimate of your real SAT score.</p>`;
 pb.wire();
@@ -5109,12 +5117,14 @@ ${route ? `<p class="small muted" style="margin:8px 0 0">Your difficulty-weighte
 <h3 class="apgroup">By difficulty</h3>
 ${byDiff.map(x => `<div class="check"><span class="diff-${x.df.toLowerCase()}" style="min-width:4.5em;font-weight:650">${x.df}</span><span>${x.r} of ${x.n} correct</span></div>`).join("")}
 ${spr.length ? `<div class="check"><span style="min-width:4.5em;font-weight:650">Type-in</span><span>${spr.filter(isRight).length} of ${spr.length} correct</span></div>` : ""}
+${(() => { const tops = S.modules.flatMap(M => M.items).filter(x => x.q.top); return tops.length ? `<div class="check"><span class="diff-hard" style="min-width:4.5em;font-weight:650">Top difficulty</span><span>${tops.filter(isRight).length} of ${tops.length} correct</span></div>
+<p class="small muted" style="margin:4px 0 0">Top-difficulty questions are the hardest ones (counted under Hard too). They appear only in the harder Module 2 and matter most for scores above about 700 per section.</p>` : ""; })()}
 ${blank ? `<p class="gap small">${blank} left blank. There's no penalty for guessing on the SAT, so always answer.</p>` : ""}
 ${topTraps.length ? `<h3 class="apgroup">Mistake patterns</h3>${topTraps.map(([k, n]) => `<div class="check"><span class="gap" aria-hidden="true">!</span><span><strong>${TRAP_INFO[k].label} (${n}×).</strong> ${TRAP_INFO[k].tip}</span></div>`).join("")}` : ""}
 <h3 class="apgroup">Question by question</h3>
 <p class="small muted" style="margin:0 0 8px">Mock test questions and answers stay private, so your next mock test is as fair as this one. To work on what you missed, use <strong>Practice next</strong>: it gives you similar practice questions for the same skills.</p>
 ${S.modules.map((M, mi) => `<p class="small" style="margin:14px 0 4px"><strong>Module ${mi + 1}${mi === 1 ? ` (${M.level})` : ""}</strong></p>` + M.items.map(x => { const q = x.q, ok = isRight(x); qn++;
-return `<div class="review qsum"><div class="meta"><span><strong>Q${qn}</strong></span><span>${PQ_DOMAINS[q.dom]}</span><span class="diff-${q.diff.toLowerCase()}">${q.diff}</span>${isSpr(q) ? `<span class="sprtag">Type-in</span>` : ""}<span class="${!hasAnswer(x) ? "muted" : ok ? "ok" : "gap"}">${!hasAnswer(x) ? "Blank" : ok ? "✓ Correct" : "✗ Incorrect"}</span></div></div>`; }).join("")).join("")}
+return `<div class="review qsum"><div class="meta"><span><strong>Q${qn}</strong></span><span>${PQ_DOMAINS[q.dom]}</span><span class="diff-${q.diff.toLowerCase()}">${q.diff}${q.top ? " (top)" : ""}</span>${isSpr(q) ? `<span class="sprtag">Type-in</span>` : ""}<span class="${!hasAnswer(x) ? "muted" : ok ? "ok" : "gap"}">${!hasAnswer(x) ? "Blank" : ok ? "✓ Correct" : "✗ Incorrect"}</span></div></div>`; }).join("")).join("")}
 </details>`;
 };
 const reportHTML = () => {
@@ -5135,10 +5145,11 @@ return `<h2>${MOCK_SPEC[S.sec].label}: ${r} of ${items.length} correct (${pct(r,
 <h3>By skill area</h3>
 <table><thead><tr><th>Skill area</th><th>Correct</th><th>Questions</th><th>Percent</th></tr></thead><tbody>${doms.map(([l, a, n]) => `<tr><td>${l}</td><td>${a}</td><td>${n}</td><td>${pct(a, n)}</td></tr>`).join("")}</tbody></table>
 <h3>By difficulty</h3>
-<table><thead><tr><th>Difficulty</th><th>Correct</th><th>Questions</th></tr></thead><tbody>${diffs.map(([l, a, n]) => `<tr><td>${l}</td><td>${a}</td><td>${n}</td></tr>`).join("")}${spr.length ? `<tr><td>Type-in (any difficulty)</td><td>${spr.filter(isRight).length}</td><td>${spr.length}</td></tr>` : ""}</tbody></table>
+<table><thead><tr><th>Difficulty</th><th>Correct</th><th>Questions</th></tr></thead><tbody>${diffs.map(([l, a, n]) => `<tr><td>${l}</td><td>${a}</td><td>${n}</td></tr>`).join("")}${spr.length ? `<tr><td>Type-in (any difficulty)</td><td>${spr.filter(isRight).length}</td><td>${spr.length}</td></tr>` : ""}${(() => { const tops = items.filter(x => x.q.top); return tops.length ? `<tr><td>Top difficulty (also counted under Hard)</td><td>${tops.filter(isRight).length}</td><td>${tops.length}</td></tr>` : ""; })()}</tbody></table>
+${items.some(x => x.q.top) ? `<p>Top-difficulty questions are the hardest ones. They appear only in the harder Module 2 and matter most for scores above about 700 per section.</p>` : ""}
 ${blank ? `<p>${blank} question${blank === 1 ? " was" : "s were"} left blank. There's no penalty for guessing on the SAT.</p>` : ""}
 <h3>Question by question</h3>
-<table class="qbq"><thead><tr><th>#</th><th>Module</th><th>Skill area</th><th>Difficulty</th><th>Type</th><th>Result</th></tr></thead><tbody>${S.modules.map((M, mi) => M.items.map(x => { qn++; return `<tr class="${isRight(x) ? "rpt-ok" : "rpt-no"}"><td>${qn}</td><td>${mi + 1}</td><td>${PQ_DOMAINS[x.q.dom]}</td><td>${x.q.diff}</td><td>${isSpr(x.q) ? "Type-in" : "Multiple choice"}</td><td>${result(x)}</td></tr>`; }).join("")).join("")}</tbody></table>`;
+<table class="qbq"><thead><tr><th>#</th><th>Module</th><th>Skill area</th><th>Difficulty</th><th>Type</th><th>Result</th></tr></thead><tbody>${S.modules.map((M, mi) => M.items.map(x => { qn++; return `<tr class="${isRight(x) ? "rpt-ok" : "rpt-no"}"><td>${qn}</td><td>${mi + 1}</td><td>${PQ_DOMAINS[x.q.dom]}</td><td>${x.q.diff}${x.q.top ? " (top)" : ""}</td><td>${isSpr(x.q) ? "Type-in" : "Multiple choice"}</td><td>${result(x)}</td></tr>`; }).join("")).join("")}</tbody></table>`;
 }).join("");
 const next = missedPlan(all.map(x => ({ q:x.q, ok:isRight(x) })));
 return `<div class="rpt">
@@ -5472,7 +5483,7 @@ const SITE = {
 name: "OpenShelf",
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 43,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v43")
+version: 44,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v44")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "September 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
