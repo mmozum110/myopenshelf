@@ -84,6 +84,10 @@ button,input{font:inherit;color:inherit}
 @media (max-width:339px){ .sgrow{gap:4px} .sgrow .langsw button{padding:5px 7px} .sgrow .sgtop{padding:3px 7px} }
 #footContact{display:contents}
 #printArea{display:none}
+.sampleteaser{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:22px 0 4px;padding:16px 18px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface)}
+.samplebar{margin:0 0 14px;padding:14px 16px;border-radius:12px;border-left:4px solid var(--c-sat);background:var(--surface)}
+.rptwrap{background:#fff;color:#111;border-radius:12px;overflow-x:auto;border:1px solid var(--line)}
+@media (max-width:560px){ .rptwrap .rpt{padding:14px 12px} .rptwrap .rpt table{font-size:11.5px} .rptwrap .rpt th,.rptwrap .rpt td{padding:4px 5px} .rptwrap .rpt h1{font-size:21px} .rptwrap .rpt .rpt-score{font-size:19px} }
 .mockrow{padding:10px 0;border-top:1px solid var(--line)} .mockrow:first-of-type{border-top:0;padding-top:0}
 .mockrow .up{color:var(--c-ok)} .mockrow .down{color:var(--c-warn)}
 .plantabs{display:flex;gap:6px;margin:14px 0 2px;border-bottom:1.5px solid var(--line)}
@@ -628,6 +632,12 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
     <p class="warnbar" id="storageNote" hidden>This preview can't save to your browser, so progress is kept for this visit only. On your own site it saves automatically. To keep results now, open <strong>My progress</strong> and copy your progress code before closing.</p>
 
+    <section class="sampleteaser" data-en="1" aria-labelledby="sampleTitle">
+      <div><h2 class="sec-title" id="sampleTitle" style="margin:0 0 4px">See what you get</h2>
+      <p class="muted" style="margin:0">After every mock test: your score, results by skill and difficulty, and exactly what to practice next.</p></div>
+      <button class="btn" id="sampleBtn">View a sample report</button>
+    </section>
+
     <section class="featured" id="featured" aria-labelledby="featTitle">
       <h2 class="sec-title" id="featTitle">Popular guides</h2>
       <div class="featrow" id="featRow"></div>
@@ -702,7 +712,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=44"></script>
+<script src="questions.js?v=47"></script>
 <script>
 const CATS = [
 { id: "schools", label: "Schools & aid",  h: 180 },
@@ -4850,7 +4860,7 @@ const MOCK_SPEC = {
 rw:   { label:"Reading & Writing", perModule:27, minutes:32, quota:{ craft:8, info:7, conv:7, expr:5 }, order:["craft","info","conv","expr"] },
 math: { label:"Math", perModule:22, minutes:35, quota:{ alg:8, adv:8, psda:3, geo:3 }, order:null }
 };
-const MOCK_MIX = { mixed:{ Easy:.3, Medium:.4, Hard:.3 }, harder:{ Easy:.1, Medium:.35, Hard:.55 }, easier:{ Easy:.45, Medium:.4, Hard:.15 } };
+const MOCK_MIX = { mixed:{ Easy:.3, Medium:.4, Hard:.3 }, harder:{ Easy:0, Medium:.3, Hard:.7 }   /* no easy questions, like the real harder module (tuned after student feedback, Oct 2026) */, easier:{ Easy:.45, Medium:.4, Hard:.15 } };
 const MOCK_ROUTE_CUTOFF = .6;
 const MOCK_WEIGHT = { Easy:1, Medium:2, Hard:3 };
 const MOCK_SPR = [5, 6];
@@ -4897,6 +4907,63 @@ while(out.filter(isSpr).length > sprTarget && guard-- > 0 && swapIn(false));
 const rank = q => D.indexOf(q.diff);
 if(spec.order) return spec.order.flatMap(dom => out.filter(q => q.dom === dom).sort((a, b) => rank(a) - rank(b)));
 return shuffle(out).sort((a, b) => rank(a) - rank(b));
+}
+const rptRight = x => x.choice === x.q.a;
+const rptAnswered = x => isSpr(x.q) ? String(x.typed || "").trim() !== "" : x.choice !== null;
+function mockReportHTML(completed, format, name, when){
+const prof = { name }, secsOf = S => S.modules.reduce((t, M) => t + (M.secs || 0), 0);
+const all = completed.flatMap(S => S.modules.flatMap(M => M.items)), right = all.filter(rptRight).length;
+const kind = format === "sat" ? "Full SAT (Reading and Writing + Math)" : MOCK_SPEC[completed[0].sec].label + (format === "full" ? ", full section" : ", one module");
+const pct = (r, n) => n ? Math.round(r / n * 100) + "%" : "–";
+const result = x => rptRight(x) ? "Correct" : rptAnswered(x) ? "Incorrect" : "Blank";
+let qn = 0;
+const sections = completed.map(S => {
+const items = S.modules.flatMap(M => M.items), r = items.filter(rptRight).length;
+const doms = SAT_DOMS[S.sec].map(dom => { const xs = items.filter(x => x.q.dom === dom); return [PQ_DOMAINS[dom], xs.filter(rptRight).length, xs.length]; }).filter(x => x[2]);
+const diffs = ["Easy", "Medium", "Hard"].map(df => { const xs = items.filter(x => x.q.diff === df); return [df, xs.filter(rptRight).length, xs.length]; }).filter(x => x[2]);
+const spr = items.filter(x => isSpr(x.q)), blank = items.filter(x => !rptAnswered(x)).length;
+qn = 0;
+return `<h2>${MOCK_SPEC[S.sec].label}: ${r} of ${items.length} correct (${pct(r, items.length)})</h2>
+<table><thead><tr><th>Module</th><th>Correct</th><th>Questions</th></tr></thead><tbody>${S.modules.map((M, i) => `<tr><td>Module ${i + 1}${i === 1 && M.level ? ` (${M.level})` : ""}</td><td>${M.items.filter(rptRight).length}</td><td>${M.items.length}</td></tr>`).join("")}</tbody></table>
+<h3>By skill area</h3>
+<table><thead><tr><th>Skill area</th><th>Correct</th><th>Questions</th><th>Percent</th></tr></thead><tbody>${doms.map(([l, a, n]) => `<tr><td>${l}</td><td>${a}</td><td>${n}</td><td>${pct(a, n)}</td></tr>`).join("")}</tbody></table>
+<h3>By difficulty</h3>
+<table><thead><tr><th>Difficulty</th><th>Correct</th><th>Questions</th></tr></thead><tbody>${diffs.map(([l, a, n]) => `<tr><td>${l}</td><td>${a}</td><td>${n}</td></tr>`).join("")}${spr.length ? `<tr><td>Type-in (any difficulty)</td><td>${spr.filter(rptRight).length}</td><td>${spr.length}</td></tr>` : ""}${(() => { const tops = items.filter(x => x.q.top); return tops.length ? `<tr><td>Top difficulty (also counted under Hard)</td><td>${tops.filter(rptRight).length}</td><td>${tops.length}</td></tr>` : ""; })()}</tbody></table>
+${items.some(x => x.q.top) ? `<p>Top-difficulty questions are the hardest ones. They appear only in the harder Module 2 and matter most for scores above about 700 per section.</p>` : ""}
+${blank ? `<p>${blank} question${blank === 1 ? " was" : "s were"} left blank. There's no penalty for guessing on the SAT.</p>` : ""}
+<h3>Question by question</h3>
+<table class="qbq"><thead><tr><th>#</th><th>Module</th><th>Skill area</th><th>Difficulty</th><th>Type</th><th>Result</th></tr></thead><tbody>${S.modules.map((M, mi) => M.items.map(x => { qn++; return `<tr class="${rptRight(x) ? "rpt-ok" : "rpt-no"}"><td>${qn}</td><td>${mi + 1}</td><td>${PQ_DOMAINS[x.q.dom]}</td><td>${x.q.diff}${x.q.top ? " (top)" : ""}</td><td>${isSpr(x.q) ? "Type-in" : "Multiple choice"}</td><td>${result(x)}</td></tr>`; }).join("")).join("")}</tbody></table>`;
+}).join("");
+const next = missedPlan(all.map(x => ({ q:x.q, ok:rptRight(x) })));
+return `<div class="rpt">
+<p class="rpt-brand">${SITE.name} · myopenshelf.org</p>
+<h1>Mock test report</h1>
+<p><strong>Student:</strong> ${esc(prof.name)}<br><strong>Date:</strong> ${when.toLocaleDateString(undefined, { year:"numeric", month:"long", day:"numeric" })}, ${when.toLocaleTimeString(undefined, { hour:"numeric", minute:"2-digit" })}<br><strong>Test:</strong> ${kind}<br><strong>Testing time:</strong> ${mmss(completed.reduce((t, S) => t + secsOf(S), 0))}</p>
+<p class="rpt-score">${right} of ${all.length} correct · ${pct(right, all.length)}</p>
+${sections}
+${next.length ? `<h2>Practice next</h2><p>Skill areas missed on this test, most-missed first. Practice them on ${SITE.name} with similar practice questions.</p>
+<table><thead><tr><th>Skill area</th><th>Section</th><th>Missed</th><th>Specific skills to practice</th></tr></thead><tbody>${next.map(b => `<tr><td>${PQ_DOMAINS[b.dom]}</td><td>${b.sec === "math" ? "Math" : "Reading and Writing"}</td><td>${b.missed} of ${b.n}</td><td>${Object.entries(b.skills || {}).filter(([, v]) => v.missed > 0).sort((x, y) => y[1].missed - x[1].missed).map(([k, v]) => `${skillName(k)} (${v.missed})`).join(", ")}</td></tr>`).join("")}</tbody></table>` : ""}
+<p class="rpt-note">Mock test questions and answers are kept private so future mock tests stay fair, so this report lists skills and results only. Percent correct is not an official SAT score; for a scaled score, take a practice test in College Board's Bluebook app. SAT® is a trademark registered by the College Board, which is not affiliated with, and does not endorse, ${SITE.name}.</p>
+</div>`;
+}
+const REPORT_CSS = `.rpt{font:14px/1.45 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#111;max-width:760px;margin:0 auto;padding:20px}
+.rpt h1{font-size:24px;margin:2px 0 10px}.rpt h2{font-size:18px;margin:22px 0 8px;border-bottom:2px solid #222;padding-bottom:4px}.rpt h3{font-size:15px;margin:14px 0 6px}
+.rpt table{border-collapse:collapse;width:100%;margin:4px 0 8px;font-size:13px}.rpt th,.rpt td{border:1px solid #bbb;padding:4px 7px;text-align:left}.rpt th{background:#eee}
+.rpt tr.rpt-no td:last-child{font-weight:700}.rpt .rpt-score{font-size:22px;font-weight:700;margin:8px 0 4px}.rpt .rpt-brand{color:#555;margin:0;font-size:12px}
+.rpt .rpt-note{color:#444;font-size:12px;margin-top:20px}.rpt tr{page-break-inside:avoid}`;
+function sampleMockCompleted(){
+const used = new Set(), byId = (a, b) => a.id < b.id ? -1 : 1;
+const pick = (dom, diff, top) => { const q = TEST_PQ.filter(x => x.sec === "math" && x.dom === dom && x.diff === diff && !!x.top === !!top && !used.has(x.id)).sort(byId)[0]; used.add(q.id); return q; };
+const M1 = [["alg","Easy",1],["alg","Easy",1],["alg","Medium",1],["alg","Medium",1],["alg","Medium",1],["alg","Medium",1],["alg","Hard",0],["alg","Hard",1],
+["adv","Easy",1],["adv","Easy",1],["adv","Medium",1],["adv","Medium",0],["adv","Medium",1],["adv","Medium",1],["adv","Hard",1],["adv","Hard",1],
+["psda","Easy",1],["psda","Medium",1],["psda","Hard",1],["geo","Easy",1],["geo","Medium",0],["geo","Hard",1]];
+const M2 = [["alg","Easy",1],["alg","Medium",1],["alg","Medium",1],["alg","Medium",1],["alg","Hard",1],["alg","Hard",0],["alg","Hard",1,1],["alg","Hard",0,1],
+["adv","Easy",1],["adv","Medium",1],["adv","Medium",1],["adv","Medium",1],["adv","Hard",1],["adv","Hard",0],["adv","Hard",1,1],["adv","Hard",1,1],
+["psda","Medium",1],["psda","Hard",1],["psda","Hard",null,1],["geo","Medium",1],["geo","Hard",0],["geo","Hard",1,1]];
+const item = ([dom, diff, ok, top]) => { const q = pick(dom, diff, top);
+return isSpr(q) ? { q, choice: ok ? q.a : ok === null ? null : 99, typed: ok === null ? "" : ok ? String(q.v) : "0" } : { q, choice: ok ? q.a : ok === null ? null : (q.a + 1) % 4 }; };
+const order = list => list.map(item).sort((a, b) => DIFF_ORDER[a.q.diff] - DIFF_ORDER[b.q.diff]);
+return [{ sec:"math", modules:[ { level:"mixed", secs:31 * 60 + 40, items:order(M1) }, { level:"harder", secs:33 * 60 + 5, items:order(M2) } ] }];
 }
 function renderMock(el){
 let cfg = store.get("os_mock2", { sec:"rw", format:"sat", timer:true });
@@ -5127,47 +5194,7 @@ ${S.modules.map((M, mi) => `<p class="small" style="margin:14px 0 4px"><strong>M
 return `<div class="review qsum"><div class="meta"><span><strong>Q${qn}</strong></span><span>${PQ_DOMAINS[q.dom]}</span><span class="diff-${q.diff.toLowerCase()}">${q.diff}${q.top ? " (top)" : ""}</span>${isSpr(q) ? `<span class="sprtag">Type-in</span>` : ""}<span class="${!hasAnswer(x) ? "muted" : ok ? "ok" : "gap"}">${!hasAnswer(x) ? "Blank" : ok ? "✓ Correct" : "✗ Incorrect"}</span></div></div>`; }).join("")).join("")}
 </details>`;
 };
-const reportHTML = () => {
-const prof = activeProf(), when = new Date(), secsOf = S => S.modules.reduce((t, M) => t + (M.secs || 0), 0);
-const all = sess.completed.flatMap(S => S.modules.flatMap(M => M.items)), right = all.filter(isRight).length;
-const kind = sess.format === "sat" ? "Full SAT (Reading and Writing + Math)" : MOCK_SPEC[sess.completed[0].sec].label + (sess.format === "full" ? ", full section" : ", one module");
-const pct = (r, n) => n ? Math.round(r / n * 100) + "%" : "–";
-const result = x => isRight(x) ? "Correct" : hasAnswer(x) ? "Incorrect" : "Blank";
-let qn = 0;
-const sections = sess.completed.map(S => {
-const items = S.modules.flatMap(M => M.items), r = items.filter(isRight).length;
-const doms = SAT_DOMS[S.sec].map(dom => { const xs = items.filter(x => x.q.dom === dom); return [PQ_DOMAINS[dom], xs.filter(isRight).length, xs.length]; }).filter(x => x[2]);
-const diffs = ["Easy", "Medium", "Hard"].map(df => { const xs = items.filter(x => x.q.diff === df); return [df, xs.filter(isRight).length, xs.length]; }).filter(x => x[2]);
-const spr = items.filter(x => isSpr(x.q)), blank = items.filter(x => !hasAnswer(x)).length;
-qn = 0;
-return `<h2>${MOCK_SPEC[S.sec].label}: ${r} of ${items.length} correct (${pct(r, items.length)})</h2>
-<table><thead><tr><th>Module</th><th>Correct</th><th>Questions</th></tr></thead><tbody>${S.modules.map((M, i) => `<tr><td>Module ${i + 1}${i === 1 && M.level ? ` (${M.level})` : ""}</td><td>${M.items.filter(isRight).length}</td><td>${M.items.length}</td></tr>`).join("")}</tbody></table>
-<h3>By skill area</h3>
-<table><thead><tr><th>Skill area</th><th>Correct</th><th>Questions</th><th>Percent</th></tr></thead><tbody>${doms.map(([l, a, n]) => `<tr><td>${l}</td><td>${a}</td><td>${n}</td><td>${pct(a, n)}</td></tr>`).join("")}</tbody></table>
-<h3>By difficulty</h3>
-<table><thead><tr><th>Difficulty</th><th>Correct</th><th>Questions</th></tr></thead><tbody>${diffs.map(([l, a, n]) => `<tr><td>${l}</td><td>${a}</td><td>${n}</td></tr>`).join("")}${spr.length ? `<tr><td>Type-in (any difficulty)</td><td>${spr.filter(isRight).length}</td><td>${spr.length}</td></tr>` : ""}${(() => { const tops = items.filter(x => x.q.top); return tops.length ? `<tr><td>Top difficulty (also counted under Hard)</td><td>${tops.filter(isRight).length}</td><td>${tops.length}</td></tr>` : ""; })()}</tbody></table>
-${items.some(x => x.q.top) ? `<p>Top-difficulty questions are the hardest ones. They appear only in the harder Module 2 and matter most for scores above about 700 per section.</p>` : ""}
-${blank ? `<p>${blank} question${blank === 1 ? " was" : "s were"} left blank. There's no penalty for guessing on the SAT.</p>` : ""}
-<h3>Question by question</h3>
-<table class="qbq"><thead><tr><th>#</th><th>Module</th><th>Skill area</th><th>Difficulty</th><th>Type</th><th>Result</th></tr></thead><tbody>${S.modules.map((M, mi) => M.items.map(x => { qn++; return `<tr class="${isRight(x) ? "rpt-ok" : "rpt-no"}"><td>${qn}</td><td>${mi + 1}</td><td>${PQ_DOMAINS[x.q.dom]}</td><td>${x.q.diff}${x.q.top ? " (top)" : ""}</td><td>${isSpr(x.q) ? "Type-in" : "Multiple choice"}</td><td>${result(x)}</td></tr>`; }).join("")).join("")}</tbody></table>`;
-}).join("");
-const next = missedPlan(all.map(x => ({ q:x.q, ok:isRight(x) })));
-return `<div class="rpt">
-<p class="rpt-brand">${SITE.name} · myopenshelf.org</p>
-<h1>Mock test report</h1>
-<p><strong>Student:</strong> ${esc(prof.name)}<br><strong>Date:</strong> ${when.toLocaleDateString(undefined, { year:"numeric", month:"long", day:"numeric" })}, ${when.toLocaleTimeString(undefined, { hour:"numeric", minute:"2-digit" })}<br><strong>Test:</strong> ${kind}<br><strong>Testing time:</strong> ${mmss(sess.completed.reduce((t, S) => t + secsOf(S), 0))}</p>
-<p class="rpt-score">${right} of ${all.length} correct · ${pct(right, all.length)}</p>
-${sections}
-${next.length ? `<h2>Practice next</h2><p>Skill areas missed on this test, most-missed first. Practice them on ${SITE.name} with similar practice questions.</p>
-<table><thead><tr><th>Skill area</th><th>Section</th><th>Missed</th></tr></thead><tbody>${next.map(b => `<tr><td>${PQ_DOMAINS[b.dom]}</td><td>${b.sec === "math" ? "Math" : "Reading and Writing"}</td><td>${b.missed} of ${b.n}</td></tr>`).join("")}</tbody></table>` : ""}
-<p class="rpt-note">Mock test questions and answers are kept private so future mock tests stay fair, so this report lists skills and results only. Percent correct is not an official SAT score; for a scaled score, take a practice test in College Board's Bluebook app. SAT® is a trademark registered by the College Board, which is not affiliated with, and does not endorse, ${SITE.name}.</p>
-</div>`;
-};
-const REPORT_CSS = `.rpt{font:14px/1.45 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#111;max-width:760px;margin:0 auto;padding:20px}
-.rpt h1{font-size:24px;margin:2px 0 10px}.rpt h2{font-size:18px;margin:22px 0 8px;border-bottom:2px solid #222;padding-bottom:4px}.rpt h3{font-size:15px;margin:14px 0 6px}
-.rpt table{border-collapse:collapse;width:100%;margin:4px 0 8px;font-size:13px}.rpt th,.rpt td{border:1px solid #bbb;padding:4px 7px;text-align:left}.rpt th{background:#eee}
-.rpt tr.rpt-no td:last-child{font-weight:700}.rpt .rpt-score{font-size:22px;font-weight:700;margin:8px 0 4px}.rpt .rpt-brand{color:#555;margin:0;font-size:12px}
-.rpt .rpt-note{color:#444;font-size:12px;margin-top:20px}.rpt tr{page-break-inside:avoid}`;
+const reportHTML = () => mockReportHTML(sess.completed, sess.format, activeProf().name, new Date());
 const finish = auto => {
 clearMockTimer();
 sess.done = true;
@@ -5483,7 +5510,7 @@ const SITE = {
 name: "OpenShelf",
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 44,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v44")
+version: 47,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v47")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "September 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
@@ -5575,6 +5602,16 @@ if(!ok){ try{ await navigator.clipboard.writeText(text); ok = true; }catch(e){} 
 return ok;
 }
 const PAGES = {
+sample: { title:"Sample mock test report", render: el => {
+if(window.QUESTIONS_MISSING){ el.innerHTML = `<h1>Sample mock test report</h1><p>The sample needs the question file, which didn't load. Check your connection and reload.</p>`; return; }
+const rpt = mockReportHTML(sampleMockCompleted(), "full", "Sample student", new Date(2026, 9, 6, 16, 30));
+el.innerHTML = `
+<div class="samplebar" data-en="1"><p style="margin:0 0 8px"><strong>This is a sample report,</strong> with made-up results for a fictional student. After every mock test, ${SITE.name} gives you a report like this to keep or share with a parent or tutor. It shows your score, your results by skill and difficulty, and exactly what to practice next. Mock test questions themselves stay private.</p>
+<div class="ractions"><button class="btn small" data-go="mocktest">Take a mock test</button><button class="btn small ghost" id="smPdf">Save the sample as PDF</button></div></div>
+<div class="rptwrap"><style>${REPORT_CSS}</style>${rpt}</div>`;
+el.querySelector('[data-go="mocktest"]').onclick = () => { track("sample-report", { action:"take-test" }); openTool("mocktest"); };
+el.querySelector("#smPdf").onclick = () => { track("sample-report", { action:"pdf" }); printReport(`<style>${REPORT_CSS}</style>${rpt}`); };
+} },
 suggest: { title:"Suggestion box", render: el => {
 const mail = SITE.email, MAXLEN = 1500;
 const kinds = [["suggestion", "Suggestion"], ["question", "Question"], ["problem", "Report a problem"], ["other", "Other"]];
@@ -6037,6 +6074,7 @@ bar.querySelector("#qmReload").onclick = () => location.reload();
 window.addEventListener("error", e => { if(!e.filename || e.filename === location.href.split("#")[0]) showCrash("page", e.error || e.message); });
 window.addEventListener("unhandledrejection", e => showCrash("page (async)", e.reason));
 document.addEventListener("click", e => { if(e.target.closest(".dlhist")) downloadMockHistory(activeProf()); });
+document.addEventListener("click", e => { const b = e.target.closest("#sampleBtn"); if(b){ track("sample-report", { action:"open" }); openPage("sample", b); } });
 document.addEventListener("click", e => {
 const b = e.target.closest("[data-mpf]"); if(!b) return;
 const [fs, fd] = b.dataset.mpf.split("|"); track("mock-plan-practice", { dom:fd });
