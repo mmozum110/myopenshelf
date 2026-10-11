@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OpenShelf: step-by-step math, SAT practice and college planning</title>
 <meta name="description" content="Free SAT practice and mock tests, step-by-step math from Algebra 1 to Statistics, and college planning tools for students and parents. No sign-up.">
-<meta name="theme-color" content="#172033">
+<meta name="theme-color" content="#F4F7FC">
 <link rel="canonical" href="https://myopenshelf.org/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="OpenShelf">
@@ -28,26 +28,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400&display=swap" rel="stylesheet">
 <style>
 :root{
---paper:#EEF1F6; --surface:#FFFFFF; --ink:#172033; --muted:#566076; --line:#D3D9E4; --ledge:#B9A58A;
---accent:#2B59C3; --accent-ink:#FFFFFF; --scrim:rgba(23,32,51,.45);
---c-schools:#4F7A28; --c-sat:#4B4FA8; --c-courses:#2F6F62; --c-apply:#A87612; --c-college:#4F7A28; --c-ok:#2F6F62; --c-warn:#B8434E; --c-all:#172033;
+--paper:#F4F7FC; --surface:#FFFFFF; --ink:#14213D; --muted:#4B5875; --line:#D6DEEC; --ledge:#B9A58A;
+--accent:#1E5BD8; --accent-ink:#FFFFFF; --scrim:rgba(20,33,61,.45);
+--c-schools:#4F7A28; --c-sat:#4B4FA8; --c-courses:#2F6F62; --c-apply:#8A6110; --c-college:#4F7A28; --c-ok:#2F6F62; --c-warn:#B8434E; --c-all:#14213D;
 --sans:"Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
 color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
 :root:not([data-theme="light"]){
---paper:#10151F; --surface:#182030; --ink:#E6EAF2; --muted:#9AA4B8; --line:#2A3447; --ledge:#5C4E3C;
---accent:#7FA2F0; --accent-ink:#0E1422; --scrim:rgba(0,0,0,.6);
---c-schools:#6C9A3E; --c-sat:#6468C4; --c-courses:#3F8C7C; --c-apply:#B98A2A; --c-college:#6C9A3E; --c-ok:#3F8C7C; --c-warn:#C85A64; --c-all:#3A4661;
-color-scheme:dark;
+--paper:#F4F7FC; --surface:#FFFFFF; --ink:#14213D; --muted:#4B5875; --line:#D6DEEC; --ledge:#B9A58A;
+--accent:#1E5BD8; --accent-ink:#FFFFFF; --scrim:rgba(20,33,61,.45);
+--c-schools:#4F7A28; --c-sat:#4B4FA8; --c-courses:#2F6F62; --c-apply:#8A6110; --c-college:#4F7A28; --c-ok:#2F6F62; --c-warn:#B8434E; --c-all:#14213D;
+color-scheme:light;
 }
 }
 :root[data-theme="dark"]{
---paper:#10151F; --surface:#182030; --ink:#E6EAF2; --muted:#9AA4B8; --line:#2A3447; --ledge:#5C4E3C;
---accent:#7FA2F0; --accent-ink:#0E1422; --scrim:rgba(0,0,0,.6);
---c-schools:#6C9A3E; --c-sat:#6468C4; --c-courses:#3F8C7C; --c-apply:#B98A2A; --c-college:#6C9A3E; --c-ok:#3F8C7C; --c-warn:#C85A64; --c-all:#3A4661;
-color-scheme:dark;
+--paper:#F4F7FC; --surface:#FFFFFF; --ink:#14213D; --muted:#4B5875; --line:#D6DEEC; --ledge:#B9A58A;
+--accent:#1E5BD8; --accent-ink:#FFFFFF; --scrim:rgba(20,33,61,.45);
+--c-schools:#4F7A28; --c-sat:#4B4FA8; --c-courses:#2F6F62; --c-apply:#8A6110; --c-college:#4F7A28; --c-ok:#2F6F62; --c-warn:#B8434E; --c-all:#14213D;
+color-scheme:light;
 }
 *{box-sizing:border-box}
 html{font-size:100%}
@@ -72,6 +72,7 @@ button,input{font:inherit;color:inherit}
 .mc-out{margin-top:12px}
 .mc-other[hidden], .mc-tiers[hidden]{display:none !important}
 .contactmail{font-size:1.15rem;margin:0 0 12px;word-break:break-all}
+a:not(.btn){color:var(--accent)}
 .footver{margin:10px 0 0;font-size:.75rem;color:var(--muted);opacity:.85}
 .sgtop{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .sgtop .sgicon{color:var(--c-apply);flex:none}
@@ -84,6 +85,7 @@ button,input{font:inherit;color:inherit}
 @media (max-width:339px){ .sgrow{gap:4px} .sgrow .langsw button{padding:5px 7px} .sgrow .sgtop{padding:3px 7px} }
 #footContact{display:contents}
 #printArea{display:none}
+blockquote.lit{margin:8px 0 12px;padding:8px 14px;border-left:3px solid var(--line);background:var(--paper);border-radius:0 8px 8px 0;line-height:1.6}
 .sampleteaser{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:22px 0 4px;padding:16px 18px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface)}
 .samplebar{margin:0 0 14px;padding:14px 16px;border-radius:12px;border-left:4px solid var(--c-sat);background:var(--surface)}
 .rptwrap{background:#fff;color:#111;border-radius:12px;overflow-x:auto;border:1px solid var(--line)}
@@ -388,6 +390,7 @@ details.box > summary{font-weight:650;cursor:pointer}
 .aprow:first-of-type{border-top:0}
 body[data-searching="1"] #toolsArea,
 body[data-searching="1"] #featured,
+body[data-searching="1"] .sampleteaser,
 body[data-searching="1"] .shelf,
 body[data-searching="1"] .hero > p,
 body[data-searching="1"] .try{display:none}
@@ -428,8 +431,6 @@ a.builtby:hover .bb-name strong{text-decoration:underline;text-underline-offset:
 .segtab[aria-selected="true"]{background:var(--ink);color:var(--paper)}
 .hero .subhead{font-size:clamp(1.125rem,3.6vw,1.375rem);font-weight:600;color:var(--muted);margin:8px 0 22px;letter-spacing:-.005em;line-height:1.35}
 :root{--sh-math:#2A6A5C;--sh-sat:#4B4FA8;--sh-col:#855A08}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sh-math:#62B8A5;--sh-sat:#A2A6F4;--sh-col:#DDAA45}}
-:root[data-theme="dark"]{--sh-math:#62B8A5;--sh-sat:#A2A6F4;--sh-col:#DDAA45}
 .hero .subhead{display:flex;flex-wrap:wrap;align-items:center;gap:2px 0}
 .hero .subhead .sh{font-weight:700;white-space:nowrap}
 .sh-math{color:var(--sh-math)}.sh-sat{color:var(--sh-sat)}.sh-col{color:var(--sh-col)}
@@ -712,7 +713,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=47"></script>
+<script src="questions.js?v=51"></script>
 <script>
 const CATS = [
 { id: "schools", label: "Schools & aid",  h: 180 },
@@ -1685,18 +1686,54 @@ box.innerHTML = saved.size ? `<button class="chip" id="savedChip" aria-pressed="
 box.hidden = !saved.size;
 const sc = $("#savedChip"); if(sc) sc.onclick = () => { state.savedOnly = !state.savedOnly; renderChips(); renderResults(); };
 }
+/* Smarter search: word forms (plurals, -ing, -ed), small typos, common words ignored, shorthand, and a fallback
+   to the closest matches when nothing matches every word. Non-Latin (e.g. Bangla) queries use plain text matching. */
+const S_STOP = new Set("a an the and or of to for in on at is are be do does did how what which who when where why my me i you your can could should with about from into vs versus get getting it its this that these those".split(" "));
+const S_SYN = { ec:"extracurricular", ecs:"extracurricular", ivies:"ivy", uni:"college", unis:"college", university:"college", universities:"college", recs:"recommendation", rec:"recommendation", maths:"math", scholarships:"scholarship", sats:"sat", aps:"ap", fin:"financial" };
+const sWords = t => (String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").match(/[\p{L}\p{N}]+/gu) || []);
+function sStem(w){
+  if(!/^[a-z0-9]+$/.test(w)) return w;
+  if(w.length > 4 && w.endsWith("ies")) return w.slice(0, -3) + "y";
+  if(w.length > 4 && /(ches|shes|sses|xes|zes)$/.test(w)) return w.slice(0, -2);
+  if(w.length > 3 && w.endsWith("s") && !/(ss|us|is)$/.test(w)) return w.slice(0, -1);
+  if(w.length > 5 && w.endsWith("ing")) return w.slice(0, -3);
+  if(w.length > 4 && w.endsWith("ed")) return w.slice(0, -2);
+  return w;
+}
+function sTerms(q){ return [...new Set(sWords(q).filter(w => !S_STOP.has(w)).map(w => sStem(S_SYN[w] || w)))]; }
+const sIndex = text => [...new Set(sWords(text).map(sStem))];
+function sDist(a, b, max){            /* edit distance, giving up once it exceeds max */
+  if(Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = Array.from({ length:b.length + 1 }, (_, j) => j);
+  for(let i = 1; i <= a.length; i++){
+    const cur = [i]; let best = i;
+    for(let j = 1; j <= b.length; j++){ cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); best = Math.min(best, cur[j]); }
+    if(best > max) return max + 1; prev = cur;
+  }
+  return prev[b.length];
+}
+/* 2 = exact or prefix match, 1 = close spelling, 0 = no match */
+function sHit(t, ws){
+  if(!/^[a-z0-9]+$/.test(t)) return ws.some(w => w.includes(t)) ? 2 : 0;
+  for(const w of ws) if(w === t || (t.length >= 3 && w.startsWith(t))) return 2;
+  if(t.length >= 5){ const max = t.length >= 9 ? 2 : 1; for(const w of ws) if(w.length >= 4 && sDist(t, w, max) <= max) return 1; }
+  return 0;
+}
+let searchPartial = false;
 function filtered(){
-const terms = state.q.toLowerCase().split(/\s+/).filter(Boolean);
-return LESSONS.filter(l =>
-inAud(l) &&
-(state.cat === "all" || l.cat === state.cat) &&
-(state.level === "all" || l.level === state.level) &&
-(!state.savedOnly || saved.has(l.id)) &&
-terms.every(t => l._all.includes(t))
-).map((l, i) => {
-let s = 0; terms.forEach(t => { if(l._title.includes(t)) s += 3; if(l._tags.includes(t)) s += 2; if(l._sum.includes(t)) s += 1; });
-return {l, s, i};
-}).sort((a,b) => b.s - a.s || a.i - b.i).map(x => x.l);
+const terms = sTerms(state.q);
+searchPartial = false;
+const pool = LESSONS.filter(l => inAud(l) && (state.cat === "all" || l.cat === state.cat) && (state.level === "all" || l.level === state.level) && (!state.savedOnly || saved.has(l.id)));
+if(!terms.length) return pool;
+const scored = pool.map((l, i) => {
+  if(!l._sw) l._sw = { all:sIndex(l._all), title:sIndex(l._title), tags:sIndex(l._tags), sum:sIndex(l._sum) };
+  let s = 0, n = 0;
+  terms.forEach(t => { const h = sHit(t, l._sw.all); if(h){ n++; s += h + 3 * sHit(t, l._sw.title) + 2 * sHit(t, l._sw.tags) + sHit(t, l._sw.sum); } });
+  return { l, s, n, i };
+});
+let hits = scored.filter(x => x.n === terms.length);
+if(!hits.length && terms.length > 1){ hits = scored.filter(x => x.n > 0); searchPartial = hits.length > 0; }     /* nothing matches every word: show the closest */
+return hits.sort((a, b) => b.n - a.n || b.s - a.s || a.i - b.i).map(x => x.l);
 }
 function whoLabel(){ return ""; }
 function lessonRow(l){
@@ -1711,12 +1748,13 @@ return `<button class="lesson" data-id="${l.id}" style="--c:var(--c-${l.cat})">
 </span></button>`;
 }
 function toolMatches(q){
-const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+const terms = sTerms(q);
 if(!terms.length) return [];
-return Object.entries(TOOL_META).filter(([id, t]) => {
-const hay = (t.title + " " + t.desc + " " + id).toLowerCase();
-return terms.every(x => hay.includes(x));
-});
+return Object.entries(TOOL_META).map(([id, t]) => {
+const ws = sIndex(t.title + " " + t.desc + " " + id), tw = sIndex(t.title);
+const n = terms.filter(x => sHit(x, ws)).length, s = terms.reduce((a, x) => a + sHit(x, ws) + 2 * sHit(x, tw), 0);
+return { id, t, n, s };
+}).filter(x => x.n === terms.length).sort((a, b) => b.s - a.s).map(x => [x.id, x.t]);
 }
 function renderResults(){
 const list = filtered();
@@ -1737,7 +1775,7 @@ $("#clearAll").onclick = () => { state.q=""; state.cat="all"; state.level="all";
 box.innerHTML = list.map(lessonRow).join("");
 box.querySelectorAll(".lesson").forEach(b => b.onclick = () => openLesson(b.dataset.id, b));
 }
-$("#count").innerHTML = `${list.length} guide${list.length===1?"":"s"}${tools.length ? ` · ${tools.length} tool${tools.length===1?"":"s"}` : ""}${searching ? ` <button class="linkbtn" id="clearQ">Clear search</button>` : ""}`;
+$("#count").innerHTML = `${searchPartial ? `<span class="muted">No guide matches every word; showing the closest.</span> · ` : ""}${list.length} guide${list.length===1?"":"s"}${tools.length ? ` · ${tools.length} tool${tools.length===1?"":"s"}` : ""}${searching ? ` <button class="linkbtn" id="clearQ">Clear search</button>` : ""}`;
 const cq = $("#clearQ");
 if(cq) cq.onclick = () => { state.q = ""; $("#q").value = ""; renderResults(); $("#q").focus(); };
 }
@@ -2583,25 +2621,25 @@ m_area:"Area and volume", m_lat:"Lines, angles and triangles", m_trig:"Right tri
 };
 const MATH_SKILL_MAP = (() => {
 const g = {
-m_lin1:"m1 m5 m23 m41 m44 m45 m47 m52 m53 m118 m133 mx10 mx11 mx15 mx49 mx50 mx51 mx52 m141 m146 m151",
+m_lin1:"m1 m5 m23 m41 m44 m45 m47 m52 m53 m118 m133 mx10 mx11 mx15 mx49 mx50 mx51 mx52 m141 m146 m151 m201 m202 m213 m216",
 m_linfn:"m3 m24 m42 m55 m60 m115 m119 m134 m137 mx1 mx12 mx53 mx54 mx55 mx56 m142 m147 m152",
 m_lin2:"m2 m26 m43 m46 m51 m91 mx2 mx8 mx14 mx57 mx58 mx59 mx60 m143 m148 m153",
 m_sys:"m4 m6 m48 m54 m56 m120 m135 m136 mx3 mx4 mx6 mx7 mx13 mx61 mx62 mx63 mx64 m145 m154",
 m_ineq:"m25 m49 mx5 mx9 mx16 mx65 mx66 mx67 mx68 m144 m149 m150 m155",
-m_nlfn:"m7 m10 m11 m30 m32 m57 m62 m64 m67 m71 m117 m138 m140 mx17 mx20 mx22 mx24 mx25 mx27 mx28 mx29 mx32 mx81 mx82 m158 m160 m164 m165 m170",
+m_nlfn:"m7 m10 m11 m30 m32 m57 m62 m64 m67 m71 m117 m138 m140 mx17 mx20 mx22 mx24 mx25 mx27 mx28 mx29 mx32 mx81 mx82 m158 m160 m164 m165 m170 m203 m204 m205 m206 m210 m215 m218",
 m_nleq:"m8 m28 m29 m31 m50 m61 m63 m65 m68 m69 m70 m139 mx18 mx19 mx21 mx23 mx26 mx31 mx83 m159 m163 m168 m169",
-m_equiv:"m9 m27 m58 m59 m66 m116 mx30 mx84 m156 m157 m161 m162 m166 m167",
-m_ratio:"m14 m33 m72 m75 m86 m114 m129 m130 m131 mx38 m171 m176",
+m_equiv:"m9 m27 m58 m59 m66 m116 mx30 mx84 m156 m157 m161 m162 m166 m167 m209 m211",
+m_ratio:"m14 m33 m72 m75 m86 m114 m129 m130 m131 mx38 m171 m176 m217",
 m_pct:"m12 m15 m17 m34 m74 m76 m79 m81 m85 m112 m132 mx34 mx36 mx85 m172 m177",
-m_data1:"m13 m16 m36 m73 m78 m82 m113 mx37 mx86 m173 m178 m182",
+m_data1:"m13 m16 m36 m73 m78 m82 m113 mx37 mx86 m173 m178 m182 m207 m214",
 m_data2:"m77 mx33 mx39 m175 m179 m183",
 m_prob:"m35 m83 m111 mx35 mx87 m174 m181",
 m_infer:"m80 m84 mx88 m180 m184",
 m_claims:"mx40 m185",
-m_area:"m37 m38 m88 m89 m96 m98 m101 m104 m107 m121 m122 m125 m128 mx45 mx46 mx69 mx70 mx71 m186 m191 m195 m200",
+m_area:"m37 m38 m88 m89 m96 m98 m101 m104 m107 m121 m122 m125 m128 mx45 mx46 mx69 mx70 mx71 m186 m191 m195 m200 m212",
 m_lat:"m20 m39 m87 m97 m100 m106 m124 mx41 mx48 mx72 mx73 mx74 m187 m190 m194 m199",
 m_trig:"m18 m21 m90 m92 m95 m103 m108 m123 m127 mx44 mx75 mx76 mx77 m189 m193 m198",
-m_circ:"m19 m22 m40 m93 m94 m99 m102 m105 m109 m110 m126 mx42 mx43 mx47 mx78 mx79 mx80 m188 m192 m196 m197"
+m_circ:"m19 m22 m40 m93 m94 m99 m102 m105 m109 m110 m126 mx42 mx43 mx47 mx78 mx79 mx80 m188 m192 m196 m197 m208"
 };
 const m = {}; Object.entries(g).forEach(([k, ids]) => ids.split(" ").forEach(id => { m[id] = k; })); return m;
 })();
@@ -5510,7 +5548,7 @@ const SITE = {
 name: "OpenShelf",
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 47,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v47")
+version: 53,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "September 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
