@@ -86,7 +86,28 @@ a:not(.btn){color:var(--accent)}
 #footContact{display:contents}
 #printArea{display:none}
 blockquote.lit{margin:8px 0 12px;padding:8px 14px;border-left:3px solid var(--line);background:var(--paper);border-radius:0 8px 8px 0;line-height:1.6}
-.sampleteaser{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:22px 0 4px;padding:16px 18px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface)}
+.sampleteaser{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;align-items:center;margin:30px 0 4px;padding:18px 20px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface)}
+@media (max-width:700px){ .sampleteaser{grid-template-columns:1fr} }
+.rptpeek{background:#fff;color:#14213D;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.85rem;box-shadow:0 6px 18px rgba(20,33,61,.08)}
+.pk-head{font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:#4B5875;font-weight:700}
+.pk-score{font-weight:800;font-size:1.1rem;margin:2px 0 8px}
+.pk-row{display:grid;grid-template-columns:7.5em minmax(0,1fr) 3.6em;align-items:center;gap:8px;margin:5px 0}
+.pk-row i{display:block;height:8px;border-radius:99px;background:linear-gradient(90deg,#1E5BD8 var(--w),#E3E8F2 var(--w))}
+.pk-row b{text-align:right;font-weight:700}
+.pk-next{margin-top:9px;padding-top:8px;border-top:1px dashed #D6DEEC;color:#4B5875}
+.startrow{margin:22px 0 6px}
+.startgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}
+.starttile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:16px 18px;border:0;border-radius:16px;background:var(--c);color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:0 6px 16px rgba(20,33,61,.14);transition:transform .12s ease}
+.starttile:hover{transform:translateY(-2px)}
+.starttile:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.starttile .sticon{font-size:1.7rem;line-height:1.1}
+.starttile .stlabel{font-weight:800;font-size:1.08rem;line-height:1.25}
+.starttile .stsub{font-size:.86rem;opacity:.95}
+@media (max-width:599px){ .startgrid{grid-template-columns:1fr;gap:10px} .starttile{flex-direction:row;align-items:center;gap:12px;padding:14px 16px} .starttile .stsub{display:none} }
+.toolcard .ticon{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--paper);font-style:normal;font-size:1.15rem;margin-bottom:8px}
+.toolcard .newbadge{display:inline-block;margin-left:4px;padding:1px 8px;border-radius:999px;background:var(--accent);color:#fff;font-style:normal;font-size:.68rem;font-weight:800;letter-spacing:.03em;vertical-align:2px}
+.toolcard .tshort{display:none}
+@media (max-width:599px){ .toolcard .tlong{display:none} .toolcard .tshort{display:block} }
 .samplebar{margin:0 0 14px;padding:14px 16px;border-radius:12px;border-left:4px solid var(--c-sat);background:var(--surface)}
 .rptwrap{background:#fff;color:#111;border-radius:12px;overflow-x:auto;border:1px solid var(--line)}
 @media (max-width:560px){ .rptwrap .rpt{padding:14px 12px} .rptwrap .rpt table{font-size:11.5px} .rptwrap .rpt th,.rptwrap .rpt td{padding:4px 5px} .rptwrap .rpt h1{font-size:21px} .rptwrap .rpt .rpt-score{font-size:19px} }
@@ -391,6 +412,7 @@ details.box > summary{font-weight:650;cursor:pointer}
 body[data-searching="1"] #toolsArea,
 body[data-searching="1"] #featured,
 body[data-searching="1"] .sampleteaser,
+body[data-searching="1"] .startrow,
 body[data-searching="1"] .shelf,
 body[data-searching="1"] .hero > p,
 body[data-searching="1"] .try{display:none}
@@ -633,21 +655,38 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
     <p class="warnbar" id="storageNote" hidden>This preview can't save to your browser, so progress is kept for this visit only. On your own site it saves automatically. To keep results now, open <strong>My progress</strong> and copy your progress code before closing.</p>
 
-    <section class="sampleteaser" data-en="1" aria-labelledby="sampleTitle">
-      <div><h2 class="sec-title" id="sampleTitle" style="margin:0 0 4px">See what you get</h2>
-      <p class="muted" style="margin:0">After every mock test: your score, results by skill and difficulty, and exactly what to practice next.</p></div>
-      <button class="btn" id="sampleBtn">View a sample report</button>
-    </section>
-
-    <section class="featured" id="featured" aria-labelledby="featTitle">
-      <h2 class="sec-title" id="featTitle">Popular guides</h2>
-      <div class="featrow" id="featRow"></div>
+    <section class="startrow" aria-labelledby="startTitle">
+      <h2 class="sec-title" id="startTitle">Start here</h2>
+      <div class="startgrid">
+        <button class="starttile" data-start="practice" style="--c:var(--c-sat)"><span class="sticon" aria-hidden="true">📝</span><span class="stlabel">Practice SAT</span><span class="stsub">Step-by-step help</span></button>
+        <button class="starttile" data-start="mocktest" style="--c:var(--accent)"><span class="sticon" aria-hidden="true">⏱️</span><span class="stlabel">Take a mock test</span><span class="stsub">Real SAT format</span></button>
+        <button class="starttile" data-start="scoreplan" style="--c:var(--c-courses)"><span class="sticon" aria-hidden="true">🎯</span><span class="stlabel">Build my score plan</span><span class="stsub">A plan for every week</span></button>
+      </div>
     </section>
 
     <div id="fxLive" class="sr" aria-live="polite"></div>
     <div id="nudges"></div>
 
     <div id="toolsArea"></div>
+
+    <section class="sampleteaser" data-en="1" aria-labelledby="sampleTitle">
+      <div class="stx"><h2 class="sec-title" id="sampleTitle" style="margin:0 0 4px">See what you get</h2>
+      <p class="muted" style="margin:0 0 14px">After every mock test: your score, results by skill and difficulty, and exactly what to practice next.</p>
+      <button class="btn" id="sampleBtn">View a sample report</button></div>
+      <div class="rptpeek" aria-hidden="true">
+        <div class="pk-head">Mock test report · Math</div>
+        <div class="pk-score">36 of 44 correct · 82%</div>
+        <div class="pk-row"><span>Algebra</span><i style="--w:88%"></i><b>88%</b></div>
+        <div class="pk-row"><span>Advanced Math</span><i style="--w:63%"></i><b>63%</b></div>
+        <div class="pk-row"><span>Top difficulty</span><i style="--w:67%"></i><b>4 of 6</b></div>
+        <div class="pk-next"><strong>Practice next:</strong> Advanced Math · Nonlinear functions</div>
+      </div>
+    </section>
+
+    <section class="featured" id="featured" aria-labelledby="featTitle">
+      <h2 class="sec-title" id="featTitle">Popular guides</h2>
+      <div class="featrow" id="featRow"></div>
+    </section>
 
     <section class="shelf" aria-labelledby="shelfTitle">
       <h2 id="shelfTitle">Guides by topic</h2>
@@ -1337,6 +1376,7 @@ return { lang, bnNum, set(l){ store.set("os_lang", l); store.set("os_qlang", nul
 })();
 const bnNum = I18N.bnNum;
 const BN = {
+"Start here":"এখান থেকে শুরু করুন", "Practice SAT":"SAT অনুশীলন", "Take a mock test":"মক টেস্ট দিন", "Build my score plan":"আমার স্কোর পরিকল্পনা তৈরি করুন", "Step-by-step help":"ধাপে ধাপে সাহায্য", "Real SAT format":"আসল SAT ফরম্যাট", "A plan for every week":"প্রতি সপ্তাহের পরিকল্পনা", "New":"নতুন", "Step-by-step SAT and math practice":"ধাপে ধাপে SAT ও গণিত অনুশীলন", "Real SAT format, adaptive modules":"আসল SAT ফরম্যাট, অভিযোজিত মডিউল", "A weekly plan to your target":"লক্ষ্যে পৌঁছানোর সাপ্তাহিক পরিকল্পনা", "Scores, skills and what's next":"স্কোর, দক্ষতা ও পরবর্তী করণীয়", "Browse every question":"সব প্রশ্ন দেখুন", "Where your score lands":"আপনার স্কোর কোথায় দাঁড়ায়", "A weekly summary for parents":"অভিভাবকদের জন্য সাপ্তাহিক সারাংশ", "Assign sets, compare students":"সেট দিন, শিক্ষার্থীদের তুলনা করুন", "To-dos for grades 9–12":"৯–১২ শ্রেণির করণীয়", "Sort colleges: reach, target, likely":"কলেজ সাজান: রিচ, টার্গেট, লাইকলি", "Plan four years of classes":"চার বছরের ক্লাস পরিকল্পনা", "AP credit at 28 top colleges":"২৮টি শীর্ষ কলেজে AP ক্রেডিট", "Scholarship steps by score":"স্কোর অনুযায়ী বৃত্তির ধাপ", "Key dates this year":"এ বছরের গুরুত্বপূর্ণ তারিখ",
 "My progress":"আমার অগ্রগতি", "Learning made easy.":"শেখা হলো সহজ।", "Open to all.":"সবার জন্য উন্মুক্ত।",
 "Math":"গণিত", "SAT practice":"SAT অনুশীলন", "College planning":"কলেজ পরিকল্পনা",
 "Search lessons":"পাঠ খুঁজুন", "Search, e.g. SAT scores, calculus, Early Decision":"খুঁজুন, যেমন: SAT স্কোর, ক্যালকুলাস, Early Decision",
@@ -1957,13 +1997,31 @@ const TOOL_GROUPS = [
 { label:"For parents & tutors", ids:["parent","tutor","checklists"] },
 { label:"Plan & apply", ids:["listbuilder","planner","apcredit","meritcalc","deadlines"] }
 ];
+/* Home-page tool cards: an icon, a one-line description for phones, and a "New" badge until a date. */
+const TOOL_EXTRA = {
+  practice:{ icon:"📝", short:"Step-by-step SAT and math practice" },
+  mocktest:{ icon:"⏱️", short:"Real SAT format, adaptive modules", newUntil:"2026-12-31" },
+  scoreplan:{ icon:"🎯", short:"A weekly plan to your target", newUntil:"2026-12-31" },
+  dashboard:{ icon:"📈", short:"Scores, skills and what's next", newUntil:"2026-12-31" },
+  bank:{ icon:"📚", short:"Browse every question" },
+  satcheck:{ icon:"🔎", short:"Where your score lands" },
+  parent:{ icon:"👪", short:"A weekly summary for parents" },
+  tutor:{ icon:"🧑‍🏫", short:"Assign sets, compare students" },
+  checklists:{ icon:"✅", short:"To-dos for grades 9–12" },
+  listbuilder:{ icon:"🗂️", short:"Sort colleges: reach, target, likely" },
+  planner:{ icon:"🗓️", short:"Plan four years of classes" },
+  apcredit:{ icon:"🎓", short:"AP credit at 28 top colleges" },
+  meritcalc:{ icon:"💰", short:"Scholarship steps by score" },
+  deadlines:{ icon:"⏰", short:"Key dates this year" }
+};
+const isNewTool = id => { const x = TOOL_EXTRA[id]; return !!(x && x.newUntil && Date.now() < new Date(x.newUntil + "T23:59:59").getTime()); };
 function renderToolsSection(){
 const area = $("#toolsArea");
 area.innerHTML = `<section class="tools" aria-labelledby="toolsTitle">
 <h2 class="sec-title" id="toolsTitle">Tools for students &amp; parents</h2>
 <p class="muted" style="margin:0">Free, private tools. Everything you enter stays on this device.</p>
 ${TOOL_GROUPS.map(g => `<h3 class="toolgroup">${g.label}</h3><div class="tools-grid">${g.ids.filter(id => TOOL_META[id]).map(id =>
-`<button class="toolcard" data-tool="${id}"><b>${TOOL_META[id].title}</b><span>${TOOL_META[id].desc}</span></button>`).join("")}</div>`).join("")}
+`<button class="toolcard" data-tool="${id}">${TOOL_EXTRA[id] ? `<i class="ticon" aria-hidden="true">${TOOL_EXTRA[id].icon}</i>` : ""}<b>${TOOL_META[id].title}${isNewTool(id) ? ` <em class="newbadge">New</em>` : ""}</b><span class="tlong">${TOOL_META[id].desc}</span>${TOOL_EXTRA[id] ? `<span class="tshort">${TOOL_EXTRA[id].short}</span>` : ""}</button>`).join("")}</div>`).join("")}
 </section>`;
 area.querySelectorAll(".toolcard").forEach(b => b.onclick = () => openTool(b.dataset.tool, b));
 }
@@ -5548,7 +5606,7 @@ const SITE = {
 name: "OpenShelf",
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 53,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
+version: 54,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "September 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
@@ -6112,6 +6170,11 @@ bar.querySelector("#qmReload").onclick = () => location.reload();
 window.addEventListener("error", e => { if(!e.filename || e.filename === location.href.split("#")[0]) showCrash("page", e.error || e.message); });
 window.addEventListener("unhandledrejection", e => showCrash("page (async)", e.reason));
 document.addEventListener("click", e => { if(e.target.closest(".dlhist")) downloadMockHistory(activeProf()); });
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-start]"); if(!b) return;
+  track("start-tile", { tool:b.dataset.start }); openTool(b.dataset.start, b);
+  if(b.dataset.start === "practice") setTimeout(() => { const t = document.querySelector('#tBody [data-track="sat"]'); if(t) t.click(); }, 0);
+});
 document.addEventListener("click", e => { const b = e.target.closest("#sampleBtn"); if(b){ track("sample-report", { action:"open" }); openPage("sample", b); } });
 document.addEventListener("click", e => {
 const b = e.target.closest("[data-mpf]"); if(!b) return;
