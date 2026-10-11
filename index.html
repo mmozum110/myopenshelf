@@ -97,12 +97,13 @@ blockquote.lit{margin:8px 0 12px;padding:8px 14px;border-left:3px solid var(--li
 .pk-next{margin-top:9px;padding-top:8px;border-top:1px dashed #D6DEEC;color:#4B5875}
 .startrow{margin:22px 0 6px}
 .startgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}
-.starttile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:16px 18px;border:0;border-radius:16px;background:var(--c);color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:0 6px 16px rgba(20,33,61,.14);transition:transform .12s ease}
+.starttile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:16px 18px;border:1.5px solid var(--tbd);border-radius:16px;background:var(--tbg);color:var(--tfg);font:inherit;text-align:left;cursor:pointer;box-shadow:0 2px 8px rgba(20,33,61,.06);transition:transform .12s ease, box-shadow .12s ease}
+.starttile:hover{box-shadow:0 6px 16px rgba(20,33,61,.12)}
 .starttile:hover{transform:translateY(-2px)}
-.starttile:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.starttile:focus-visible{outline:3px solid var(--tfg);outline-offset:3px}
 .starttile .sticon{font-size:1.7rem;line-height:1.1}
 .starttile .stlabel{font-weight:800;font-size:1.08rem;line-height:1.25}
-.starttile .stsub{font-size:.86rem;opacity:.95}
+.starttile .stsub{font-size:.86rem;color:var(--tsub)}
 @media (max-width:599px){ .startgrid{grid-template-columns:1fr;gap:10px} .starttile{flex-direction:row;align-items:center;gap:12px;padding:14px 16px} .starttile .stsub{display:none} }
 .toolcard .ticon{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--paper);font-style:normal;font-size:1.15rem;margin-bottom:8px}
 .toolcard .newbadge{display:inline-block;margin-left:4px;padding:1px 8px;border-radius:999px;background:var(--accent);color:#fff;font-style:normal;font-size:.68rem;font-weight:800;letter-spacing:.03em;vertical-align:2px}
@@ -658,9 +659,9 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
     <section class="startrow" aria-labelledby="startTitle">
       <h2 class="sec-title" id="startTitle">Start here</h2>
       <div class="startgrid">
-        <button class="starttile" data-start="practice" style="--c:var(--c-sat)"><span class="sticon" aria-hidden="true">📝</span><span class="stlabel">Practice SAT</span><span class="stsub">Step-by-step help</span></button>
-        <button class="starttile" data-start="mocktest" style="--c:var(--accent)"><span class="sticon" aria-hidden="true">⏱️</span><span class="stlabel">Take a mock test</span><span class="stsub">Real SAT format</span></button>
-        <button class="starttile" data-start="scoreplan" style="--c:var(--c-courses)"><span class="sticon" aria-hidden="true">🎯</span><span class="stlabel">Build my score plan</span><span class="stsub">A plan for every week</span></button>
+        <button class="starttile" data-start="practice" style="--tbg:#E6F1FB;--tfg:#0C447C;--tsub:#185FA5;--tbd:#B5D4F4"><span class="sticon" aria-hidden="true">📝</span><span class="stlabel">Practice SAT</span><span class="stsub">Step-by-step help</span></button>
+        <button class="starttile" data-start="mocktest" style="--tbg:#E1F5EE;--tfg:#085041;--tsub:#0F6E56;--tbd:#9FE1CB"><span class="sticon" aria-hidden="true">⏱️</span><span class="stlabel">Take a mock test</span><span class="stsub">Real SAT format</span></button>
+        <button class="starttile" data-start="scoreplan" style="--tbg:#FAEEDA;--tfg:#633806;--tsub:#854F0B;--tbd:#FAC775"><span class="sticon" aria-hidden="true">🎯</span><span class="stlabel">Build my score plan</span><span class="stsub">A plan for every week</span></button>
       </div>
     </section>
 
@@ -5606,7 +5607,7 @@ const SITE = {
 name: "OpenShelf",
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 54,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
+version: 55,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "September 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
