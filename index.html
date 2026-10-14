@@ -160,7 +160,9 @@ a.btn{text-decoration:none}
 .logo-mark{display:inline-flex;gap:2px;align-items:flex-end;height:22px}
 .logo-mark i{display:block;width:5px;border-radius:1px 1px 0 0}
 .hright{display:flex;gap:8px;align-items:center}
-@media (max-width:389px){ .top{gap:4px} .logo{font-size:1.0625rem;gap:5px} .hright{gap:5px} .hright .btn.small{padding:6px 9px;font-size:.8438rem} }
+@media (max-width:430px){ .top{gap:4px} .logo{font-size:1.0625rem;gap:5px} .hright{gap:5px} .hright .btn.small{padding:6px 9px;font-size:.8438rem} }
+@media (max-width:359px){ .wrap{padding-left:14px;padding-right:14px} .hright{gap:4px} .hright .btn.small{padding:6px 7px} .hright .sg-wide{width:34px;height:34px} .hright .sg-wide .sgicon{width:18px;height:18px} .logo .beta{font-size:.55rem;padding:0 4px} }
+@media (max-width:340px){ .logo .beta{display:none} }
 .btn{white-space:nowrap;border:0;border-radius:999px;padding:10px 18px;font-weight:600;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
 .btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
 .btn.small{padding:7px 14px;font-size:.9375rem}
@@ -624,6 +626,15 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 .toast[hidden]{display:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Suggestion box: a lightbulb in the header's top-right corner on phones; a labeled button beside My progress on wider screens */
+.sgrow{display:none !important}
+@media (max-width:679px){
+  .hright .sg-wide{display:inline-flex;order:3;width:38px;height:38px;padding:0 !important;justify-content:center;border-radius:999px}
+  .hright .sg-wide span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .hright .sg-wide .sgicon{width:20px;height:20px}
+}
+@media (max-width:359px){ header.top .hright .sg-wide{width:32px;height:32px} header.top .hright .sg-wide .sgicon{width:17px;height:17px} header.top #myProgTop{padding:6px 8px;font-size:.78rem} header.top #tsize{padding:6px 6px} header.top .logo{font-size:1rem} header.top .hright{gap:3px} }
 </style>
 </head>
 <body>
@@ -639,7 +650,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
       <div id="headerAct"></div>
     </div>
   </header>
-  <div class="sgrow"><div class="langsw" role="group" aria-label="Language" data-noi18n><button data-lang="en" lang="en">English</button><button data-lang="bn" lang="bn">বাংলা</button></div><button class="btn ghost small sgtop sg-narrow" aria-label="Suggestion box: send us an idea or question"><svg class="sgicon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2V17h5v-1.2c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3z"/></svg><span>Suggestion box</span></button></div>
+  <div class="sgrow"><button class="btn ghost small sgtop sg-narrow" aria-label="Suggestion box: send us an idea or question"><svg class="sgicon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2V17h5v-1.2c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3z"/></svg><span>Suggestion box</span></button></div>
 
   <main>
     <section class="hero">
@@ -753,8 +764,10 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=51"></script>
+<script src="questions.js?v=58"></script>
 <script>
+/* Bangla (বাংলা) is turned off for now. The translations are kept: set BANGLA_ON to true and restore the header switch to bring it back. */
+const BANGLA_ON = false;
 const CATS = [
 { id: "schools", label: "Schools & aid",  h: 180 },
 { id: "sat",     label: "SAT & testing",  h: 170 },
@@ -1370,7 +1383,7 @@ $("#myProgTop").onclick = () => openTool("dashboard", $("#myProgTop"));
 }
 const I18N = (() => {
 const saved = store.get("os_lang", null);
-const lang = saved || ((navigator.language || "").toLowerCase().startsWith("bn") ? "bn" : "en");
+const lang = BANGLA_ON ? (saved || ((navigator.language || "").toLowerCase().startsWith("bn") ? "bn" : "en")) : "en";   /* Bangla is turned off for now: everyone sees English */
 const D = "০১২৩৪৫৬৭৮৯";
 const bnNum = s => String(s).replace(/\d/g, d => D[d]);
 return { lang, bnNum, set(l){ store.set("os_lang", l); store.set("os_qlang", null); /* the top switch resets question language too */ track("language", { lang:l }); location.reload(); } };
@@ -3191,7 +3204,7 @@ why: q => !last[q.id] ? "new" : !last[q.id].ok ? "missed" : "helped" };
 }
 const orderUnit = qs => qs.slice().sort((a, b) => (DIFF_ORDER[a.diff] - DIFF_ORDER[b.diff]) || (parseInt(a.id.replace(/\D/g, "")) - parseInt(b.id.replace(/\D/g, ""))));
 const courseUnits = (pid, sec) => Object.keys(PQ_DOMAINS).filter(k => PRACTICE_PQ.some(q => q.sec === sec && q.dom === k)).map((k, i) => ({ k, n:i + 1, l:PQ_DOMAINS[k], p:unitProgress(pid, sec, k) }));
-const qLang = () => store.get("os_qlang", null) || I18N.lang;
+const qLang = () => BANGLA_ON ? (store.get("os_qlang", null) || I18N.lang) : "en";
 function localQ(q, it){
 const lang = (it && it.lang) || qLang();
 if(lang !== "bn" || !q.bn) return q;
@@ -3555,7 +3568,7 @@ el.innerHTML = `
 <div class="pqhead"><span class="small muted">${sess.label ? esc(sess.label) + " · " : ""}Question ${sess.i + 1} of ${N}${(sess.streak || 0) >= 2 && sess.mode === "guided" ? ` <span class="streak" title="Correct answers in a row">🔥 ${sess.streak} in a row</span>` : ""}</span><span class="pqtools">${soundBtn("gpSound")}<button class="linkbtn" id="gpEnd">End and see results</button></span></div>
 <div class="bar" style="margin:6px 0 16px"><i style="width:${sess.i / N * 100}%;background:var(--c-sat)"></i></div>
 <div class="meta"><span class="mcat" style="color:var(--c-sat)">${SEC_SHORT[q.sec] || "Math"}</span><span>${PQ_DOMAINS[q.dom]}</span>${isCourse(q.sec) ? "" : `<span class="diff-${q.diff.toLowerCase()}">${q.diff}</span>`}</div>
-${it.q.bn ? (() => { const cur = it.lang || qLang(); return `<div class="qlangsw" role="group" aria-label="Question language" data-noi18n><span class="qlangl" aria-hidden="true">${cur === "bn" ? "প্রশ্নের ভাষা" : "Question language"}</span><button data-ql="en" lang="en" aria-pressed="${cur === "en"}">English</button><button data-ql="bn" lang="bn" aria-pressed="${cur === "bn"}">বাংলা</button></div>`; })() : ""}${guidedMath ? `<p class="qlabel">Question</p>` : ""}<div class="pqstem">${q.q}</div>
+${BANGLA_ON && it.q.bn ? (() => { const cur = it.lang || qLang(); return `<div class="qlangsw" role="group" aria-label="Question language" data-noi18n><span class="qlangl" aria-hidden="true">${cur === "bn" ? "প্রশ্নের ভাষা" : "Question language"}</span><button data-ql="en" lang="en" aria-pressed="${cur === "en"}">English</button><button data-ql="bn" lang="bn" aria-pressed="${cur === "bn"}">বাংলা</button></div>`; })() : ""}${guidedMath ? `<p class="qlabel">Question</p>` : ""}<div class="pqstem">${q.q}</div>
 ${coach}
 ${rwCoach}
 ${guidedMath && !choicesOpen ? `<p class="small" style="margin:16px 0 6px"><strong>Answer choices</strong> <span class="muted">· unlock after the steps</span></p>` : `<p class="small" style="margin:16px 0 6px"><strong>Answer choices</strong></p>`}
@@ -5607,7 +5620,7 @@ const SITE = {
 name: "OpenShelf",
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 55,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
+version: 58,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "September 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
