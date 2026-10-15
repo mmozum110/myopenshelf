@@ -635,6 +635,10 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
   .hright .sg-wide .sgicon{width:20px;height:20px}
 }
 @media (max-width:359px){ header.top .hright .sg-wide{width:32px;height:32px} header.top .hright .sg-wide .sgicon{width:17px;height:17px} header.top #myProgTop{padding:6px 8px;font-size:.78rem} header.top #tsize{padding:6px 6px} header.top .logo{font-size:1rem} header.top .hright{gap:3px} }
+.ideafig{margin:6px 0 14px}
+.ideafig svg{display:block;width:100%;max-width:440px;height:auto;margin:6px 0;border:1px solid var(--line);border-radius:12px;font-family:inherit}
+.ideafig .figcap{margin:6px 0 4px;line-height:1.55}
+.ideafig .figlabel{margin:14px 0 2px;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -764,7 +768,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=58"></script>
+<script src="questions.js?v=62"></script>
 <script>
 /* Bangla (বাংলা) is turned off for now. The translations are kept: set BANGLA_ON to true and restore the header switch to bring it back. */
 const BANGLA_ON = false;
@@ -3123,6 +3127,7 @@ return `<div class="ideacard" id="ideaCard">
 ${q.bn && (it.lang || qLang()) === "bn" ? `<p class="small muted" lang="bn">এই ব্যাখ্যাটি আপাতত শুধু ইংরেজিতে।</p><p class="small muted">This explanation is in English for now.</p>` : ""}
 <h4>What the question is asking</h4><p>${c.ask}</p>
 <h4>The idea you need</h4><p>${c.idea}</p>
+${c.fig ? `<h4>See it</h4><div class="ideafig">${c.fig}</div>` : ""}
 <h4>Solve it</h4><ol class="ideasteps">${c.steps.map(x => `<li>${x}</li>`).join("")}</ol>
 <p class="ideanote"><strong>Check:</strong> ${c.check}</p>
 <h4>The answer choices</h4>
@@ -3528,7 +3533,7 @@ const input = s.t === "n"
 : `<div class="qopts" style="margin-top:8px">${s.c.map((c, j) => `<button class="qopt stepopt" data-j="${j}">${c}</button>`).join("")}</div>`;
 current = `<div class="step now"><p class="small" style="margin:0"><strong>Step ${it.si+1} of ${q.steps.length}</strong></p><p style="margin:4px 0 0">${s.p}</p>${input}
 <div id="stepFb" class="fb" aria-live="polite">${it.fb}</div>
-<div class="steptools"><button class="linkbtn" id="stepHint">Hint</button><button class="linkbtn" id="stepShow">Show step</button>${explainLink}<button class="linkbtn" id="stepSkip">Skip to choices</button></div></div>`;
+<div class="steptools">${s.h ? `<button class="linkbtn" id="stepHint">Hint</button>` : ""}<button class="linkbtn" id="stepShow">Show step</button>${explainLink}<button class="linkbtn" id="stepSkip">Skip to choices</button></div></div>`;
 } else if(it.stepsDone){
 current = `<p class="coachsay" style="margin-top:12px">${it.stepLog.every(x => x === "solved") ? "Excellent, you solved every step on your own!" : "Nice work getting through every step."} Now pick the answer choice that matches your result.</p>`;
 } else {
@@ -3662,7 +3667,7 @@ inp.addEventListener("keydown", e => { if(e.key === "Enter") check(); });
 } else {
 el.querySelectorAll(".stepopt").forEach(b => b.onclick = () => +b.dataset.j === s.a ? (b.classList.add("right"), correct()) : (b.classList.add("wrong"), wrong()));
 }
-$("#stepHint").onclick = () => { it.hintOn = true; it.fb = `Hint: ${s.h}`; drawItem(); const f = $("#stepAns"); if(f) f.focus(); };
+if($("#stepHint")) $("#stepHint").onclick = () => { it.hintOn = true; it.fb = `Hint: ${s.h}`; drawItem(); const f = $("#stepAns"); if(f) f.focus(); };
 $("#stepShow").onclick = () => showStep();
 $("#stepSkip").onclick = () => { it.skipped = true; drawItem(); };
 }
@@ -5620,7 +5625,7 @@ const SITE = {
 name: "OpenShelf",
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 58,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
+version: 62,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "September 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
