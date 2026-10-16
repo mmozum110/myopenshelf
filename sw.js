@@ -3,7 +3,7 @@
    when they're offline or on a weak connection. The page and the question bank (questions.js) are always
    checked with the server (cache: "no-cache"), so an update shows up on the next visit.
    When you upload a new index.html and questions.js, change VERSION below so old saved copies are cleared. */
-const VERSION = "openshelf-v64";
+const VERSION = "openshelf-v65";
 const FILES = ["./", "index.html", "questions.js", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png"];
 
 self.addEventListener("install", e => {
@@ -16,6 +16,8 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   const req = e.request, url = new URL(req.url);
   if(req.method !== "GET" || url.origin !== location.origin) return;
+  /* narration audio (audio/*.mp3) is left to the browser: it streams with range requests and is not saved for offline use */
+  if(url.pathname.includes("/audio/")) return;
   const fresh = req.mode === "navigate" || /\/(index\.html)?$/.test(url.pathname) || /\/(questions|sw)\.js$/.test(url.pathname);
   const net = fresh ? fetch(req.url, { cache:"no-cache", credentials:"same-origin" }) : fetch(req);
   e.respondWith(

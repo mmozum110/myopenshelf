@@ -639,6 +639,21 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 .ideafig svg{display:block;width:100%;max-width:440px;height:auto;margin:6px 0;border:1px solid var(--line);border-radius:12px;font-family:inherit}
 .ideafig .figcap{margin:6px 0 4px;line-height:1.55}
 .ideafig .figlabel{margin:14px 0 2px;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+.wtbar{margin:4px 0 2px}
+.wtbar .btn{display:inline-flex;align-items:center;gap:8px}
+.wtbar .wtlen{font-weight:400;font-size:.8125rem;color:var(--muted)}
+.wt{margin:6px 0 14px}
+.wt svg{display:block;width:100%;max-width:440px;height:auto;margin:6px 0;border:1px solid var(--line);border-radius:12px;font-family:inherit}
+.wt svg .wt-h{opacity:0}
+.wtcap{min-height:4.6em;margin:8px 0 6px;padding:10px 12px;border-radius:10px;background:var(--surface);border:1px solid var(--line);max-width:440px;box-sizing:border-box}
+.wtcap .wtk{display:block;font-size:.75rem;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:2px}
+.wtctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;max-width:440px}
+.wtdots{display:flex;gap:8px;flex-basis:100%;margin:2px 0}
+.wtdot{width:14px;height:14px;padding:0;border-radius:999px;border:2px solid var(--accent);background:transparent;cursor:pointer}
+.wtdot.on{background:var(--accent)}
+.wtbarline{height:3px;border-radius:3px;background:var(--line);max-width:440px;margin:4px 0 0;overflow:hidden}
+.wtbarline i{display:block;height:100%;width:0;background:var(--accent)}
+.wtnote{font-size:.8125rem;color:var(--muted);margin:6px 0 0}
 </style>
 </head>
 <body>
@@ -768,7 +783,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=64"></script>
+<script src="questions.js?v=65"></script>
 <script>
 /* Bangla (বাংলা) is turned off for now. The translations are kept: set BANGLA_ON to true and restore the header switch to bring it back. */
 const BANGLA_ON = false;
@@ -3127,7 +3142,7 @@ return `<div class="ideacard" id="ideaCard">
 ${q.bn && (it.lang || qLang()) === "bn" ? `<p class="small muted" lang="bn">এই ব্যাখ্যাটি আপাতত শুধু ইংরেজিতে।</p><p class="small muted">This explanation is in English for now.</p>` : ""}
 <h4>What the question is asking</h4><p>${c.ask}</p>
 <h4>The idea you need</h4><p>${c.idea}</p>
-${c.fig ? `<h4>See it</h4><div class="ideafig">${c.fig}</div>` : ""}
+${c.fig ? `<h4>See it</h4>${walkButton(q)}<div class="ideafig" id="ideaFig">${c.fig}</div>` : ""}
 <h4>Solve it</h4><ol class="ideasteps">${c.steps.map(x => `<li>${x}</li>`).join("")}</ol>
 <p class="ideanote"><strong>Check:</strong> ${c.check}</p>
 <h4>The answer choices</h4>
@@ -3139,6 +3154,166 @@ ${MATH_CARDS[sk] ? `<div class="ideabar"><button class="btn ghost small" id="ski
 }
 (() => { const miss = PQ.filter(q => ["math", "alg1", "geom", "alg2", "stat9", "stat10"].includes(q.sec) && (q.pool || "practice") === "practice" && !MATH_PROBLEM[q.id]).map(q => q.id);
 if(miss.length) console.warn("OpenShelf: math questions with no problem card:", miss.join(", ")); })();
+/* "▶ Watch it": a narrated walkthrough of a Geometry practice explanation (practice only; the explanation card never shows in a mock test).
+   The drawing builds in the order of the color code: black/gray parts with the question, blue (given) with the idea,
+   green (third) and orange (unknown) with the solving steps. Audio: audio/<id>.mp3, one file per question, loaded only on tap.
+   GEOM_WALK[id] = { t:[start second of each part], d:total seconds } (parts: question, idea, each step, check). */
+if(typeof GEOM_WALK === "undefined") window.GEOM_WALK = {};
+function walkButton(q){
+const w = GEOM_WALK[q.id], c = MATH_PROBLEM[q.id];
+if(!w || !c || !c.fig || q.sec !== "geom") return "";
+return `<div class="wtbar"><button class="btn ghost small wtgo" data-wt="${q.id}" aria-controls="ideaFig">▶ Watch it <span class="wtlen">narrated, about ${Math.max(1, Math.round(w.d / 10) * 10)} seconds</span></button></div>`;
+}
+const WT = (() => {
+let cur = null;   /* the walkthrough now playing */
+const BLUE = ["#1E5BD8","#E6EEFC","#6E9BD1","#DCEAFB"], ORANGE = ["#B45309","#FDF1E2","#8A5A2B"], GREEN = ["#0F6E56","#E1F5EE","#F1F7EC"];
+const reduce = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+function color(el){
+const st = (el.getAttribute("stroke") || "").toUpperCase(), fi = (el.getAttribute("fill") || "").toUpperCase();
+const pick = x => BLUE.includes(x) ? "b" : ORANGE.includes(x) ? "o" : GREEN.includes(x) ? "g" : "";
+if(el.tagName.toLowerCase() !== "text") return pick(st) || pick(fi);
+const c = pick(fi), tx = el.textContent.trim();
+if(c === "o"){   /* orange text: "?" or an expression like (2x + 10)° labels the unknown; anything with a value is the answer */
+if(/\?$/.test(tx) || (!/[=→:]/.test(tx) && /[a-z?]/i.test(tx) && !/[a-z]{3,}/i.test(tx))) return "o";
+return "a";
+}
+if(c || !tx.includes("=")) return c;
+return /[·×+−÷].*=/.test(tx) ? "s" : "i";   /* a black label like "a straight line = 180°" comes with the idea; a worked sum comes with the steps */
+}
+function parts(c){
+const L = [["The question", c.ask], ["The idea", c.idea]];
+c.steps.forEach((s, i) => L.push([c.steps.length > 1 ? `Step ${i + 1} of ${c.steps.length}` : "Solve it", s]));
+L.push(["Check", c.check]);
+return L;
+}
+function stop(){
+if(!cur) return;
+const p = cur; cur = null;
+cancelAnimationFrame(p.raf);
+if(p.audio){ p.audio.pause(); p.audio.removeAttribute("src"); try { p.audio.load(); } catch(e){} }
+}
+function close(){
+const p = cur; stop();
+if(p && p.box.isConnected){ p.box.innerHTML = p.saved; p.box.classList.replace("wt", "ideafig"); }
+document.querySelectorAll(".wtgo").forEach(b => b.hidden = false);
+}
+function start(id, btn){
+stop();
+const c = MATH_PROBLEM[id], w = GEOM_WALK[id], box = $("#ideaFig");
+if(!c || !w || !box) return;
+const L = parts(c), n = c.steps.length;
+const saved = box.innerHTML;
+const tmp = document.createElement("div"); tmp.innerHTML = c.fig;
+const svg = tmp.querySelector("svg");
+const els = [...svg.children].filter((el, i) => !(i === 0 && el.tagName.toLowerCase() === "rect"));
+/* which part reveals each piece of the drawing */
+const lastPart = L.length - 1, firstStep = 2;
+/* question: the figure, the givens (blue) and the unknown's marking (orange); idea: rule labels and green helpers;
+   steps: worked sums, then the orange answer with the last step */
+const when = { "": 0, b: 0, o: 0, i: 1, g: 1, s: firstStep, a: lastPart - 1 };
+const rank = { "": 0, b: 1, o: 2, i: 3, g: 3, s: 4, a: 5 };
+els.forEach(el => { const k = color(el); el.dataset.wp = when[k]; el.dataset.wr = rank[k]; el.dataset.wc = k; el.classList.add("wt-h"); });
+box.classList.replace("ideafig", "wt");
+box.innerHTML = "";
+box.appendChild(svg);
+box.insertAdjacentHTML("beforeend", `<div class="wtbarline" aria-hidden="true"><i></i></div>
+<div class="wtcap" aria-live="polite"><span class="wtk"></span><span class="wtt"></span></div>
+<div class="wtctl"><div class="wtdots">${L.map((x, i) => `<button class="wtdot" data-wi="${i}" aria-label="Go to: ${x[0]}"></button>`).join("")}</div>
+<button class="btn ghost small wtpp">⏸ Pause</button><button class="btn ghost small wtre">↺ Replay</button><button class="btn ghost small wtx">✕ Close</button></div>
+<p class="wtnote" hidden></p>`);
+if(btn) btn.closest(".wtbar").querySelectorAll(".wtgo").forEach(b => b.hidden = true);
+const p = cur = { id, box, saved, svg, els, L, w, part: -1, playing: true, audio: null, clock: 0, last: performance.now(), raf: 0, useAudio: true };
+const audio = new Audio();
+audio.preload = "auto";
+audio.src = `audio/${id}.mp3`;
+p.audio = audio;
+audio.addEventListener("ended", () => { if(cur === p){ p.playing = false; p.ended = true; sync(true); } });
+audio.addEventListener("error", () => { if(cur === p && p.useAudio){ p.useAudio = false; p.clock = audio.currentTime || p.clock; const note = box.querySelector(".wtnote"); note.hidden = false; note.textContent = "The narration couldn't load (are you offline?). The drawing and captions still play."; } });
+audio.play().catch(() => { if(cur === p && !audio.error){ p.playing = false; sync(true); } });
+track("geom-walk", { q:id });
+tick();
+}
+const now = p => p.useAudio && p.audio && !p.audio.error ? p.audio.currentTime : p.clock;
+function partAt(p, t){ let k = 0; p.w.t.forEach((s, i) => { if(t >= s - 0.05) k = i; }); return k; }
+function show(p, k, animate){
+const fast = !animate || reduce();
+const fresh = p.els.filter(el => +el.dataset.wp <= k && el.classList.contains("wt-h"));
+const rk = [...new Set(fresh.map(el => +el.dataset.wr))].sort((a, b) => a - b);   /* black first, then blue, orange, labels */
+const step = Math.min(110, 2400 / Math.max(1, fresh.length));
+let order = 0;
+p.els.forEach(el => { if(+el.dataset.wp > k) el.classList.add("wt-h"); });
+rk.forEach(r => fresh.filter(el => +el.dataset.wr === r).forEach(el => {
+el.classList.remove("wt-h");
+if(!fast){
+const delay = (order++) * step + rk.indexOf(r) * 250;
+el.animate([{ opacity:0 }, { opacity:1 }], { duration:500, delay, fill:"backwards", easing:"ease-out" });
+const tag = el.tagName.toLowerCase();
+if(["line","path","polyline","polygon","circle"].includes(tag) && el.getAttribute("stroke") && el.getAttribute("stroke") !== "none" && !el.getAttribute("stroke-dasharray")){
+let len = 0; try { len = el.getTotalLength(); } catch(e){}
+if(len > 0) el.animate([{ strokeDasharray:`${len} ${len}`, strokeDashoffset:len }, { strokeDasharray:`${len} ${len}`, strokeDashoffset:0 }], { duration:700, delay, easing:"ease-in-out" });
+}
+}
+}));
+/* point at what this part talks about: the idea flashes the givens, the steps and check flash the unknown */
+if(!fast && k > 0){
+const focus = k === 1 ? ["b", "i", "g"] : k === p.L.length - 1 ? ["a", "o"] : ["o", "a", "s", "g"];
+const delay = fresh.length ? 900 : 200;
+p.els.filter(el => focus.includes(el.dataset.wc) && !fresh.includes(el)).forEach(el =>
+el.animate([{ opacity:1 }, { opacity:.2 }, { opacity:1 }, { opacity:.2 }, { opacity:1 }], { duration:1400, delay, easing:"ease-in-out" }));
+}
+}
+function sync(force){
+const p = cur; if(!p) return;
+const t = now(p), k = p.ended ? p.L.length - 1 : partAt(p, t);
+if(k !== p.part || force){
+const back = k < p.part;
+p.part = k;
+show(p, k, !back && !force);
+p.box.querySelector(".wtk").textContent = p.L[k][0];
+p.box.querySelector(".wtt").innerHTML = p.L[k][1];
+p.box.querySelectorAll(".wtdot").forEach((d, i) => d.classList.toggle("on", i <= k));
+}
+p.box.querySelector(".wtbarline i").style.width = `${Math.min(100, (p.ended ? 1 : t / p.w.d) * 100)}%`;
+p.box.querySelector(".wtpp").textContent = p.playing ? "⏸ Pause" : "▶ Play";
+}
+function tick(){
+const p = cur; if(!p) return;
+if(!p.box.isConnected){ stop(); return; }   /* the card was redrawn or closed */
+const ms = performance.now();
+if(p.playing && !p.useAudio){ p.clock += (ms - p.last) / 1000; if(p.clock >= p.w.d){ p.clock = p.w.d; p.playing = false; p.ended = true; } }
+p.last = ms;
+sync(false);
+p.raf = requestAnimationFrame(tick);
+}
+function seek(t){
+const p = cur; if(!p) return;
+p.ended = false;
+if(p.useAudio){ try { p.audio.currentTime = t; } catch(e){} } p.clock = t;
+p.part = -2;  /* redraw from this point */
+p.els.forEach(el => el.classList.add("wt-h"));
+if(!p.playing) toggle();
+}
+function toggle(){
+const p = cur; if(!p) return;
+if(p.playing){ p.playing = false; if(p.useAudio) p.audio.pause(); }
+else {
+if(p.ended){ p.ended = false; p.part = -2; p.els.forEach(el => el.classList.add("wt-h")); p.clock = 0; if(p.useAudio) p.audio.currentTime = 0; }
+p.playing = true; p.last = performance.now();
+if(p.useAudio) p.audio.play().catch(() => {});
+}
+sync(true);
+}
+document.addEventListener("click", e => {
+const go = e.target.closest(".wtgo"); if(go){ start(go.dataset.wt, go); return; }
+if(!cur) return;
+if(e.target.closest(".wtpp")) toggle();
+else if(e.target.closest(".wtre")) seek(0);
+else if(e.target.closest(".wtx")) close();
+else { const d = e.target.closest(".wtdot"); if(d) seek(cur.w.t[+d.dataset.wi] + 0.01); }
+});
+document.addEventListener("visibilitychange", () => { if(document.hidden && cur && cur.playing) toggle(); });
+return { stop };
+})();
 function rwCardHTML(k){
 const c = RW_CARDS[k]; if(!c) return "";
 const tab = c.table ? `<div class="ideatabwrap"><table class="ideatab"><thead><tr>${c.table.head.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${c.table.rows.map(r => `<tr>${r.map(x => `<td>${x}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : "";
@@ -5625,7 +5800,7 @@ const SITE = {
 name: "OpenShelf",
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 64,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
+version: 65,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "September 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
