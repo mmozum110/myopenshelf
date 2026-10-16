@@ -583,6 +583,13 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 .pwtable td.ok{color:var(--c-ok)} .pwtable td.gap{color:#B42318}
 .drillrow{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line)}
 .drillrow small{display:block;color:var(--muted)}
+.pwtable td.pwq{white-space:normal;min-width:180px;max-width:320px}
+.phsess{border-top:1px solid var(--line);padding:4px 0}
+.phsess summary{display:grid;grid-template-columns:88px 1fr auto;gap:10px;align-items:start;cursor:pointer;padding:6px 0;list-style:none}
+.phsess summary::-webkit-details-marker{display:none}
+.phsess summary small{display:block;color:var(--muted);font-size:.78rem}
+.phnums{text-align:right}
+@media (max-width:520px){ .phsess summary{grid-template-columns:1fr auto} .phwhen{grid-column:1/-1} }
 .pwtxt{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
 .pwtxt small{color:var(--muted);font-size:.8125rem}
 .planall{margin:10px 0 0;padding-left:0;list-style:none}
@@ -870,7 +877,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=72"></script>
+<script src="questions.js?v=73"></script>
 <script>
 /* Bangla (বাংলা) is turned off for now. The translations are kept: set BANGLA_ON to true and restore the header switch to bring it back. */
 const BANGLA_ON = false;
@@ -5050,6 +5057,27 @@ function median(a){ if(!a.length) return null; const s = a.slice().sort((x, y) =
 const parseDate = s => { const [y, m, d] = String(s).split("-").map(Number); return new Date(y, (m || 1) - 1, d || 1); };
 const fmtDate = s => parseDate(s).toLocaleDateString(undefined, { month:"short", day:"numeric" });
 const fmtDur = s => s < 60 ? `${s} sec` : s < 3600 ? `${Math.round(s / 60)} min` : `${Math.floor(s / 3600)} h ${Math.round(s % 3600 / 60)} min`;
+/* A practice answer shown for parents and tutors: the letter chosen, and the right one if it was wrong */
+const ansCell = a => { const q = qOf(a); if(!q) return "—"; const L = a.p != null && a.p >= 0 && a.p < 4 ? "ABCD"[a.p] : null;
+const typed = q.o && L && q.o[a.p] != null ? q.o[a.p] : "";
+return L ? (a.ok ? `${L}` : `${L} <span class="muted">(right: ${"ABCD"[q.a]})</span>`) : (a.ok ? "✓" : "blank or other"); };
+const qSnippet = q => { const t = String(q.q || "").replace(/<[^>]+>/g, " ").replace(/Which choice completes the text so that it conforms to the conventions of Standard English\?/i, "").replace(/\s+/g, " ").trim();
+return t.length > 110 ? t.slice(0, 107) + "…" : t; };
+/* Group answers into practice sessions: a new session starts after a 30-minute gap, or when the section or mode changes. */
+function practiceSessions(A){
+const out = []; let cur = null;
+A.filter(a => qOf(a)).slice().sort((a, b) => a.t - b.t).forEach(a => {
+const q = qOf(a), kind = q.pool === "test" ? "mock" : a.m === "t" ? "test" : "guided";
+if(!cur || a.t - cur.end > 30 * 60000 || cur.sec !== q.sec || cur.kind !== kind){ cur = { sec:q.sec, kind, start:a.t, end:a.t, items:[] }; out.push(cur); }
+cur.items.push(a); cur.end = a.t;
+});
+return out.reverse();
+}
+function sessionTable(arr){
+return `<div class="pwtablewrap"><table class="pwtable"><thead><tr><th>#</th><th>Question</th><th>Skill</th><th>Answer</th><th>Result</th><th>Time</th><th>Help used</th></tr></thead><tbody>${arr.slice().sort((a, b) => a.t - b.t).map((a, i) => {
+const q = qOf(a), sk = skillName(skillOf(q)) || PQ_DOMAINS[q.dom] || "", hu = helpUsed(a);
+return `<tr><td>${i + 1}</td><td class="pwq">${esc(qSnippet(q))}</td><td>${esc(sk)}</td><td>${ansCell(a)}</td><td class="${a.ok ? "ok" : "gap"}">${a.ok ? "✓ right" : "✗ wrong"}</td><td>${fmtDur(a.s || 0)}</td><td>${hu ? esc(hu) : a.m === "t" ? "none (no-help mode)" : "none"}</td></tr>`; }).join("")}</tbody></table></div>`;
+}
 /* what help a practice answer used, in words ("" if none) */
 const helpUsed = a => { const out = [];
 if(a.h){ if(a.h[1]) out.push(`${a.h[1]} hint${a.h[1] > 1 ? "s" : ""}`); if(a.h[2]) out.push(`${a.h[2]} step${a.h[2] > 1 ? "s" : ""} shown`); }
@@ -5266,6 +5294,7 @@ function renderDashboard(el){
 const draw = () => {
 const prof = activeProf(), d = getPD(prof.id), A = d.attempts, now = Date.now();
 const pb = profileBar("Showing progress for", draw);
+setTimeout(() => { const b = el.querySelector("#phMore"); if(b) b.onclick = () => { el.querySelectorAll(".phsess[hidden]").forEach(x => x.hidden = false); b.remove(); }; }, 0);
 const wk = A.filter(x => x.t >= now - 7 * DAY), m30 = A.filter(x => x.t >= now - 30 * DAY);
 const days7 = new Set(wk.map(x => new Date(x.t).toDateString())).size;
 const steps = A.filter(x => x.h).reduce((s, x) => { s.solo += x.h[0]; s.all += x.h[0] + x.h[1] + x.h[2]; return s; }, { solo:0, all:0 });
@@ -5312,6 +5341,23 @@ ${us.map(u => `<tr><th>Unit ${u.n}: ${SKILL_SHORT[u.k] || u.l}</th><td class="hc
 </tbody></table><p class="small muted" style="margin:6px 0 0">${dn} of ${us.length} units complete. Mastered means answered correctly on your own on your most recent try.</p></div>`; }).join("")}</div>
 <div class="box"><h2>Mistake patterns</h2><p class="muted small">Why wrong answers were chosen, from the last 60 days. Each wrong choice in the question bank is tagged with the trap it represents.</p>
 ${traps.length ? traps.slice(0, 5).map(([k, n]) => `<div class="trap"><div class="bar-l"><span><strong>${TRAP_INFO[k].label}</strong> <small class="muted">${TRAP_INFO[k].sec === "math" ? "Math" : "Reading & Writing"}</small></span><span>${n}×</span></div><div class="bar"><i style="width:${n / maxTrap * 100}%;background:var(--c-warn)"></i></div><p class="small" style="margin:6px 0 0">${TRAP_INFO[k].tip}</p></div>`).join("") : `<p>No mistakes logged yet. Patterns appear after a few practice sets.</p>`}</div>
+${(() => {   /* every practice session from the last 30 days, with each answer, time and help */
+const S = practiceSessions(A.filter(x => x.t >= now - 30 * DAY));
+if(!S.length) return `<div class="box"><h2>Practice history</h2><p class="muted small" style="margin:0">No practice in the last 30 days on this device for ${esc(prof.name)}.</p></div>`;
+const secName = s => s === "math" ? "SAT Math" : s === "rw" ? "SAT Reading & Writing" : ((COURSES.find(c => c.id === s) || {}).label || s);
+const kindName = { guided:"guided practice", test:"no-help practice", mock:"mock test" };
+const rows = S.map((s, k) => {
+const right = s.items.filter(a => a.ok).length, secs = s.items.reduce((t, a) => t + (a.s || 0), 0), helped = s.items.filter(a => helpUsed(a)).length;
+const doms = [...new Set(s.items.map(a => PQ_DOMAINS[qOf(a).dom]).filter(Boolean))].slice(0, 3).join(", ");
+const when = new Date(s.start);
+return `<details class="phsess"${k >= 8 ? " hidden" : ""}${k === 0 ? " open" : ""}><summary><span class="phwhen">${when.toLocaleDateString([], { weekday:"short", month:"short", day:"numeric" })}<small>${when.toLocaleTimeString([], { hour:"numeric", minute:"2-digit" })}</small></span>
+<span class="phwhat"><strong>${secName(s.sec)}</strong> · ${kindName[s.kind]}<small>${esc(doms)}</small></span>
+<span class="phnums"><strong>${right} of ${s.items.length}</strong> right<small>${fmtDur(secs)} · ${s.kind === "guided" ? (helped ? `help on ${helped}` : "no help used") : "no help available"}</small></span></summary>
+${sessionTable(s.items)}</details>`; }).join("");
+return `<div class="box"><h2>Practice history</h2><p class="muted small" style="margin:0 0 8px">Every practice session from the last 30 days. Tap a session to see each question: the answer chosen, the right answer, the time it took and any help used.</p>
+${rows}${S.length > 8 ? `<button class="linkbtn small" id="phMore">Show all ${S.length} sessions</button>` : ""}
+<p class="small muted" style="margin:10px 0 0">Practice is saved on the device where it was done. To see a student's practice from their own phone or computer, have them copy their progress code at the bottom of this page, then import it in <button class="linkbtn" data-go="tutor">Tutor &amp; family view</button>.</p></div>`;
+})()}
 <div class="box"><h2>Trends</h2>
 <p class="small" style="margin:0"><strong>Weekly accuracy</strong> <span class="muted">(weeks with 3+ questions)</span></p>
 ${lineChart([{ name:"Math", color:"var(--c-sat)", pts:accWeek("math") }, { name:"Reading & Writing", color:"var(--c-courses)", pts:accWeek("rw") }].concat(COURSES.filter(c => A.some(x => qOf(x) && qOf(x).sec === c.id)).map((c, i) => ({ name:c.label, color:["var(--c-apply)","var(--c-schools)","var(--c-warn)"][i % 3], pts:accWeek(c.id) }))), { min:0, max:100, fmt:v => Math.round(v) + "%", label:"Weekly accuracy by section" })}
@@ -5859,12 +5905,11 @@ const rows = [...byDay.entries()].sort((a, b) => b[0].localeCompare(a[0])).map((
 const doms = new Map(); arr.forEach(a => { const dm = qOf(a).dom; doms.set(dm, (doms.get(dm) || 0) + 1); });
 const right = arr.filter(a => a.ok).length, secs = arr.reduce((t, a) => t + (a.s || 0), 0), helped = arr.filter(a => helpUsed(a)).length;
 const what = [...doms.entries()].sort((a, b) => b[1] - a[1]).map(([dm, n]) => doms.size > 1 ? `${PQ_DOMAINS[dm]} (${n})` : PQ_DOMAINS[dm]).join(", ");
-const rowsQ = arr.slice().sort((a, b) => a.t - b.t).map(a => { const q = qOf(a), sk = skillName(skillOf(q)) || PQ_DOMAINS[q.dom], hu = helpUsed(a);
-return `<tr><td>${new Date(a.t).toLocaleTimeString([], { hour:"numeric", minute:"2-digit" })}</td><td>${esc(sk)}</td><td class="${a.ok ? "ok" : "gap"}">${a.ok ? "✓ right" : "✗ wrong"}</td><td>${fmtDur(a.s || 0)}</td><td>${hu ? esc(hu) : "none"}${a.m === "t" ? " (test mode)" : ""}</td></tr>`; }).join("");
+
 return `<li><details><summary><span class="pwday">${day === todayKey ? "Today" : fmtDate(day)}</span><span>${arr.length} question${arr.length === 1 ? "" : "s"}: ${esc(what)} · <strong>${right} correct</strong> · ${fmtDur(secs)} · ${helped ? `help on ${helped}` : "no help used"}</span></summary>
-<div class="pwtablewrap"><table class="pwtable"><thead><tr><th>Time</th><th>Skill</th><th>Result</th><th>Took</th><th>Help used</th></tr></thead><tbody>${rowsQ}</tbody></table></div></details></li>`;
+${sessionTable(arr)}</details></li>`;
 }).join("");
-return `<div class="pwdone"><p class="small" style="margin:10px 0 4px"><strong>Done this week</strong> <span class="muted">(tap a day to see each question)</span></p><ul class="pwdays small">${rows}</ul><button class="linkbtn small" data-go="dashboard">See every answer on My progress</button></div>`;
+return `<div class="pwdone"><p class="small" style="margin:10px 0 4px"><strong>Done this week</strong> <span class="muted">(tap a day to see each question)</span></p><ul class="pwdays small">${rows}</ul><button class="linkbtn small" data-go="dashboard">See all practice history on My progress</button></div>`;
 })()}
 ${(() => {   /* sessions are ticked off in order as their questions are answered */
 const left = {};
@@ -6639,7 +6684,7 @@ const SITE = {
 name: "OpenShelf",
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 72,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
+version: 73,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "September 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
