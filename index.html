@@ -568,6 +568,21 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 .planweek li.done .pwtxt strong{text-decoration:line-through;color:var(--muted)}
 .pwmark{flex:0 0 auto;width:24px;text-align:center;color:var(--c-sat);font-weight:800}
 .planweek li.done .pwmark{color:var(--c-ok)}
+.pwdone{margin-top:4px}
+.pwdays{list-style:none;margin:0 0 4px;padding:0}
+.pwdays li{display:flex;gap:10px;padding:4px 0;border-top:1px dashed var(--line)}
+.pwdays li:first-child{border-top:0}
+.pwday{flex:0 0 58px;font-weight:700;color:var(--muted)}
+.pwdays details{width:100%}
+.pwdays summary{display:flex;gap:10px;cursor:pointer;list-style:none}
+.pwdays summary::-webkit-details-marker{display:none}
+.pwdays summary::after{content:"▾";margin-left:auto;color:var(--muted)}
+.pwtablewrap{overflow-x:auto;margin:6px 0 4px}
+.pwtable{border-collapse:collapse;width:100%;font-size:.8125rem}
+.pwtable th,.pwtable td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;white-space:nowrap}
+.pwtable td.ok{color:var(--c-ok)} .pwtable td.gap{color:#B42318}
+.drillrow{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line)}
+.drillrow small{display:block;color:var(--muted)}
 .pwtxt{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
 .pwtxt small{color:var(--muted);font-size:.8125rem}
 .planall{margin:10px 0 0;padding-left:0;list-style:none}
@@ -855,7 +870,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=69"></script>
+<script src="questions.js?v=71"></script>
 <script>
 /* Bangla (বাংলা) is turned off for now. The translations are kept: set BANGLA_ON to true and restore the header switch to bring it back. */
 const BANGLA_ON = false;
@@ -2474,6 +2489,7 @@ if(TRAPS[q.id]) TRAPS[q.id] = order.map(i => TRAPS[q.id][i]);
 })();
 function rwSkill(q){
 if(!q || q.sec !== "rw") return null;
+if(q.skill && RW_CARDS[q.skill]) return q.skill;   /* questions tagged with a skill, like "tense" */
 const t = q.q.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 if(/most logical transition/i.test(t)) return "trans";
 if(/conventions of Standard English/i.test(t)){
@@ -2496,7 +2512,7 @@ return null;
 const RW_SKILL_NAMES = {
 wic:"Words in context", purpose:"Text structure and purpose", cross:"Cross-text connections",
 central:"Central ideas and details", textev:"Command of evidence: textual", quant:"Command of evidence: quantitative", infer:"Inferences",
-bound:"Boundaries (punctuation)", form:"Form, structure and sense",
+bound:"Boundaries (punctuation)", form:"Form, structure and sense", tense:"Verb tense",
 trans:"Transitions", synth:"Rhetorical synthesis"
 };
 const RW_CARDS = {
@@ -2747,6 +2763,35 @@ traps: [
 "Mixing up <em>its</em> and <em>it's</em>, or <em>their</em>, <em>there</em> and <em>they're</em>.",
 "Choosing an -ing form that leaves the sentence without a main verb.",
 "Letting an opening phrase describe the wrong person or thing."]
+},
+tense: {
+ask: `<p>“Which choice completes the text so that it conforms to the conventions of Standard English?” when the choices are the <strong>same verb at different times</strong>: <em>worked, works, has worked, had worked, will work</em>.</p>`,
+idea: `<p>Tense tells <strong>when</strong> something happens. You never have to guess: the sentence always gives a time clue. It might be a date (<em>in 1902</em>), a time word (<em>yesterday, tomorrow, since, by the time</em>), or another verb in the sentence. Find the clue, put the action on a timeline (past, now, future), and choose the tense that matches.</p>
+<p>The trickiest ones are the <strong>“have” and “had”</strong> tenses. <em>Has/have worked</em> means it started in the past and reaches up to now. <em>Had worked</em> means it happened before something else in the past.</p>`,
+table: { head:["When you see…", "Use", "Example"], rows:[
+["A finished past time: <em>yesterday, last year, in 1902, ago</em>", "Simple past", "The museum <em>opened</em> in 1902."],
+["A habit or a general fact: <em>every day, usually, each spring</em>", "Simple present", "The library <em>hosts</em> a contest every year."],
+["A future time: <em>tomorrow, next month, in 2030</em>", "Future", "The council <em>will announce</em> its plan tomorrow."],
+["From the past up to now: <em>since 2015, for ten years, over the past decade</em>", "<em>has / have</em> + past participle", "Since 2015, she <em>has published</em> 40 articles."],
+["The earlier of two past events: <em>by the time, before, already</em> + a past event", "<em>had</em> + past participle", "By the time the team arrived, the storm <em>had passed</em>."],
+["Finished before a future time: <em>by 2040, by next year</em>", "<em>will have</em> + past participle", "By 2040, electric cars <em>will have made up</em> half of sales."],
+["In the middle of doing something when something else happened: <em>while, when</em>", "<em>was / were</em> + -ing", "While they <em>were testing</em> samples, the power went out."]] },
+steps: [
+"Look at the choices. Same verb, different times? It's a tense question.",
+"Underline every time clue: dates, time words, and the other verbs in the sentence.",
+"Draw a quick timeline: is the action in the past, now, or the future? If there are two past events, which came first?",
+"Pick the tense from the table, then reread the sentence. Make sure it still has a real main verb: an -ing word or a <em>to</em> form alone can't be the main verb."],
+ex: { text:`<p>When the first train pulled into the new station in 1890, workers ______ the tracks for nearly two years.</p>`,
+q:"Which choice completes the text so that it conforms to the conventions of Standard English?",
+o:["had been laying","have been laying","are laying","will lay"], a:0,
+why:`<p><strong>Time clues:</strong> <em>in 1890</em> and <em>pulled</em> put the train's arrival in the past. <em>For nearly two years</em> before that, workers were laying tracks.</p>
+<p><strong>Timeline:</strong> the track work came <em>before</em> the train arrived, and both are in the past. The earlier past action takes <em>had</em>: <em>had been laying</em> (it went on for a while, so <em>been</em> + -ing).</p>
+<p><strong>Why not the others:</strong> <em>have been laying</em> means up to now, but this all ended in 1890. <em>Are laying</em> is the present, and <em>will lay</em> is the future.</p>` },
+traps: [
+"Using <em>has</em> or <em>have</em> with a finished time like <em>in 1902</em> or <em>last year</em>. A finished past time takes the simple past.",
+"Missing the “earlier of two past events” signal (<em>by the time, before</em>): the earlier event takes <em>had</em>.",
+"Switching tenses in the middle of a story or a list of actions without a reason.",
+"Choosing an -ing form that leaves the sentence without a main verb."]
 },
 synth: {
 ask: `<p>“While researching a topic, a student took these notes…” followed by “The student wants to [goal]. Which choice most effectively uses relevant information from the notes to accomplish this goal?”</p>`,
@@ -4244,9 +4289,23 @@ let sess = null;
 const saveCfg = () => store.set("os_gp", cfg);
 const newItem = q => ({ q, choice:null, locked:false, si:0, tries:0, stepLog:[], stepsDone:false, skipped:false, tips:0, fb:"" });
 const startSet = ps => {
-track("practice-start", { section:ps.sec, mode:ps.mode, questions:ps.qs.length, source: ps.source || (ps.label ? (ps.label.startsWith("Recommended") || ps.label.startsWith("Starting diagnostic") ? "recommended" : ps.label.startsWith("More like") ? "more-like-these" : "custom") : "setup") }); el.dataset.en = isCourse(ps.sec) ? "" : "1"; sess = { mode:ps.mode, sec:ps.sec, label:ps.label || "", i:0, items: ps.qs.map(newItem), unit:ps.unit || null, unitN:ps.unitN || null,
+track("practice-start", { section:ps.sec, mode:ps.mode, questions:ps.qs.length, source: ps.source || (ps.label ? (ps.label.startsWith("Recommended") || ps.label.startsWith("Starting diagnostic") ? "recommended" : ps.label.startsWith("More like") ? "more-like-these" : "custom") : "setup") }); el.dataset.en = isCourse(ps.sec) ? "" : "1"; sess = { mode:ps.mode, sec:ps.sec, label:ps.label || "", i:0, t0:Date.now(), items: ps.qs.map(newItem), unit:ps.unit || null, unitN:ps.unitN || null,
 wasComplete: ps.unit ? unitProgress(activeProf().id, ps.sec, ps.unit).complete : false }; drawItem(); top(); };
 const top = () => { $("#toolView").scrollTop = 0; };
+const drawDrill = k => {
+const D = SKILL_DRILLS[k]; if(!D) return drawSetup();
+const qs = drillSet(k, 10), total = PRACTICE_PQ.filter(q => q.skill === k).length;
+track("drill-open", { skill:k });
+el.innerHTML = `<h1>Skill drill: ${D.title}</h1>
+<p class="muted">Read this short lesson first, then practice. During the questions, tap <strong>📘 Explain the idea</strong> to see the lesson again.</p>
+${rwCardHTML(k)}
+<div class="ractions"><button class="btn" id="drGo">Start ${qs.length} guided questions</button><button class="btn ghost" id="drTest">${qs.length} questions, no help</button><button class="btn ghost" id="drBack">Back</button></div>
+<p class="small muted">${total} ${D.title.toLowerCase()} questions in all. Each set starts with ones you've missed before, then new ones.</p>`;
+$("#drGo").onclick = () => startSet({ qs:drillSet(k, 10), sec:D.sec, mode:"guided", label:`${D.title} drill`, source:"drill" });
+$("#drTest").onclick = () => startSet({ qs:drillSet(k, 10), sec:D.sec, mode:"test", label:`${D.title} drill (no help)`, source:"drill" });
+$("#drBack").onclick = () => { drawSetup(); top(); };
+top();
+};
 const startUnit = (k, n) => {
 const p = unitProgress(activeProf().id, cfg.sec, k);
 const qs = orderUnit(p.complete || !p.tried ? p.qs : p.todo);
@@ -4350,6 +4409,8 @@ ${n < cfg.len && n > 0 ? `<p class="muted small" style="margin:6px 0 0">This ${u
 <p class="small muted" style="margin:14px 0 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">Sounds: ${soundBtn("gpSoundSet")} <span>${FX.on() ? "on" : "off"}</span>${FX.on() ? `<button class="linkbtn" id="gpSoundTest">Play a test sound</button>` : ""}</p>
 <div class="ractions"><button class="btn" id="gpStart" ${n ? "" : "disabled"}>${n ? `Start ${n} question${n === 1 ? "" : "s"}` : "No questions match"}</button><button class="btn ghost" id="gpRecBtn">Practice my weakest ${unitWord}</button></div>
 </div>
+${cfg.sec === "rw" ? `<div class="box" style="margin-top:20px"><h2 style="margin-top:0">Skill drills</h2><p class="small muted" style="margin:0 0 8px">A short lesson on one rule, then questions that practice just that rule.</p>
+${Object.entries(SKILL_DRILLS).filter(([, D]) => D.sec === "rw").map(([k, D]) => `<div class="drillrow"><span><strong>${D.title}</strong><small>${D.blurb}</small></span><button class="btn small" data-drill="${k}">Open</button></div>`).join("")}</div>` : ""}
 <details class="box more" style="margin-top:20px"><summary>Have an assignment code from your tutor?</summary>
 <label class="fld" style="margin-top:10px"><span>Assignment code</span><textarea id="gpCode" class="codebox" rows="2" placeholder="OSA1…"></textarea></label>
 <div class="err" id="gpCodeErr" role="alert"></div>
@@ -4376,6 +4437,7 @@ track("practice-track", { track:want });
 saveCfg(); drawSetup();
 });
 $("#gpDom").onchange = e => { cfg.dom = e.target.value; saveCfg(); drawSetup(); };
+el.querySelectorAll("[data-drill]").forEach(b => b.onclick = () => drawDrill(b.dataset.drill));
 pbar.wire();
 $("#gpRecBtn").onclick = () => { track("weakest-skill-set", { section:cfg.sec }); const rec = recommendSet(getPD(activeProf().id).attempts, cfg.sec); toast(rec.label); startSet({ qs:rec.qs, sec:rec.sec, mode:cfg.mode, label:rec.label }); };
 $("#gpCodeGo").onclick = () => { track("assignment-code-used"); try{ const a = readAssignCode($("#gpCode").value); startSet({ qs:a.qs, sec:a.sec, mode:a.mode, label:a.label, source:"assignment-code" }); }catch(e){ $("#gpCodeErr").textContent = e.message; } };
@@ -4622,11 +4684,13 @@ const tips = answered.reduce((s, it) => s + it.tips, 0), noTip = answered.filter
 helpBox = `<div class="box"><h2>Coaching used</h2><p>${tips} tips used across ${answered.length} questions. You answered <strong>${noTip}</strong> correctly without any tips.</p></div>`;
 }
 const pct = answered.length ? Math.round(right / answered.length * 100) : 0;
+if(sess.t0 && !sess.secs) sess.secs = Math.round((Date.now() - sess.t0) / 1000);
+const timeLine = sess.secs ? `<p class="small" style="margin:6px 0 0">Time: <strong>${fmtDur(sess.secs)}</strong>${answered.length ? ` · about ${fmtDur(Math.round(sess.secs / answered.length))} per question` : ""}</p>` : "";
 el.innerHTML = `
 <h1>Your results</h1>
 <div class="box scorebox"><p class="big">${right} of ${answered.length}</p><h2>${!answered.length ? "No questions answered yet" : withHelp ? `${solo} solved on your own, ${withHelp} with help` : pct === 100 ? "Perfect set!" : pct >= 80 ? "Strong work" : pct >= 60 ? "Good progress" : "Keep going. Every explanation below is a lesson."}</h2>
 ${withHelp ? `<p class="small muted">Questions you needed a hint or a shown step on still count as correct here, but they're tracked separately so you can see real independence.</p>` : ""}
-${sess.items.length > answered.length ? `<p class="small muted">${sess.items.length - answered.length} question(s) not answered.</p>` : ""}</div>
+${sess.items.length > answered.length ? `<p class="small muted">${sess.items.length - answered.length} question(s) not answered.</p>` : ""}${timeLine}</div>
 ${helpBox}
 ${up ? unitBox : byDiffBox()}
 ${up ? "" : planBox(missedPlan(answered.map(it => ({ q:it.q, ok: it.choice === it.q.a }))), false)}
@@ -4678,7 +4742,7 @@ drawItem(); top();
 };
 top();
 };
-if(PENDING_SET){ const ps = PENDING_SET; PENDING_SET = null; startSet(ps); } else drawSetup();
+if(PENDING_DRILL){ const k = PENDING_DRILL; PENDING_DRILL = null; drawDrill(k); } else if(PENDING_SET){ const ps = PENDING_SET; PENDING_SET = null; startSet(ps); } else drawSetup();
 }
 function renderBank(el){
 let f = store.get("os_bankf", { sec:"math", diff:"all", dom:"all", pool:"practice" });
@@ -4930,6 +4994,17 @@ const DAY = 86400000;
 const QBY = Object.fromEntries(PQ.map(q => [q.id, q]));
 const PRACTICE_PQ = PQ.filter(q => q.pool !== "test");
 let PENDING_SET = null;
+let PENDING_DRILL = null;
+/* Skill drills: a short lesson, then a guided set aimed at one rule. */
+const SKILL_DRILLS = { tense:{ sec:"rw", title:"Verb tense", blurb:"How to pick the right tense from the time clues, then 10 guided questions." } };
+function drillSet(k, n){
+const last = {};
+getPD(activeProf().id).attempts.forEach(x => { if(!last[x.q] || x.t >= last[x.q].t) last[x.q] = x; });
+const rank = q => !last[q.id] ? 1 : credit(last[q.id]) < 1 ? 0 : 2;     /* missed before → new → already mastered */
+return PRACTICE_PQ.filter(q => q.skill === k).map(q => [rank(q), Math.random(), q]).sort((a, b) => a[0] - b[0] || a[1] - b[1])
+.slice(0, n || 10).map(x => x[2]).sort((a, b) => DIFF_ORDER[a.diff] - DIFF_ORDER[b.diff]);
+}
+function openDrill(k){ PENDING_DRILL = k; openTool("practice"); }
 function getProfiles(){
 let p = store.get("os_profiles", null);
 if(!p || !Array.isArray(p.list) || !p.list.length){ p = { active:"me", list:[{ id:"me", name:"Me", grade:"" }] }; store.set("os_profiles", p); }
@@ -4974,6 +5049,13 @@ return Object.entries(c).sort((a, b) => b[1] - a[1]);
 function median(a){ if(!a.length) return null; const s = a.slice().sort((x, y) => x - y), m = Math.floor(s.length / 2); return s.length % 2 ? s[m] : (s[m-1] + s[m]) / 2; }
 const parseDate = s => { const [y, m, d] = String(s).split("-").map(Number); return new Date(y, (m || 1) - 1, d || 1); };
 const fmtDate = s => parseDate(s).toLocaleDateString(undefined, { month:"short", day:"numeric" });
+const fmtDur = s => s < 60 ? `${s} sec` : s < 3600 ? `${Math.round(s / 60)} min` : `${Math.floor(s / 3600)} h ${Math.round(s % 3600 / 60)} min`;
+/* what help a practice answer used, in words ("" if none) */
+const helpUsed = a => { const out = [];
+if(a.h){ if(a.h[1]) out.push(`${a.h[1]} hint${a.h[1] > 1 ? "s" : ""}`); if(a.h[2]) out.push(`${a.h[2]} step${a.h[2] > 1 ? "s" : ""} shown`); }
+if(a.tp) out.push(`${a.tp} tip${a.tp > 1 ? "s" : ""}`);
+if(a.sol) out.push("opened the explanation");
+return out.join(", "); };
 const heatCell = st => st.n ? `<td class="hc ${st.p >= .75 ? "hi" : st.p >= .5 ? "mid" : "lo"}" title="${st.r} of ${st.n} correct${st.h ? `, ${st.h} with help` : ""}"><b>${Math.round(st.p * 100)}%</b><small>${st.r}/${st.n}</small>${st.h ? `<small class="hhelp">${st.h} helped</small>` : ""}</td>` : `<td class="hc none"><small>—</small></td>`;
 function lineChart(series, opt){
 opt = opt || {};
@@ -5698,6 +5780,16 @@ if(!p) return drawSetup(prof, d, pb);
 const A = d.attempts, pace = planPace(p), weeks = planWeeks(p, A, mockPlanStatus(d));
 const now = Date.now(), wi = Math.min(weeks.length - 1, Math.max(0, Math.floor((now - p.created) / (7 * DAY))));
 const wk = weeks[wi], wkEnd = wk.start + 7 * DAY;
+/* Keep this week's focus steady once the week starts, so finished sessions don't disappear when the
+   weakest skill changes mid-week. A new week (or an edited plan) picks a fresh focus. */
+{ const lk = p.lock, sig = wk.items.map(it => it.k + (it.sec || "")).join(",");
+if(lk && lk.w === wi && lk.created === p.created && lk.sig === sig){
+wk.items.forEach((it, i) => { if(it.k === "set" && lk.doms[i]){ it.dom = lk.doms[i]; it.t = `${it.sec === "math" ? "Math" : "Reading & Writing"}: ${PQ_DOMAINS[it.dom]}`; } });
+wk.focus = lk.focus; wk.focusList = lk.focusList; wk.src = lk.src;
+} else {
+p.lock = { w:wi, created:p.created, sig, doms:wk.items.map(it => it.dom || null), focus:wk.focus, focusList:wk.focusList, src:wk.src };
+const dd = getPD(prof.id); if(dd.plan){ dd.plan.lock = p.lock; savePD(prof.id, dd); }
+} }
 const testDay = new Date(p.date + "T12:00"), daysLeft = Math.ceil((testDay - now) / DAY);
 const tg = planTargets(p);
 const scope = p.secs || "both", secsList = planSecs(p), secLabel = x => x === "math" ? "Math" : "Reading & Writing";
@@ -5749,13 +5841,45 @@ const cover = src === "mock" && wk.listLen ? (wk.listLen[x] > wk.perWeek[x]
 ? `This week covers ${wk.perWeek[x]} of your ${wk.listLen[x]} missed ${secLabel(x)} areas; the rest continue next week.`
 : wk.listLen[x] === 1 ? `This week covers your one missed ${secLabel(x)} area.` : `This week covers all ${wk.listLen[x]} of your missed ${secLabel(x)} areas.`) : "";
 const sess = wk.items.map((it, i) => [it, i]).filter(([it]) => it.k === "set" && it.sec === x);
-const planned = sess.reduce((t, [it]) => t + it.sets * 10, 0), done = satAns.filter(a => qOf(a).sec === x).length;
+const planned = sess.reduce((t, [it]) => t + it.sets * 10, 0);
+const focusDoms = [...new Set(sess.map(([it]) => it.dom))];
+const done = satAns.filter(a => qOf(a).sec === x && focusDoms.includes(qOf(a).dom)).length;   /* only answers on this week's focus skills count toward the sessions */
 return `<div class="planpanel" role="tabpanel" id="pp-${x}" aria-labelledby="pt-${x}"${secsList.length > 1 && tab !== x ? " hidden" : ""}>
 <p class="small" style="margin:12px 0 6px"><strong>${secLabel(x)} focus this week: ${names}</strong> <span class="muted">(${why})</span></p>
 ${cover ? `<p class="small muted" style="margin:0 0 6px">${cover} Each set is aimed at the specific skills you missed.</p>` : ""}
 ${src === "nodata" ? `<div class="note" style="margin:8px 0"><p style="margin:0 0 8px">Take the ${secLabel(x)} section of a mock test to find your real weak spots. Until then, this part of the plan is a starting point, not personalized.</p><button class="btn small" data-mocksec="${x}" data-mockfmt="full">Take a ${secLabel(x)} mock test</button></div>` : ""}
-${planned ? `<div class="bar-l small" style="margin-top:10px"><span>${secLabel(x)} practice questions this week</span><span class="muted">${Math.min(done, planned)} of ${planned}</span></div><div class="bar"><i style="width:${Math.min(100, done / planned * 100)}%;background:var(--c-ok)"></i></div>` : ""}
-<ol class="planweek">${sess.map(([it, i]) => `<li><span class="pwmark" aria-hidden="true">▸</span><span class="pwtxt"><strong>${esc(it.t)}</strong><small>${esc(it.d)}</small></span><button class="btn small" data-ps="${i}">Start</button></li>`).join("")}</ol>
+${planned ? `<div class="bar-l small" style="margin-top:10px"><span>${secLabel(x)} questions on this week's focus</span><span class="muted">${Math.min(done, planned)} of ${planned}</span></div><div class="bar"><i style="width:${Math.min(100, done / planned * 100)}%;background:var(--c-ok)"></i></div>` : ""}
+${(() => {   /* what was practiced this week, day by day, so a parent or tutor can see it */
+const mine = satAns.filter(a => qOf(a).sec === x);
+if(!mine.length) return `<p class="small muted" style="margin:8px 0 0">No ${secLabel(x)} practice yet this week.</p>`;
+const byDay = new Map();
+mine.forEach(a => { const k = new Date(a.t).toLocaleDateString("en-CA"); if(!byDay.has(k)) byDay.set(k, []); byDay.get(k).push(a); });
+const todayKey = new Date().toLocaleDateString("en-CA");
+const rows = [...byDay.entries()].sort((a, b) => b[0].localeCompare(a[0])).map(([day, arr]) => {
+const doms = new Map(); arr.forEach(a => { const dm = qOf(a).dom; doms.set(dm, (doms.get(dm) || 0) + 1); });
+const right = arr.filter(a => a.ok).length, secs = arr.reduce((t, a) => t + (a.s || 0), 0), helped = arr.filter(a => helpUsed(a)).length;
+const what = [...doms.entries()].sort((a, b) => b[1] - a[1]).map(([dm, n]) => doms.size > 1 ? `${PQ_DOMAINS[dm]} (${n})` : PQ_DOMAINS[dm]).join(", ");
+const rowsQ = arr.slice().sort((a, b) => a.t - b.t).map(a => { const q = qOf(a), sk = skillName(skillOf(q)) || PQ_DOMAINS[q.dom], hu = helpUsed(a);
+return `<tr><td>${new Date(a.t).toLocaleTimeString([], { hour:"numeric", minute:"2-digit" })}</td><td>${esc(sk)}</td><td class="${a.ok ? "ok" : "gap"}">${a.ok ? "✓ right" : "✗ wrong"}</td><td>${fmtDur(a.s || 0)}</td><td>${hu ? esc(hu) : "none"}${a.m === "t" ? " (test mode)" : ""}</td></tr>`; }).join("");
+return `<li><details><summary><span class="pwday">${day === todayKey ? "Today" : fmtDate(day)}</span><span>${arr.length} question${arr.length === 1 ? "" : "s"}: ${esc(what)} · <strong>${right} correct</strong> · ${fmtDur(secs)} · ${helped ? `help on ${helped}` : "no help used"}</span></summary>
+<div class="pwtablewrap"><table class="pwtable"><thead><tr><th>Time</th><th>Skill</th><th>Result</th><th>Took</th><th>Help used</th></tr></thead><tbody>${rowsQ}</tbody></table></div></details></li>`;
+}).join("");
+return `<div class="pwdone"><p class="small" style="margin:10px 0 4px"><strong>Done this week</strong> <span class="muted">(tap a day to see each question)</span></p><ul class="pwdays small">${rows}</ul><button class="linkbtn small" data-go="dashboard">See every answer on My progress</button></div>`;
+})()}
+${(() => {   /* sessions are ticked off in order as their questions are answered */
+const left = {};
+satAns.forEach(a => { const q = qOf(a); if(q.sec === x) left[q.dom] = (left[q.dom] || 0) + 1; });
+const same = t => sess.filter(([y]) => y.t === t).length;
+const nth = {};
+return `<ol class="planweek">${sess.map(([it, i]) => {
+const dn = (left[it.dom] || 0) >= it.sets * 10;
+if(dn) left[it.dom] -= it.sets * 10;
+nth[it.t] = (nth[it.t] || 0) + 1;
+const tag = same(it.t) > 1 ? ` · session ${nth[it.t]} of ${same(it.t)}` : "";
+return `<li class="${dn ? "done" : ""}"><span class="pwmark" aria-hidden="true">${dn ? "✓" : "▸"}</span><span class="pwtxt"><strong>${esc(it.t)}</strong><small>${esc(it.d)}${tag}${dn ? " · done" : ""}</small></span><button class="btn small${dn ? " ghost" : ""}" data-ps="${i}">${dn ? "Again" : "Start"}</button></li>`;
+}).join("")}</ol>`;
+})()}
+${x === "rw" ? `<p class="small" style="margin:10px 0 0">Having trouble with verb tense? <button class="linkbtn" data-drillopen="tense">Open the Verb tense lesson and drill</button></p>` : ""}
 <details class="more planweeks"><summary>Coming weeks: ${secLabel(x)} (preview)</summary>
 <p class="small muted" style="margin:6px 0">Future weeks open when they start. Their focus is a preview that updates from your answers. To practice ahead, use any Practice button above.</p>
 <ol class="planall">${weeks.filter(y => y.w >= wi).map((y, idx) => {
@@ -5776,6 +5900,7 @@ const tg = wk.src[it.sec] === "mock" ? mockTarget(it.sec, it.dom) : null;
 startPendingPractice({ qs: focusSet(it.sec, it.dom, 10, tg), sec:it.sec, label:`Plan week ${wi + 1}: ${targetLabel(it.dom, tg)}` }, it.mode === "test" ? "test" : "guided");
 });
 el.querySelectorAll("[data-go]").forEach(b => b.onclick = () => openTool(b.dataset.go));
+el.querySelectorAll("[data-drillopen]").forEach(b => b.onclick = () => openDrill(b.dataset.drillopen));
 el.querySelectorAll("[data-allweeks]").forEach(b => b.onclick = () => { b.closest(".planpanel").querySelectorAll(".wkmore").forEach(li => li.hidden = false); b.remove(); });
 el.querySelectorAll("[data-ptab]").forEach(b => b.onclick = () => {
 const x = b.dataset.ptab; store.set("os_planTab", x); track("plan-tab", { section:x });
@@ -6514,7 +6639,7 @@ const SITE = {
 name: "OpenShelf",
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 69,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
+version: 71,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "September 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
