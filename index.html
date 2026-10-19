@@ -321,6 +321,24 @@ details.more summary{cursor:pointer;font-weight:650}
 .callink{color:var(--accent);font-weight:600}
 .pqhead{display:flex;justify-content:space-between;align-items:center}
 .pqstem{font-family:var(--serif);font-size:1.1875rem;line-height:1.6;margin:10px 0 16px}
+/* Words in context */
+.vpass{font-family:var(--serif);font-size:1.1875rem;line-height:1.85;margin:6px 0 0}
+.vpass .vw{border-radius:4px;transition:background .12s}
+.vpass .vw.on{background:#FFE7A3}
+.vkey,.vkeydemo{font:inherit;line-height:1.2;vertical-align:baseline;display:inline;color:var(--accent);background:#EAF1FD;border:0;border-bottom:2px solid var(--accent);border-radius:4px 4px 0 0;padding:0 2px;margin:0;cursor:pointer;font-weight:600}
+.vkey.learned{border-bottom-color:var(--c-ok);color:var(--c-ok);background:#E6F3EF}
+.vkey.review{border-bottom-color:var(--c-warn);color:var(--c-warn);background:#FBEDEE}
+.vkey.sel{outline:2px solid var(--accent);outline-offset:1px}
+.vcard{margin-top:14px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#FAFBFE}
+.vcard p{margin:4px 0}
+.vch{font-size:1.125rem}
+.vst,.vchip{display:inline-block;font-size:.75rem;font-weight:700;padding:1px 8px;border-radius:999px;background:#EEF1F6;color:var(--muted);margin-left:4px}
+.vst.learned,.vchip.learned{background:#E6F3EF;color:var(--c-ok)}
+.vst.review,.vchip.review{background:#FBEDEE;color:var(--c-warn)}
+.vmy{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0}
+.vchip{white-space:nowrap}
+.vmy .vchip{margin:0;font-size:.8125rem}
+.vfb{margin-top:12px}.vfb p{margin:4px 0}
 .pqstem p{margin:0 0 12px}
 .pqstem.small{font-size:1rem}
 .review{padding:12px 0;border-top:1px solid var(--line)}
@@ -879,7 +897,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=79"></script>
+<script src="questions.js?v=82"></script>
 <script>
 /* Bangla (বাংলা) is turned off for now. The translations are kept: set BANGLA_ON to true and restore the header switch to bring it back. */
 const BANGLA_ON = false;
@@ -2103,6 +2121,7 @@ bank:       { title:"SAT question bank",      desc:"Every question with answers,
 deadlines:  { title:"Deadlines countdown",    desc:"Application, SAT and financial aid dates this year." },
 checklists: { title:"Parent checklists",      desc:"What to do in grades 9 to 12, with progress saved." },
 meritcalc:  { title:"Merit aid calculator",   desc:"See how close a score is to the next scholarship step, and what a retake could be worth." },
+words:      { title:"Words in context",       desc:"SAT vocabulary the way the test uses it: read or listen to a short passage, tap words to see what they mean there, then check yourself." },
 calc:       { title:"Calculator",             desc:"A scientific and graphing calculator that stays open while you practice or take a mock test. Graph equations, then tap to find where they cross. The SAT allows a calculator on the whole Math section." }
 };
 const IVY_SAT = [
@@ -2123,7 +2142,7 @@ bio:  { label:"Biology, pre-med, neuroscience",               m:760, rw:750, mT:
 hum:  { label:"Humanities, history, English, political science", m:740, rw:760, mT:"740+",   rwT:"760 to 800" }
 };
 const TOOL_GROUPS = [
-{ label:"Practice & progress", ids:["practice","mocktest","calc","scoreplan","dashboard","satcheck"] },
+{ label:"Practice & progress", ids:["practice","mocktest","words","calc","scoreplan","dashboard","satcheck"] },
 { label:"For parents & tutors", ids:["parent","tutor","checklists"] },
 { label:"Plan & apply", ids:["listbuilder","planner","apcredit","meritcalc","deadlines"] }
 ];
@@ -2135,6 +2154,7 @@ const TOOL_EXTRA = {
   dashboard:{ icon:"📈", short:"Scores, skills and what's next", newUntil:"2026-12-31" },
   bank:{ icon:"📚", short:"Browse every question" },
   calc:{ icon:"🧮", short:"Scientific and graphing calculator", newUntil:"2026-12-31" },
+  words:{ icon:"🔤", short:"SAT vocabulary in context", newUntil:"2027-02-28" },
   satcheck:{ icon:"🔎", short:"Where your score lands" },
   parent:{ icon:"👪", short:"A weekly summary for parents" },
   tutor:{ icon:"🧑‍🏫", short:"Assign sets, compare students" },
@@ -6784,7 +6804,7 @@ name: "My OpenShelf",
 fileName: "MyOpenShelf",   // used in downloaded file names (no spaces)
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "My OpenShelf Learning"
-version: 79,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
+version: 82,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "October 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
@@ -7128,6 +7148,107 @@ const blocked = better.filter(t => !gpaOk(t) && score >= t.min).sort((a, b) => b
 const gpaUnknown = gpa == null && tiers.some(t => t.gpa != null && score >= t.min);
 return { cur, next, pts: next ? next.min - score : null, gain: next ? next.amt - cur : 0, years, blocked, gpaUnknown, top: !better.length };
 }
+/* Words in context: read a short original passage (or listen, with each word lit up as it's spoken), tap the
+   highlighted words to see what they mean in that sentence, then check yourself on new sentences.
+   Progress per word is kept on this device in os_words: { word: { r:right, w:wrong, last:"r"|"w"|"s", t:time } }. */
+function renderWords(el){
+const W = store.get("os_words", {});
+const save = () => store.set("os_words", W);
+const list = typeof VOCAB !== "undefined" ? VOCAB : [];
+let cur = list.find(p => p.id === store.get("os_words_p", "")) || list[0];
+const audio = new Audio(); audio.preload = "none";
+let raf = 0, lastOn = -1;
+const status = w => { const x = W[w]; return !x ? "new" : x.last === "r" ? "learned" : x.last === "w" ? "review" : "seen"; };
+const LBL = { new:"New", seen:"Seen", learned:"Learned", review:"Review" };
+const stopRead = () => { audio.pause(); cancelAnimationFrame(raf); const b = el.querySelector("#vPlay"); if(b) b.innerHTML = "▶ Listen"; };
+const lightUp = () => {
+  const t = audio.currentTime, T = cur.t || [];
+  let k = -1; for(let j = 0; j < T.length && T[j] <= t; j++) k = j;
+  if(k !== lastOn){ el.querySelectorAll(".vw.on").forEach(x => x.classList.remove("on")); const n = el.querySelector(`.vw[data-i="${k}"]`); if(n) n.classList.add("on"); lastOn = k; }
+  if(!audio.paused) raf = requestAnimationFrame(lightUp);
+};
+audio.onended = () => { stopRead(); el.querySelectorAll(".vw.on").forEach(x => x.classList.remove("on")); lastOn = -1; };
+const observer = new MutationObserver(() => { if(!document.contains(el) || $("#toolView").hidden){ audio.pause(); observer.disconnect(); } });
+observer.observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:["hidden"] });
+function card(w){
+  const d = cur.words[w]; if(!d) return "";
+  return `<div class="vcard" role="region" aria-live="polite"><p class="vch"><strong>${esc(w)}</strong> <span class="muted small">${esc(d.pos)}</span> <span class="vst ${status(w)}">${LBL[status(w)]}</span></p>
+  <p><strong>Here it means:</strong> ${d.here}</p>
+  <p><strong>Fits here:</strong> ${d.fits.map(esc).join(", ")}</p>
+  <p><strong>Careful, it doesn't mean:</strong> ${d.not}</p>
+  <p class="small muted"><strong>Word family:</strong> ${d.family}</p></div>`;
+}
+function draw(){
+  stopRead(); lastOn = -1;
+  let i = 0;
+  const passage = cur.text.map(s => s.split(" ").map(raw => {
+    const m = raw.match(/^(\W*)\[(\w+)\](\W*)$/), idx = i++;
+    return m ? `<span class="vw" data-i="${idx}">${esc(m[1])}<button class="vkey ${status(m[2])}" data-w="${esc(m[2])}" aria-label="${esc(m[2])}: show meaning">${esc(m[2])}</button>${esc(m[3])}</span>`
+             : `<span class="vw" data-i="${idx}">${esc(raw)}</span>`;
+  }).join(" ")).join(" ");
+  const keys = Object.keys(cur.words);
+  const done = keys.filter(w => W[w] && W[w].last === "r").length;
+  const all = list.flatMap(p => Object.keys(p.words));
+  el.innerHTML = `
+  <h1>Words in context</h1>
+  <p class="muted">The SAT doesn't test word lists. It asks what a word means <em>in a particular sentence</em>, often a common word used in a less common way. Read (or listen to) the passage, tap each <span class="vkeydemo">highlighted word</span> to see what it means here, then check yourself.</p>
+  ${list.length > 1 ? `<label class="fld"><span>Passage</span><select id="vPick">${list.map(p => `<option value="${p.id}"${p === cur ? " selected" : ""}>${esc(p.title)}</option>`).join("")}</select></label>` : ""}
+  <div class="box vbox">
+    <p class="small muted vmeta">${esc(cur.topic)} · ${keys.length} words to learn · ${done} learned</p>
+    <h2>${esc(cur.title)}</h2>
+    <div class="vpass" id="vPass">${passage}</div>
+    <div class="ractions" style="margin-top:12px">${cur.t ? `<button class="btn small" id="vPlay">▶ Listen</button>` : ""}<button class="btn ghost small" id="vGoQuiz">Check yourself</button></div>
+    <div id="vCard"><p class="small muted" style="margin-top:12px">Tap a highlighted word to see what it means in this passage.</p></div>
+  </div>
+  <div class="box" id="vQuiz" hidden></div>
+  <details class="box more"><summary>My words (${all.filter(w => status(w) === "learned").length} of ${all.length} learned)</summary>
+  <div class="vmy">${all.map(w => `<span class="vchip ${status(w)}">${esc(w)} · ${LBL[status(w)]}</span>`).join("")}</div>
+  <p class="small muted">Learned means you got it right the last time it was quizzed. Words marked Review come back first next time.</p></details>
+  <p class="small muted">All passages are original and written for ${esc(SITE.name)}. More passages are on the way.</p>`;
+  const pick = el.querySelector("#vPick"); if(pick) pick.onchange = () => { cur = list.find(p => p.id === pick.value); store.set("os_words_p", cur.id); draw(); };
+  el.querySelectorAll(".vkey").forEach(b => b.onclick = () => {
+    const w = b.dataset.w; if(!W[w]){ W[w] = { r:0, w:0, last:"s", t:Date.now() }; save(); }
+    el.querySelectorAll(".vkey.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel");
+    el.querySelector("#vCard").innerHTML = card(w); track("word-open", { word:w });
+  });
+  const play = el.querySelector("#vPlay");
+  if(play) play.onclick = () => {
+    if(!audio.paused){ stopRead(); return; }
+    if(!audio.src.endsWith(`audio/${cur.id}.mp3`)) audio.src = `audio/${cur.id}.mp3`;
+    audio.play().then(() => { play.innerHTML = "❚❚ Pause"; raf = requestAnimationFrame(lightUp); track("word-listen", { passage:cur.id }); })
+      .catch(() => toast("The narration couldn't load. Check your connection and try again."));
+  };
+  el.querySelector("#vGoQuiz").onclick = () => { stopRead(); quiz(); };
+}
+function quiz(){
+  const box = el.querySelector("#vQuiz"); box.hidden = false;
+  /* words to review come first */
+  const qs = cur.quiz.slice().sort((a, b) => (status(b.w) === "review") - (status(a.w) === "review"));
+  let n = 0, right = 0;
+  const one = () => {
+    if(n >= qs.length){
+      box.innerHTML = `<h2>Done: ${right} of ${qs.length}</h2><p>${right === qs.length ? "Every word learned. Nice work." : "Words you missed are marked Review. They'll come first next time, so try this check again in a day or two."}</p>
+      <div class="ractions"><button class="btn small" id="vAgain">Try again</button><button class="btn ghost small" id="vBack">Back to the passage</button></div>`;
+      box.querySelector("#vAgain").onclick = quiz; box.querySelector("#vBack").onclick = draw;
+      track("word-quiz", { passage:cur.id, right, of:qs.length }); return;
+    }
+    const q = qs[n], order = shuffle([0, 1, 2, 3]);
+    box.innerHTML = `<p class="small muted">Question ${n + 1} of ${qs.length}</p><div class="pqstem">${q.q}</div>
+    <div class="qopts">${order.map((j, k) => `<button class="qopt" data-j="${j}"><b>${"ABCD"[k]}.</b> ${q.o[j]}</button>`).join("")}</div><div id="vFb"></div>`;
+    box.scrollIntoView({ behavior:"smooth", block:"start" });
+    box.querySelectorAll(".qopt").forEach(b => b.onclick = () => {
+      const ok = +b.dataset.j === q.a, x = W[q.w] || (W[q.w] = { r:0, w:0, last:"s", t:0 });
+      ok ? (x.r++, right++) : x.w++; x.last = ok ? "r" : "w"; x.t = Date.now(); save();
+      box.querySelectorAll(".qopt").forEach(o => { o.disabled = true; if(+o.dataset.j === q.a) o.classList.add("right"); });
+      if(!ok) b.classList.add("wrong");
+      box.querySelector("#vFb").innerHTML = `<div class="vfb"><p><strong>${ok ? "Right." : "Not quite."}</strong> ${q.ex}</p>${ok ? "" : card(q.w)}<button class="btn small" id="vNext" style="margin-top:10px">${n + 1 < qs.length ? "Next" : "See results"}</button></div>`;
+      box.querySelector("#vNext").onclick = () => { n++; one(); };
+    });
+  };
+  one();
+}
+draw();
+}
 function renderMeritCalc(el){
 const bn = I18N.lang === "bn", tx = (e, b) => bn ? b : e;
 const money = n => "$" + Math.round(n).toLocaleString("en-US");
@@ -7276,7 +7397,7 @@ $("#mcGuide").onclick = () => { closeTool(); openLesson("merit-scholarships"); }
 };
 draw();
 }
-const TOOL_RENDER = { meritcalc:renderMeritCalc, scoreplan:renderScorePlan, apcredit:renderAPCredit, mocktest:renderMock, dashboard:renderDashboard, parent:renderParent, tutor:renderTutor, satcheck:renderSatCheck, listbuilder:renderListBuilder, planner:renderPlanner, practice:renderPractice, bank:renderBank, deadlines:renderDeadlines, checklists:renderChecklists };
+const TOOL_RENDER = { words:renderWords, meritcalc:renderMeritCalc, scoreplan:renderScorePlan, apcredit:renderAPCredit, mocktest:renderMock, dashboard:renderDashboard, parent:renderParent, tutor:renderTutor, satcheck:renderSatCheck, listbuilder:renderListBuilder, planner:renderPlanner, practice:renderPractice, bank:renderBank, deadlines:renderDeadlines, checklists:renderChecklists };
 function wireFooter(){
 const fv = $("#footVersion"); if(fv && SITE.version) fv.textContent = `Version ${SITE.version}`;
 const bb = document.getElementById("builtBy");
