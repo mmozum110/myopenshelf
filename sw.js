@@ -1,9 +1,9 @@
-/* OpenShelf service worker.
+/* My OpenShelf service worker.
    Network first: visitors get the newest version whenever they're online, and the last saved copy
    when they're offline or on a weak connection. The page and the question bank (questions.js) are always
    checked with the server (cache: "no-cache"), so an update shows up on the next visit.
    When you upload a new index.html and questions.js, change VERSION below so old saved copies are cleared. */
-const VERSION = "openshelf-v73";
+const VERSION = "openshelf-v79";
 const FILES = ["./", "index.html", "questions.js", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png"];
 
 self.addEventListener("install", e => {

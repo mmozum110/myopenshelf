@@ -3,25 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OpenShelf: step-by-step math, SAT practice and college planning</title>
+<title>My OpenShelf: step-by-step math, SAT practice and college planning</title>
 <meta name="description" content="Free SAT practice and mock tests, step-by-step math from Algebra 1 to Statistics, and college planning tools for students and parents. No sign-up.">
 <meta name="theme-color" content="#F4F7FC">
 <link rel="canonical" href="https://myopenshelf.org/">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="OpenShelf">
-<meta property="og:title" content="OpenShelf: Learning made easy. Open to all.">
+<meta property="og:site_name" content="My OpenShelf">
+<meta property="og:title" content="My OpenShelf: Learning made easy. Open to all.">
 <meta property="og:description" content="Free SAT practice and mock tests, step-by-step math from Algebra 1 to Statistics, and college planning tools for students and parents. No sign-up.">
 <meta property="og:url" content="https://myopenshelf.org/">
 <meta property="og:image" content="https://myopenshelf.org/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="OpenShelf logo with the words: Learning made easy. Open to all. Free SAT practice, step-by-step math and college planning.">
+<meta property="og:image:alt" content="My OpenShelf logo with the words: Learning made easy. Open to all. Free SAT practice, step-by-step math and college planning.">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="OpenShelf">
+<meta name="apple-mobile-web-app-title" content="My OpenShelf">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -153,6 +153,7 @@ a.btn{text-decoration:none}
 .qt-view:hover .qt-track{animation-play-state:paused}
 @keyframes qtscroll{to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion: reduce){ .qt-track{animation:none} .qt-group+.qt-group{display:none} .qt-view{overflow-x:auto;scrollbar-width:none;-webkit-mask-image:none;mask-image:none} .qt-view::-webkit-scrollbar{display:none} }
+.logo-word{white-space:nowrap}.logo-my{font-weight:600;opacity:.8}
 .logo-name{display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.05}
 .beta{font-size:.5625rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);border:1px solid currentColor;border-radius:999px;padding:0 5px;margin-top:3px;line-height:1.5}
 @media (min-width:600px){ .logo-name{flex-direction:row;align-items:center} .beta{font-size:.6875rem;padding:1px 7px;margin:0 0 0 8px} }
@@ -161,7 +162,7 @@ a.btn{text-decoration:none}
 .logo-mark i{display:block;width:5px;border-radius:1px 1px 0 0}
 .hright{display:flex;gap:8px;align-items:center}
 @media (max-width:430px){ .top{gap:4px} .logo{font-size:1.0625rem;gap:5px} .hright{gap:5px} .hright .btn.small{padding:6px 9px;font-size:.8438rem} }
-@media (max-width:359px){ .wrap{padding-left:14px;padding-right:14px} .hright{gap:4px} .hright .btn.small{padding:6px 7px} .hright .sg-wide{width:34px;height:34px} .hright .sg-wide .sgicon{width:18px;height:18px} .logo .beta{font-size:.55rem;padding:0 4px} }
+@media (max-width:359px){ .logo{font-size:.95rem} .wrap{padding-left:14px;padding-right:14px} .hright{gap:4px} .hright .btn.small{padding:6px 7px} .hright .sg-wide{width:34px;height:34px} .hright .sg-wide .sgicon{width:18px;height:18px} .logo .beta{font-size:.55rem;padding:0 4px} }
 @media (max-width:340px){ .logo .beta{display:none} }
 .btn{white-space:nowrap;border:0;border-radius:999px;padding:10px 18px;font-weight:600;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
 .btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
@@ -753,9 +754,9 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 <body>
 <div class="wrap">
   <header class="top">
-    <button class="logo" id="homeBtn" aria-label="OpenShelf home (beta)">
+    <button class="logo" id="homeBtn" aria-label="My OpenShelf home (beta)">
       <span class="logo-mark" aria-hidden="true"><i style="height:14px;background:var(--c-sat)"></i><i style="height:22px;background:var(--c-schools)"></i><i style="height:18px;background:var(--c-apply)"></i></span>
-      <span class="logo-name">OpenShelf<span class="beta">Beta</span></span>
+      <span class="logo-name"><span class="logo-word"><span class="logo-my">My</span> OpenShelf</span><span class="beta">Beta</span></span>
     </button>
     <div class="hright">
       <button class="btn ghost small sgtop sg-wide" aria-label="Suggestion box: send us an idea or question"><svg class="sgicon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2V17h5v-1.2c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3z"/></svg><span>Suggestion box</span></button>
@@ -831,7 +832,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
   </main>
 
   <footer>
-    <p class="betanote">OpenShelf is in beta. Questions and features are still being reviewed and improved. If you spot a mistake, please tap “Report a problem” on that question.</p>
+    <p class="betanote">My OpenShelf is in beta. Questions and features are still being reviewed and improved. If you spot a mistake, please tap “Report a problem” on that question.</p>
     <p class="footdomain"><strong>myopenshelf.org</strong> · free, no sign-up</p>
     <nav class="footlinks" aria-label="Site information">
       <button class="linkbtn" data-page="about">About</button>
@@ -839,8 +840,9 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
       <button class="linkbtn" data-page="terms">Terms &amp; disclaimer</button>
       <span id="footContact"></span>
     </nav>
-    <p>OpenShelf is free and written for general information. Nothing here guarantees admission, a test score or course credit. Always confirm requirements, deadlines and financial aid on official websites.</p>
-    <p class="small">SAT<sup>®</sup> and AP<sup>®</sup> are trademarks registered by the College Board, which is not affiliated with, and does not endorse, this site. OpenShelf is not affiliated with any college or university.</p>
+    <p>My OpenShelf is free and written for general information. Nothing here guarantees admission, a test score or course credit. Always confirm requirements, deadlines and financial aid on official websites.</p>
+    <p class="small">SAT<sup>®</sup> and AP<sup>®</sup> are trademarks registered by the College Board, which is not affiliated with, and does not endorse, this site. My OpenShelf is not affiliated with any college or university.</p>
+    <p class="small">© 2026 My OpenShelf. All rights reserved.</p>
     <div class="builtby" id="builtBy">
       <span class="bb-mark" aria-hidden="true">N</span>
       <span class="bb-text"><span class="bb-name">Built by <strong>Noventra</strong></span><span class="bb-tag">Future-ready IT solutions.</span></span>
@@ -877,7 +879,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=73"></script>
+<script src="questions.js?v=79"></script>
 <script>
 /* Bangla (বাংলা) is turned off for now. The translations are kept: set BANGLA_ON to true and restore the header switch to bring it back. */
 const BANGLA_ON = false;
@@ -1350,7 +1352,7 @@ body:`<p>Many colleges reward strong grades and test scores with scholarships th
 <li><strong>Test-optional doesn't always mean merit-optional.</strong> Some test-optional colleges still need scores to award merit money.</li>
 <li><strong>Keeping the award.</strong> Most awards require a minimum college GPA to renew each year.</li></ul>
 <h3>What about the most selective colleges?</h3>
-<p>None of the 28 top colleges covered on OpenShelf publishes an automatic score chart. Stanford, MIT, Northwestern, Georgetown and the Ivies give only need-based aid. Others, such as Duke, Rice, USC, Johns Hopkins, Maryland, Purdue and Ohio State, award competitive merit scholarships by reviewing the whole application. Several of them consider students only if they apply by November 1. Vanderbilt and UVA need a separate application or nomination for their biggest awards. At these colleges, a higher score can help a student stand out, but it doesn't unlock a set amount. The Merit aid calculator lists all 28, with links to their official pages.</p>
+<p>None of the 28 top colleges covered on My OpenShelf publishes an automatic score chart. Stanford, MIT, Northwestern, Georgetown and the Ivies give only need-based aid. Others, such as Duke, Rice, USC, Johns Hopkins, Maryland, Purdue and Ohio State, award competitive merit scholarships by reviewing the whole application. Several of them consider students only if they apply by November 1. Vanderbilt and UVA need a separate application or nomination for their biggest awards. At these colleges, a higher score can help a student stand out, but it doesn't unlock a set amount. The Merit aid calculator lists all 28, with links to their official pages.</p>
 <h3>National Merit is different</h3>
 <p>The National Merit Scholarship Program uses the PSAT/NMSQT taken in 11th grade, not the SAT. Semifinalists must also have a qualifying SAT or ACT score to become Finalists, and most already do. Some colleges offer large awards to National Merit Finalists.</p>
 <h3>Four steps to decide on a retake</h3>
@@ -1390,7 +1392,7 @@ body:`<p>অনেক কলেজ ভালো গ্রেড ও টেস্
 <li><strong>টেস্ট-ঐচ্ছিক মানেই বৃত্তিতেও স্কোর ঐচ্ছিক নয়।</strong> কিছু টেস্ট-ঐচ্ছিক কলেজ মেধা বৃত্তি দিতে এখনও স্কোর চায়।</li>
 <li><strong>বৃত্তি ধরে রাখা।</strong> বেশিরভাগ বৃত্তি প্রতি বছর নবায়নের জন্য কলেজে একটি ন্যূনতম GPA রাখতে হয়।</li></ul>
 <h3>সবচেয়ে প্রতিযোগিতামূলক কলেজগুলোর কী হবে?</h3>
-<p>OpenShelf-এ থাকা ২৮টি শীর্ষ কলেজের কোনোটিই স্বয়ংক্রিয় স্কোর চার্ট প্রকাশ করে না। Stanford, MIT, Northwestern, Georgetown ও আইভি লিগ শুধু প্রয়োজনভিত্তিক সহায়তা দেয়। Duke, Rice, USC, Johns Hopkins, Maryland, Purdue ও Ohio State-এর মতো অন্যরা পুরো আবেদন দেখে প্রতিযোগিতামূলক মেধা বৃত্তি দেয়। এদের কয়েকটি শুধু ১ নভেম্বরের মধ্যে আবেদনকারীদেরই বিবেচনা করে। Vanderbilt ও UVA-র সবচেয়ে বড় বৃত্তির জন্য আলাদা আবেদন বা মনোনয়ন লাগে। এসব কলেজে বেশি স্কোর শিক্ষার্থীকে এগিয়ে রাখতে পারে, কিন্তু নির্দিষ্ট পরিমাণ টাকা নিশ্চিত করে না। মেধা বৃত্তি ক্যালকুলেটরে ২৮টি কলেজের তালিকা ও তাদের অফিসিয়াল পেজের লিংক আছে।</p>
+<p>My OpenShelf-এ থাকা ২৮টি শীর্ষ কলেজের কোনোটিই স্বয়ংক্রিয় স্কোর চার্ট প্রকাশ করে না। Stanford, MIT, Northwestern, Georgetown ও আইভি লিগ শুধু প্রয়োজনভিত্তিক সহায়তা দেয়। Duke, Rice, USC, Johns Hopkins, Maryland, Purdue ও Ohio State-এর মতো অন্যরা পুরো আবেদন দেখে প্রতিযোগিতামূলক মেধা বৃত্তি দেয়। এদের কয়েকটি শুধু ১ নভেম্বরের মধ্যে আবেদনকারীদেরই বিবেচনা করে। Vanderbilt ও UVA-র সবচেয়ে বড় বৃত্তির জন্য আলাদা আবেদন বা মনোনয়ন লাগে। এসব কলেজে বেশি স্কোর শিক্ষার্থীকে এগিয়ে রাখতে পারে, কিন্তু নির্দিষ্ট পরিমাণ টাকা নিশ্চিত করে না। মেধা বৃত্তি ক্যালকুলেটরে ২৮টি কলেজের তালিকা ও তাদের অফিসিয়াল পেজের লিংক আছে।</p>
 <h3>ন্যাশনাল মেরিট আলাদা</h3>
 <p>ন্যাশনাল মেরিট স্কলারশিপ প্রোগ্রামে যোগ্যতা নির্ধারিত হয় একাদশ শ্রেণিতে দেওয়া PSAT/NMSQT দিয়ে, SAT দিয়ে নয়। সেমিফাইনালিস্টদের ফাইনালিস্ট হতে একটি যোগ্য SAT বা ACT স্কোরও লাগে, যা বেশিরভাগেরই থাকে। কিছু কলেজ ন্যাশনাল মেরিট ফাইনালিস্টদের বড় বৃত্তি দেয়।</p>
 <h3>আবার পরীক্ষা দেওয়ার সিদ্ধান্ত নিতে চারটি ধাপ</h3>
@@ -1508,7 +1510,7 @@ const BN = {
 "Math":"গণিত", "SAT practice":"SAT অনুশীলন", "College planning":"কলেজ পরিকল্পনা",
 "Search lessons":"পাঠ খুঁজুন", "Search, e.g. SAT scores, calculus, Early Decision":"খুঁজুন, যেমন: SAT স্কোর, ক্যালকুলাস, Early Decision",
 "Try:":"দেখুন:", "SAT scores":"SAT স্কোর", "extracurriculars":"পাঠ্যক্রম-বহির্ভূত কার্যক্রম", "AP credit":"AP ক্রেডিট", "financial aid":"আর্থিক সহায়তা",
-"OpenShelf home":"OpenShelf হোম", "Site information":"সাইটের তথ্য", "Topics":"বিষয়", "Level":"স্তর", "Language":"ভাষা",
+"My OpenShelf home":"My OpenShelf হোম", "Site information":"সাইটের তথ্য", "Topics":"বিষয়", "Level":"স্তর", "Language":"ভাষা",
 "Popular guides":"জনপ্রিয় গাইড", "Extracurricular activities":"পাঠ্যক্রম-বহির্ভূত কার্যক্রম", "Ideas by interest area":"আগ্রহের ক্ষেত্র অনুযায়ী ধারণা",
 "What each Ivy values":"প্রতিটি আইভি কী মূল্য দেয়", "Beyond grades, school by school":"গ্রেডের বাইরে, স্কুল অনুযায়ী",
 "SAT score targets":"SAT স্কোরের লক্ষ্য", "What each Ivy's students scored":"প্রতিটি আইভির শিক্ষার্থীরা কত স্কোর করেছে",
@@ -1536,8 +1538,8 @@ const BN = {
 "Key takeaways":"মূল শিক্ষা", "Try this":"এটি চেষ্টা করুন", "Try the tool":"টুলটি ব্যবহার করুন", "Save lesson":"পাঠ সংরক্ষণ করুন", "Next lesson":"পরের পাঠ",
 "Saved to your shelf.":"আপনার শেলফে সংরক্ষিত হয়েছে।", "Removed from your shelf.":"শেলফ থেকে সরানো হয়েছে।", "Marked as completed.":"সম্পন্ন হিসেবে চিহ্নিত হয়েছে।", "Marked as not completed.":"অসম্পন্ন হিসেবে চিহ্নিত হয়েছে।",
 "· free, no sign-up":"· বিনামূল্যে, সাইন-আপ ছাড়া", "About":"আমাদের সম্পর্কে", "Privacy":"গোপনীয়তা", "Terms & disclaimer":"শর্তাবলি ও দায়মুক্তি", "Contact":"যোগাযোগ",
-"OpenShelf is free and written for general information. Nothing here guarantees admission, a test score or course credit. Always confirm requirements, deadlines and financial aid on official websites.":"OpenShelf বিনামূল্যে এবং সাধারণ তথ্যের জন্য লেখা। এখানে কোনো কিছুই ভর্তি, টেস্ট স্কোর বা কোর্স ক্রেডিটের নিশ্চয়তা দেয় না। শর্ত, সময়সীমা ও আর্থিক সহায়তার তথ্য সবসময় অফিশিয়াল ওয়েবসাইটে যাচাই করুন।",
-"SAT® and AP® are trademarks registered by the College Board, which is not affiliated with, and does not endorse, this site. OpenShelf is not affiliated with any college or university.":"SAT® ও AP® হলো College Board-এর নিবন্ধিত ট্রেডমার্ক; College Board এই সাইটের সাথে যুক্ত নয় এবং এটিকে সমর্থন করে না। OpenShelf কোনো কলেজ বা বিশ্ববিদ্যালয়ের সাথে যুক্ত নয়।",
+"My OpenShelf is free and written for general information. Nothing here guarantees admission, a test score or course credit. Always confirm requirements, deadlines and financial aid on official websites.":"My OpenShelf বিনামূল্যে এবং সাধারণ তথ্যের জন্য লেখা। এখানে কোনো কিছুই ভর্তি, টেস্ট স্কোর বা কোর্স ক্রেডিটের নিশ্চয়তা দেয় না। শর্ত, সময়সীমা ও আর্থিক সহায়তার তথ্য সবসময় অফিশিয়াল ওয়েবসাইটে যাচাই করুন।",
+"SAT® and AP® are trademarks registered by the College Board, which is not affiliated with, and does not endorse, this site. My OpenShelf is not affiliated with any college or university.":"SAT® ও AP® হলো College Board-এর নিবন্ধিত ট্রেডমার্ক; College Board এই সাইটের সাথে যুক্ত নয় এবং এটিকে সমর্থন করে না। My OpenShelf কোনো কলেজ বা বিশ্ববিদ্যালয়ের সাথে যুক্ত নয়।",
 "Built by Noventra":"নির্মাণে <strong>Noventra</strong>", "Future-ready IT solutions.":"ভবিষ্যৎ-উপযোগী আইটি সমাধান।",
 "Sound on. Tap to mute.":"শব্দ চালু। বন্ধ করতে চাপুন।", "Sound off. Tap to turn on.":"শব্দ বন্ধ। চালু করতে চাপুন।", "Sound on":"শব্দ চালু", "Sound off":"শব্দ বন্ধ",
 "Sounds:":"শব্দ:", "on":"চালু", "off":"বন্ধ", "Play a test sound":"পরীক্ষামূলক শব্দ বাজান",
@@ -1576,7 +1578,7 @@ const BN = {
 "Check what you know without hints. Every answer is explained at the end.":"ইঙ্গিত ছাড়া নিজেকে যাচাই করুন। শেষে প্রতিটি উত্তরের ব্যাখ্যা দেওয়া হবে।",
 "Unit progress":"ইউনিটের অগ্রগতি", "Unit complete!":"ইউনিট সম্পূর্ণ!", "Unit still complete":"ইউনিট এখনো সম্পূর্ণ",
 "Every unit in this course is complete. Amazing work.":"এই কোর্সের সব ইউনিট সম্পূর্ণ। অসাধারণ কাজ!",
-"Save OpenShelf to your phone":"OpenShelf আপনার ফোনে রাখুন", "Not now":"এখন না",
+"Save My OpenShelf to your phone":"My OpenShelf আপনার ফোনে রাখুন", "Not now":"এখন না",
 "Linear equations & inequalities":"রৈখিক সমীকরণ ও অসমতা", "Linear functions & graphs":"রৈখিক ফাংশন ও লেখচিত্র", "Systems of equations":"সহসমীকরণ",
 "Exponents & radicals":"সূচক ও মূল", "Polynomials & factoring":"বহুপদী ও উৎপাদকে বিশ্লেষণ", "Quadratic functions & equations":"দ্বিঘাত ফাংশন ও সমীকরণ",
 "Exponential functions":"সূচকীয় ফাংশন", "Data & statistics":"উপাত্ত ও পরিসংখ্যান",
@@ -1632,9 +1634,9 @@ const BN = {
 "Save a backup file":"ব্যাকআপ ফাইল সংরক্ষণ করুন",
 "Email it to yourself, or keep it in Notes, WhatsApp or Files. You can restore from it on any device.":"নিজেকে ইমেইল করুন, অথবা Notes, WhatsApp বা Files-এ রেখে দিন। যেকোনো ডিভাইসে এটি থেকে অগ্রগতি ফিরিয়ে আনতে পারবেন।",
 "Or choose a backup file":"অথবা একটি ব্যাকআপ ফাইল বেছে নিন",
-"That file doesn't contain an OpenShelf progress code.":"এই ফাইলে OpenShelf-এর কোনো অগ্রগতি কোড নেই।",
+"That file doesn't contain a My OpenShelf progress code.":"এই ফাইলে My OpenShelf-এর কোনো অগ্রগতি কোড নেই।",
 "Couldn't read that file.":"ফাইলটি পড়া যায়নি।",
-"OpenShelf is in beta. Questions and features are still being reviewed and improved. If you spot a mistake, please tap “Report a problem” on that question.":"OpenShelf এখন বেটা পর্যায়ে আছে। প্রশ্ন ও ফিচারগুলো এখনও যাচাই ও উন্নত করা হচ্ছে। কোনো ভুল চোখে পড়লে সেই প্রশ্নে “সমস্যা জানান” বোতামে চাপুন।",
+"My OpenShelf is in beta. Questions and features are still being reviewed and improved. If you spot a mistake, please tap “Report a problem” on that question.":"My OpenShelf এখন বেটা পর্যায়ে আছে। প্রশ্ন ও ফিচারগুলো এখনও যাচাই ও উন্নত করা হচ্ছে। কোনো ভুল চোখে পড়লে সেই প্রশ্নে “সমস্যা জানান” বোতামে চাপুন।",
 "Date":"তারিখ", "Test name":"টেস্টের নাম", "Log practice test":"প্র্যাকটিস টেস্ট যোগ করুন", "e.g. Bluebook Test 4":"যেমন: Bluebook Test 4",
 "Share progress with a parent or tutor":"অভিভাবক বা টিউটরের সাথে অগ্রগতি শেয়ার করুন", "First name to include":"যে প্রথম নাম যুক্ত হবে", "Update":"হালনাগাদ",
 "Progress code":"অগ্রগতি কোড", "Copy code":"কোড কপি করুন", "Copied":"কপি হয়েছে", "e.g. Aisha":"যেমন: আয়েশা",
@@ -1650,14 +1652,14 @@ const BN = {
 "Multiply every term. (a + b)² has a middle term, and a number outside parentheses multiplies everything inside.":"প্রতিটি পদ গুণ করুন। (a + b)²-এ একটি মধ্যপদ থাকে, আর বন্ধনীর বাইরের সংখ্যা ভেতরের সবকিছুকে গুণ করে।",
 "Always ask 'percent of what?' Percent changes are based on the original amount, not the new one.":"সবসময় জিজ্ঞেস করুন: ‘কিসের শতাংশ?’ শতাংশ পরিবর্তন মূল পরিমাণের ওপর ভিত্তি করে হয়, নতুন পরিমাণের ওপর নয়।",
 "Back up your progress.":"আপনার অগ্রগতির ব্যাকআপ নিন।", "Back up now":"এখনই ব্যাকআপ নিন", "Remind me next week":"আগামী সপ্তাহে মনে করিয়ে দিন",
-"About OpenShelf":"OpenShelf সম্পর্কে", "What's here":"এখানে যা আছে", "Mock tests":"মক টেস্ট", "Progress tracking":"অগ্রগতি ট্র্যাকিং",
+"About My OpenShelf":"My OpenShelf সম্পর্কে", "What's here":"এখানে যা আছে", "Mock tests":"মক টেস্ট", "Progress tracking":"অগ্রগতি ট্র্যাকিং",
 "Admissions guides and planning tools":"ভর্তির গাইড ও পরিকল্পনার টুল", "Why it's free":"কেন বিনামূল্যে", "About the questions":"প্রশ্নগুলো সম্পর্কে",
 "Contact details coming soon.":"যোগাযোগের তথ্য শিগগিরই আসছে।", "Last updated September 2026.":"সর্বশেষ হালনাগাদ: সেপ্টেম্বর ২০২৬।",
-"Good SAT and admissions guidance shouldn't depend on what a family can afford. OpenShelf has no ads, no paid tiers and no sign-up.":"ভালো SAT ও ভর্তি-নির্দেশনা পরিবারের সামর্থ্যের ওপর নির্ভর করা উচিত নয়। OpenShelf-এ কোনো বিজ্ঞাপন, পেইড প্ল্যান বা সাইন-আপ নেই।",
+"Good SAT and admissions guidance shouldn't depend on what a family can afford. My OpenShelf has no ads, no paid tiers and no sign-up.":"ভালো SAT ও ভর্তি-নির্দেশনা পরিবারের সামর্থ্যের ওপর নির্ভর করা উচিত নয়। My OpenShelf-এ কোনো বিজ্ঞাপন, পেইড প্ল্যান বা সাইন-আপ নেই।",
 "All practice and test questions are original, written to match the format and skills of the digital SAT. They are not official College Board questions, and they have not been independently reviewed or verified; difficulty levels are our own estimates. For official full-length practice with scaled scores, use College Board's free Bluebook app.":"সব অনুশীলন ও টেস্টের প্রশ্ন মৌলিক, ডিজিটাল SAT-এর ফরম্যাট ও দক্ষতা অনুযায়ী লেখা। এগুলো College Board-এর অফিশিয়াল প্রশ্ন নয়, এবং স্বাধীনভাবে পর্যালোচনা বা যাচাই করা হয়নি; কাঠিন্যের স্তরগুলো আমাদের নিজস্ব অনুমান। স্কেলড স্কোরসহ অফিশিয়াল পূর্ণ প্র্যাকটিসের জন্য College Board-এর বিনামূল্যের Bluebook অ্যাপ ব্যবহার করুন।",
 "Found a mistake in a question or guide? Every one has a \"Report a problem\" link.":"কোনো প্রশ্ন বা গাইডে ভুল পেয়েছেন? প্রতিটিতে “সমস্যা জানান” লিংক আছে।",
-"Short version:":"সংক্ষেপে:", "OpenShelf doesn't collect your information. Everything you enter stays in your own browser.":"OpenShelf আপনার তথ্য সংগ্রহ করে না। আপনি যা লেখেন সবই আপনার নিজের ব্রাউজারে থাকে।",
-"What's stored, and where":"কী সংরক্ষিত হয় এবং কোথায়", "To remember your progress, OpenShelf saves data in your browser's local storage on your own device. That includes:":"আপনার অগ্রগতি মনে রাখতে OpenShelf আপনার নিজের ডিভাইসের ব্রাউজারে তথ্য সংরক্ষণ করে। এর মধ্যে আছে:",
+"Short version:":"সংক্ষেপে:", "My OpenShelf doesn't collect your information. Everything you enter stays in your own browser.":"My OpenShelf আপনার তথ্য সংগ্রহ করে না। আপনি যা লেখেন সবই আপনার নিজের ব্রাউজারে থাকে।",
+"What's stored, and where":"কী সংরক্ষিত হয় এবং কোথায়", "To remember your progress, My OpenShelf saves data in your browser's local storage on your own device. That includes:":"আপনার অগ্রগতি মনে রাখতে My OpenShelf আপনার নিজের ডিভাইসের ব্রাউজারে তথ্য সংরক্ষণ করে। এর মধ্যে আছে:",
 "Practice and mock test answers, scores and timing":"অনুশীলন ও মক টেস্টের উত্তর, স্কোর ও সময়", "Practice test scores and goals you enter":"আপনার লেখা প্র্যাকটিস টেস্টের স্কোর ও লক্ষ্য",
 "Course plans, college lists and checklists":"কোর্স পরিকল্পনা, কলেজ তালিকা ও চেকলিস্ট", "Names you type in, such as a student's first name":"আপনার লেখা নাম, যেমন শিক্ষার্থীর প্রথম নাম", "Settings like text size":"লেখার আকারের মতো সেটিংস",
 "This information is never sent to us or anyone else. We have no server that receives it, and we can't see it.":"এই তথ্য কখনো আমাদের বা অন্য কারও কাছে পাঠানো হয় না। এটি গ্রহণ করার মতো কোনো সার্ভার আমাদের নেই, এবং আমরা এটি দেখতে পাই না।",
@@ -1666,16 +1668,16 @@ const BN = {
 "If you choose to copy a progress code, it contains your practice results, practice test scores, goal and the first name you entered. It goes only where you send it, so share it only with a parent or tutor you trust. Assignment codes contain only a title and a list of question numbers.":"আপনি অগ্রগতি কোড কপি করলে তাতে আপনার অনুশীলনের ফলাফল, প্র্যাকটিস টেস্টের স্কোর, লক্ষ্য ও লেখা প্রথম নাম থাকে। আপনি যেখানে পাঠান শুধু সেখানেই যায়, তাই কেবল বিশ্বস্ত অভিভাবক বা টিউটরের সাথে শেয়ার করুন। অ্যাসাইনমেন্ট কোডে শুধু একটি শিরোনাম ও প্রশ্ন নম্বরের তালিকা থাকে।",
 "Links to other sites":"অন্য সাইটের লিংক",
 "Some pages link to official college, College Board and government websites, and the deadlines tool can open Google Calendar. Those sites have their own privacy policies.":"কিছু পাতায় অফিশিয়াল কলেজ, College Board ও সরকারি ওয়েবসাইটের লিংক আছে, আর সময়সীমার টুল Google Calendar খুলতে পারে। ওইসব সাইটের নিজস্ব গোপনীয়তা নীতি আছে।",
-"Students":"শিক্ষার্থী", "OpenShelf is designed for high school students. Because we don't collect personal information from anyone, no personal information from children is collected or stored by us.":"OpenShelf উচ্চমাধ্যমিক পর্যায়ের শিক্ষার্থীদের জন্য তৈরি। আমরা কারও ব্যক্তিগত তথ্য সংগ্রহ করি না, তাই শিশুদের কোনো ব্যক্তিগত তথ্যও আমরা সংগ্রহ বা সংরক্ষণ করি না।",
+"Students":"শিক্ষার্থী", "My OpenShelf is designed for high school students. Because we don't collect personal information from anyone, no personal information from children is collected or stored by us.":"My OpenShelf উচ্চমাধ্যমিক পর্যায়ের শিক্ষার্থীদের জন্য তৈরি। আমরা কারও ব্যক্তিগত তথ্য সংগ্রহ করি না, তাই শিশুদের কোনো ব্যক্তিগত তথ্যও আমরা সংগ্রহ বা সংরক্ষণ করি না।",
 "Storage on this device":"এই ডিভাইসে সংরক্ষণ", "Delete your data":"আপনার তথ্য মুছুন", "Clearing your browser's site data removes everything. You can also do it here:":"ব্রাউজারের সাইট ডেটা মুছলে সবকিছু মুছে যায়। এখান থেকেও করতে পারেন:",
-"Delete all OpenShelf data on this device":"এই ডিভাইস থেকে OpenShelf-এর সব তথ্য মুছুন", "Tap again to permanently delete everything":"সবকিছু স্থায়ীভাবে মুছতে আবার চাপুন",
-"Effective September 2026. If OpenShelf ever adds accounts or any other feature that sends personal data off your device, this page will be updated first.":"কার্যকর: সেপ্টেম্বর ২০২৬। OpenShelf যদি কখনো অ্যাকাউন্ট বা এমন কোনো সুবিধা যোগ করে যা ব্যক্তিগত তথ্য আপনার ডিভাইসের বাইরে পাঠায়, তাহলে আগে এই পাতা হালনাগাদ করা হবে।",
+"Delete all My OpenShelf data on this device":"এই ডিভাইস থেকে My OpenShelf-এর সব তথ্য মুছুন", "Tap again to permanently delete everything":"সবকিছু স্থায়ীভাবে মুছতে আবার চাপুন",
+"Effective September 2026. If My OpenShelf ever adds accounts or any other feature that sends personal data off your device, this page will be updated first.":"কার্যকর: সেপ্টেম্বর ২০২৬। My OpenShelf যদি কখনো অ্যাকাউন্ট বা এমন কোনো সুবিধা যোগ করে যা ব্যক্তিগত তথ্য আপনার ডিভাইসের বাইরে পাঠায়, তাহলে আগে এই পাতা হালনাগাদ করা হবে।",
 "Anonymous usage counts":"নামহীন ব্যবহার-গণনা", "Don't count my visits on this device":"এই ডিভাইস থেকে আমার ভিজিট গুনবেন না",
-"Information, not a guarantee":"তথ্য, নিশ্চয়তা নয়", "OpenShelf provides general educational information. Nothing on this site guarantees admission to any college, a particular test score, course credit, or financial aid.":"OpenShelf সাধারণ শিক্ষামূলক তথ্য দেয়। এই সাইটের কোনো কিছুই কোনো কলেজে ভর্তি, নির্দিষ্ট টেস্ট স্কোর, কোর্স ক্রেডিট বা আর্থিক সহায়তার নিশ্চয়তা দেয় না।",
+"Information, not a guarantee":"তথ্য, নিশ্চয়তা নয়", "My OpenShelf provides general educational information. Nothing on this site guarantees admission to any college, a particular test score, course credit, or financial aid.":"My OpenShelf সাধারণ শিক্ষামূলক তথ্য দেয়। এই সাইটের কোনো কিছুই কোনো কলেজে ভর্তি, নির্দিষ্ট টেস্ট স্কোর, কোর্স ক্রেডিট বা আর্থিক সহায়তার নিশ্চয়তা দেয় না।",
 "Check official sources":"অফিশিয়াল উৎস যাচাই করুন", "Admissions requirements, testing policies, deadlines, AP credit rules and financial aid change often and differ by school. Always confirm details with each college's official website and with College Board before making decisions.":"ভর্তির শর্ত, পরীক্ষার নীতি, সময়সীমা, AP ক্রেডিটের নিয়ম ও আর্থিক সহায়তা প্রায়ই বদলায় এবং কলেজভেদে আলাদা। সিদ্ধান্ত নেওয়ার আগে সবসময় প্রতিটি কলেজের অফিশিয়াল ওয়েবসাইট ও College Board-এর সাথে তথ্য মিলিয়ে নিন।",
-"Practice questions":"অনুশীলনের প্রশ্ন", "All practice and test questions on OpenShelf are original and written for this site. They are not official College Board materials, and results on them are not SAT scores.":"OpenShelf-এর সব অনুশীলন ও টেস্টের প্রশ্ন মৌলিক এবং এই সাইটের জন্য লেখা। এগুলো College Board-এর অফিশিয়াল উপকরণ নয়, এবং এগুলোর ফলাফল SAT স্কোর নয়।",
-"Trademarks":"ট্রেডমার্ক", "College and university names are used only to describe their published policies. OpenShelf is not affiliated with, sponsored by, or endorsed by any college or university.":"কলেজ ও বিশ্ববিদ্যালয়ের নাম শুধু তাদের প্রকাশিত নীতি বর্ণনার জন্য ব্যবহার করা হয়েছে। OpenShelf কোনো কলেজ বা বিশ্ববিদ্যালয়ের সাথে যুক্ত নয়, তাদের দ্বারা স্পন্সর বা সমর্থিতও নয়।",
-"Use of the site":"সাইটের ব্যবহার", "OpenShelf is free for personal and classroom use. The site is provided as is. We work to keep it accurate, and we fix reported mistakes, but we can't promise it is free of errors.":"OpenShelf ব্যক্তিগত ও শ্রেণিকক্ষে ব্যবহারের জন্য বিনামূল্যে। সাইটটি যেমন আছে তেমনভাবে দেওয়া হয়েছে। আমরা একে নির্ভুল রাখার চেষ্টা করি এবং জানানো ভুল ঠিক করি, তবে এটি সম্পূর্ণ ভুলমুক্ত হওয়ার প্রতিশ্রুতি দিতে পারি না।",
+"Practice questions":"অনুশীলনের প্রশ্ন", "All practice and test questions on My OpenShelf are original and written for this site. They are not official College Board materials, and results on them are not SAT scores.":"My OpenShelf-এর সব অনুশীলন ও টেস্টের প্রশ্ন মৌলিক এবং এই সাইটের জন্য লেখা। এগুলো College Board-এর অফিশিয়াল উপকরণ নয়, এবং এগুলোর ফলাফল SAT স্কোর নয়।",
+"Trademarks":"ট্রেডমার্ক", "College and university names are used only to describe their published policies. My OpenShelf is not affiliated with, sponsored by, or endorsed by any college or university.":"কলেজ ও বিশ্ববিদ্যালয়ের নাম শুধু তাদের প্রকাশিত নীতি বর্ণনার জন্য ব্যবহার করা হয়েছে। My OpenShelf কোনো কলেজ বা বিশ্ববিদ্যালয়ের সাথে যুক্ত নয়, তাদের দ্বারা স্পন্সর বা সমর্থিতও নয়।",
+"Use of the site":"সাইটের ব্যবহার", "My OpenShelf is free for personal and classroom use. The site is provided as is. We work to keep it accurate, and we fix reported mistakes, but we can't promise it is free of errors.":"My OpenShelf ব্যক্তিগত ও শ্রেণিকক্ষে ব্যবহারের জন্য বিনামূল্যে। সাইটটি যেমন আছে তেমনভাবে দেওয়া হয়েছে। আমরা একে নির্ভুল রাখার চেষ্টা করি এবং জানানো ভুল ঠিক করি, তবে এটি সম্পূর্ণ ভুলমুক্ত হওয়ার প্রতিশ্রুতি দিতে পারি না।",
 "SAT®, AP®, Advanced Placement®, PSAT™ and Bluebook™ are trademarks registered or owned by the College Board, which is not affiliated with, and does not endorse, this site.":"SAT®, AP®, Advanced Placement®, PSAT™ ও Bluebook™ হলো College Board-এর নিবন্ধিত বা মালিকানাধীন ট্রেডমার্ক; College Board এই সাইটের সাথে যুক্ত নয় এবং এটিকে সমর্থন করে না।",
 };
 const BN_EL = {
@@ -1685,8 +1687,8 @@ const BN_EL = {
 "টিপ: যেকোনো গাইডে <strong>সংরক্ষণ</strong> বা <strong>সম্পন্ন হিসেবে চিহ্নিত করুন</strong> চাপলে সেটি এখানে দেখা যাবে। সাইন-আপ লাগবে না; সবকিছু এই ডিভাইসেই থাকে।",
 "This code contains practice results and test scores from the last 120 days. Send it to a parent or tutor you trust, who can paste it into Tutor & family view on their own device.":
 "এই কোডে গত ১২০ দিনের অনুশীলনের ফলাফল ও টেস্ট স্কোর আছে। বিশ্বস্ত অভিভাবক বা টিউটরকে পাঠান; তাঁরা নিজের ডিভাইসে <strong>টিউটর ও পরিবার ভিউ</strong>-তে এটি পেস্ট করতে পারবেন।",
-"Short version: OpenShelf doesn't collect your information. Everything you enter stays in your own browser.":
-"<strong>সংক্ষেপে:</strong> OpenShelf আপনার তথ্য সংগ্রহ করে না। আপনি যা লেখেন সবই আপনার নিজের ব্রাউজারে থাকে।",
+"Short version: My OpenShelf doesn't collect your information. Everything you enter stays in your own browser.":
+"<strong>সংক্ষেপে:</strong> My OpenShelf আপনার তথ্য সংগ্রহ করে না। আপনি যা লেখেন সবই আপনার নিজের ব্রাউজারে থাকে।",
 "SAT practice with an instructor that guides students through math one step at a time, plus coaching for Reading & Writing.":
 "<strong>SAT অনুশীলন</strong>, যেখানে একজন নির্দেশক গণিত ধাপে ধাপে বুঝিয়ে দেন, আর Reading &amp; Writing-এর জন্য কোচিং।",
 "Mock tests from a separate question bank that students never see in practice.":"<strong>মক টেস্ট</strong>, আলাদা প্রশ্নভান্ডার থেকে, যা অনুশীলনে কখনো আসে না।",
@@ -1751,8 +1753,8 @@ const BN_EL_PAT = [
 [/^(.+?) Pick a unit to start\. You complete a unit by answering every question correctly on your own, and you can switch units anytime\.$/, m => `${T(m[1])} শুরু করতে একটি ইউনিট বেছে নিন। প্রতিটি প্রশ্ন নিজে নিজে সঠিক উত্তর দিলে ইউনিট সম্পূর্ণ হয়, আর যেকোনো সময় ইউনিট বদলাতে পারবেন।`],
 [/^(\d+) of (\d+) units complete\. Mastered means answered correctly on your own on your most recent try\.$/, m => `${bnNum(m[2])}টির মধ্যে ${bnNum(m[1])}টি ইউনিট সম্পূর্ণ। আয়ত্ত মানে সর্বশেষ চেষ্টায় নিজে নিজে সঠিক উত্তর।`],
 [/^(Not backed up yet\.|Last backed up (.+)\.) Storage used on this device: (\d+) KB of about 5 MB \((\d+)%\)\.$/, m => `${m[2] ? `সর্বশেষ ব্যাকআপ: ${bnNum(m[2])}।` : "এখনো ব্যাকআপ নেওয়া হয়নি।"} এই ডিভাইসে ব্যবহৃত জায়গা: প্রায় ৫ MB-এর মধ্যে ${bnNum(m[3])} KB (${bnNum(m[4])}%)।`],
-[/^OpenShelf is using (\d+) KB of the roughly 5 MB your browser allows for this site \((\d+)%\)\. Each student keeps their 3,000 most recent answers; older ones drop off automatically\.$/, m => `OpenShelf এই সাইটের জন্য ব্রাউজারের অনুমোদিত প্রায় ৫ MB-এর মধ্যে <strong>${bnNum(m[1])} KB</strong> ব্যবহার করছে (${bnNum(m[2])}%)। প্রত্যেক শিক্ষার্থীর সর্বশেষ ৩,০০০টি উত্তর রাখা হয়; পুরোনোগুলো আপনাআপনি মুছে যায়।`],
-[/^OpenShelf \((.+)\) is a free, independent website that helps high school students and their families prepare for the SAT and understand admissions at Ivy League schools\.$/, m => `OpenShelf (<strong>${m[1]}</strong>) একটি বিনামূল্যের, স্বাধীন ওয়েবসাইট, যা উচ্চমাধ্যমিক পর্যায়ের শিক্ষার্থী ও তাদের পরিবারকে SAT-এর প্রস্তুতি নিতে এবং আইভি লিগ বিশ্ববিদ্যালয়ে ভর্তির প্রক্রিয়া বুঝতে সাহায্য করে।`],
+[/^My OpenShelf is using (\d+) KB of the roughly 5 MB your browser allows for this site \((\d+)%\)\. Each student keeps their 3,000 most recent answers; older ones drop off automatically\.$/, m => `My OpenShelf এই সাইটের জন্য ব্রাউজারের অনুমোদিত প্রায় ৫ MB-এর মধ্যে <strong>${bnNum(m[1])} KB</strong> ব্যবহার করছে (${bnNum(m[2])}%)। প্রত্যেক শিক্ষার্থীর সর্বশেষ ৩,০০০টি উত্তর রাখা হয়; পুরোনোগুলো আপনাআপনি মুছে যায়।`],
+[/^My OpenShelf \((.+)\) is a free, independent website that helps high school students and their families prepare for the SAT and understand admissions at Ivy League schools\.$/, m => `My OpenShelf (<strong>${m[1]}</strong>) একটি বিনামূল্যের, স্বাধীন ওয়েবসাইট, যা উচ্চমাধ্যমিক পর্যায়ের শিক্ষার্থী ও তাদের পরিবারকে SAT-এর প্রস্তুতি নিতে এবং আইভি লিগ বিশ্ববিদ্যালয়ে ভর্তির প্রক্রিয়া বুঝতে সাহায্য করে।`],
 [/^Questions, suggestions or corrections: (.+)$/, m => `প্রশ্ন, পরামর্শ বা সংশোধন: ${m[1]}`],
 [/^Not quite\. Try again, or tap "Give me a hint\."$/, () => `<span class="gap">ঠিক হয়নি।</span> আবার চেষ্টা করুন, অথবা “একটি ইঙ্গিত দিন” চাপুন।`],
 [/^Still not it\. Hint: (.*)$/, m => `<span class="gap">এখনো হয়নি।</span> ইঙ্গিত: ${m[1]}`],
@@ -2829,7 +2831,7 @@ traps: [
 }
 };
 (() => { const miss = PQ.filter(q => q.sec === "rw" && !RW_CARDS[rwSkill(q)]).map(q => q.id);
-if(miss.length) console.warn("OpenShelf: Reading & Writing questions with no concept card:", miss.join(", ")); })();
+if(miss.length) console.warn("My OpenShelf: Reading & Writing questions with no concept card:", miss.join(", ")); })();
 const MATH_SKILL_NAMES = {
 m_lin1:"Linear equations in one variable", m_linfn:"Linear functions", m_lin2:"Lines in the xy-plane", m_sys:"Systems of linear equations", m_ineq:"Linear inequalities",
 m_nlfn:"Nonlinear functions", m_nleq:"Nonlinear equations and systems", m_equiv:"Equivalent expressions",
@@ -2869,6 +2871,7 @@ const has = re => re.test(t);
 if(q.dom === "geo"){
 if(has(/circle|arc|sector|radian/i)) return "m_circ";
 if(has(/\b(sin|cos|tan)\b|right triangle|hypotenuse|distance between/i)) return "m_trig";
+if(has(/volume|surface area|solids?\b|cube|cylinder|cone|sphere|prism|pyramid/i)) return "m_area";
 if(has(/angle|parallel|similar|triangle/i)) return "m_lat";
 return "m_area";
 }
@@ -2889,6 +2892,7 @@ return "m_nleq";
 if(q.dom === "alg"){
 if(has(/[≤≥<>]|at most|at least|no more than|fewer than/i)) return "m_ineq";
 if(has(/system|infinitely many solutions|no solution/i) && has(/\by\b/)) return "m_sys";
+if(has(/=[^=]*\band\b[^=]*=/) && has(/\b[xa]\b/) && has(/\b[yb]\b/)) return "m_sys";   /* "3x − y = 7 and x + y = 5" */
 if(has(/slope|intercept|xy-plane|line\b|perpendicular|parallel/i)) return "m_lin2";
 if(has(/f\s*\(|function|\bper\b|\beach\b/i)) return "m_linfn";
 return "m_lin1";
@@ -3259,7 +3263,7 @@ traps:["Copying the signs from the equation instead of flipping them for the cen
 };
 Object.assign(RW_CARDS, MATH_CARDS); Object.assign(RW_SKILL_NAMES, MATH_SKILL_NAMES);
 (() => { const miss = PQ.filter(q => q.sec === "math" && (q.pool || "practice") === "practice" && !MATH_CARDS[mathSkill(q)]).map(q => q.id);
-if(miss.length) console.warn("OpenShelf: SAT Math questions with no concept card:", miss.join(", ")); })();
+if(miss.length) console.warn("My OpenShelf: SAT Math questions with no concept card:", miss.join(", ")); })();
 if(typeof MATH_PROBLEM === "undefined") window.MATH_PROBLEM = {};
 function mathProblemHTML(q, it){
 const c = MATH_PROBLEM[q.id]; if(!c) return "";
@@ -3280,7 +3284,7 @@ ${MATH_CARDS[sk] ? `<div class="ideabar"><button class="btn ghost small" id="ski
 </div>`;
 }
 (() => { const miss = PQ.filter(q => ["math", "alg1", "geom", "alg2", "stat9", "stat10"].includes(q.sec) && (q.pool || "practice") === "practice" && !MATH_PROBLEM[q.id]).map(q => q.id);
-if(miss.length) console.warn("OpenShelf: math questions with no problem card:", miss.join(", ")); })();
+if(miss.length) console.warn("My OpenShelf: math questions with no problem card:", miss.join(", ")); })();
 /* "▶ Watch it": a narrated walkthrough of a practice explanation, for Geometry and Algebra 2 (practice only; the explanation card never shows in a mock test).
    The drawing builds in the order of the color code: black/gray parts with the question, blue (given) with the idea,
    green (third) and orange (unknown) with the solving steps. Audio: audio/<id>.mp3, one file per question, loaded only on tap.
@@ -4269,7 +4273,7 @@ return `<div class="box planbox"><h2>Practice next</h2>
 <span class="plantxt"><strong>${PQ_DOMAINS[b.dom]}</strong><small>${withSection === true || withSection === "mock2" ? secName[b.sec] + " · " : ""}${b.missed} missed of ${b.n}${missedSkillsText(b)}</small></span>
 <button class="btn small ${i ? "ghost" : ""}" data-focus="${b.sec}|${b.dom}">Practice</button></li>`).join("")}</ol></div>`;
 }
-const SAT_NOTE = `<p class="satnote" role="note"><strong>About these questions:</strong> They were written for OpenShelf to match the format and skills of the digital SAT. They have not been independently reviewed or verified by College Board or any testing organization, and their difficulty levels are our own estimates. For official practice, use College Board's free Bluebook app.</p>`;
+const SAT_NOTE = `<p class="satnote" role="note"><strong>About these questions:</strong> They were written for My OpenShelf to match the format and skills of the digital SAT. They have not been independently reviewed or verified by College Board or any testing organization, and their difficulty levels are our own estimates. For official practice, use College Board's free Bluebook app.</p>`;
 function courseMix(n){
 let e = Math.round(n * .40), m = Math.round(n * .35), h = n - e - m;
 if(h < 0){ m += h; h = 0; }
@@ -5029,6 +5033,7 @@ it.logged = true;
 const q = it.q, prof = activeProf(), d = getPD(prof.id);
 const e = { q:q.id, t:Date.now(), ok: it.choice === q.a ? 1 : 0, p: it.choice, s: Math.max(1, Math.min(900, Math.round((Date.now() - (it.t0 || Date.now())) / 1000))), m: mode === "test" ? "t" : "g" };
 if(it.sol && mode !== "test") e.sol = 1;
+if(it.typed && String(it.typed).trim()) e.ty = String(it.typed).trim().slice(0, 12);   /* a type-in answer, as written */
 if(isStepSec(q.sec) && mode !== "test") e.h = ["solved","hint","shown","skipped"].map(k => it.stepLog.filter(x => x === k).length);
 if(q.sec === "rw" && mode !== "test") e.tp = it.tips;
 d.attempts.push(e); savePD(prof.id, d);
@@ -5058,10 +5063,18 @@ const parseDate = s => { const [y, m, d] = String(s).split("-").map(Number); ret
 const fmtDate = s => parseDate(s).toLocaleDateString(undefined, { month:"short", day:"numeric" });
 const fmtDur = s => s < 60 ? `${s} sec` : s < 3600 ? `${Math.round(s / 60)} min` : `${Math.floor(s / 3600)} h ${Math.round(s % 3600 / 60)} min`;
 /* A practice answer shown for parents and tutors: the letter chosen, and the right one if it was wrong */
-const ansCell = a => { const q = qOf(a); if(!q) return "—"; const L = a.p != null && a.p >= 0 && a.p < 4 ? "ABCD"[a.p] : null;
-const typed = q.o && L && q.o[a.p] != null ? q.o[a.p] : "";
-return L ? (a.ok ? `${L}` : `${L} <span class="muted">(right: ${"ABCD"[q.a]})</span>`) : (a.ok ? "✓" : "blank or other"); };
-const qSnippet = q => { const t = String(q.q || "").replace(/<[^>]+>/g, " ").replace(/Which choice completes the text so that it conforms to the conventions of Standard English\?/i, "").replace(/\s+/g, " ").trim();
+const ansCell = a => { const q = qOf(a); if(!q) return "—";
+const right = isSpr(q) ? (q.v != null ? String(q.v) : plainMath(q.o[q.a])) : "ABCD"[q.a];
+if(isSpr(q) || a.ty) return a.ty ? `typed ${esc(a.ty)}${a.ok ? "" : ` <span class="muted">(right: ${esc(right)})</span>`}` : a.ok ? "✓ typed" : `not recorded <span class="muted">(right: ${esc(right)})</span>`;
+const L = a.p != null && a.p >= 0 && a.p < 4 ? "ABCD"[a.p] : null;
+return L ? (a.ok ? L : `${L} <span class="muted">(right: ${right})</span>`) : (a.ok ? "✓" : `no answer <span class="muted">(right: ${right})</span>`); };
+const SUPS = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","−":"⁻","-":"⁻","/":"ᐟ" };
+/* question text as plain readable math: x<sup>2</sup> → x², tags removed without breaking "xy-plane", entities decoded */
+const plainMath = s => { const t = document.createElement("textarea");
+t.innerHTML = String(s || "").replace(/<figure.*?<\/figure>/gs, " ").replace(/<sup>([^<]{1,4})<\/sup>/g, (m, x) => [...x].every(c => SUPS[c]) ? [...x].map(c => SUPS[c]).join("") : "^" + x)
+.replace(/<\/?(i|em|b|strong|span|sub|sup)\b[^>]*>/g, "").replace(/<[^>]+>/g, " ");
+return t.value.replace(/\s+/g, " ").trim(); };
+const qSnippet = q => { const t = plainMath(q.q).replace(/Which choice completes the text so that it conforms to the conventions of Standard English\?/i, "").trim();
 return t.length > 110 ? t.slice(0, 107) + "…" : t; };
 /* Group answers into practice sessions: a new session starts after a 30-minute gap, or when the section or mode changes. */
 function practiceSessions(A){
@@ -5166,7 +5179,7 @@ function readProgressCode(code){
 const o = findCode(code, "OSP1.");
 if(o === undefined){
 if(String(code).includes("OSA1.")) throw new Error("That's an assignment code, not a progress code. Students enter it in Practice, under “Have an assignment code from your tutor?”");
-throw new Error("That doesn't look like an OpenShelf progress code.");
+throw new Error("That doesn't look like a My OpenShelf progress code.");
 }
 if(!o) throw new Error("The code seems incomplete. Copy the whole code and try again.");
 return { name:o.n || "Student", grade:o.g || "", goal:o.goal || {}, tests:Array.isArray(o.ts) ? o.ts : [],
@@ -5201,7 +5214,7 @@ async function saveBackupFile(prof){
 const code = makeProgressCode(prof), day = new Date().toISOString().slice(0, 10);
 const safe = String(prof.name || "student").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "student";
 const text = `${SITE.name} progress backup\nStudent: ${prof.name}\nSaved: ${day}\n\nTo restore it: open myopenshelf.org, go to My progress, then Tutor & family view, then Import a progress code. Choose this file, or copy the code below and paste it in.\n\n${code}\n`;
-const name = `${SITE.name}-progress-${safe}-${day}.txt`;
+const name = `${SITE.fileName}-progress-${safe}-${day}.txt`;
 const done = how => { store.set("os_lastBackup", Date.now()); renderNudges(); track("backup-file", { how }); toast(how === "download" ? "Backup file downloaded." : "Backup saved."); };
 try{
 const file = new File([text], name, { type:"text/plain" });
@@ -5231,7 +5244,7 @@ const fmt = m => m.format === "sat" ? "Full SAT" : m.format === "full" ? "Full s
 const rows = [["Student", "Date", "Time", "Section", "Test type", "Module 2", "Correct", "Questions", "Percent correct", "Testing time (minutes)"]]
 .concat(mocks.map(m => { const dt = new Date(m.t); return [prof.name, dt.toISOString().slice(0, 10), dt.toTimeString().slice(0, 5), m.sec === "math" ? "Math" : "Reading and Writing", fmt(m), m.route ? (m.route === "harder" ? "Harder" : "Easier") : "", m.right, m.n, Math.round(m.right / m.n * 100) + "%", m.secs ? Math.round(m.secs / 60) : ""]; }));
 const csv = "\ufeff" + rows.map(r => r.map(csvCell).join(",")).join("\r\n");
-const how = await saveFile(`${SITE.name}-mock-tests-${fileSafe(prof.name)}-${new Date().toISOString().slice(0, 10)}.csv`, csv, "text/csv");
+const how = await saveFile(`${SITE.fileName}-mock-tests-${fileSafe(prof.name)}-${new Date().toISOString().slice(0, 10)}.csv`, csv, "text/csv");
 track("mock-history-download", { how, n:mocks.length });
 if(how === "download") toast("Mock test history downloaded."); else if(how === "share") toast("Mock test history saved."); else if(how === "fail") toast("Couldn't save a file here. Try opening the site in Safari or Chrome.");
 }
@@ -5444,7 +5457,7 @@ const clDone = store.get("os_check", {}), clGrade = store.get("os_checkgrade", 9
 const clN = clItems.filter((_, i) => clDone[`${clGrade}-${i}`]).length;
 const delta = sw.p != null && sp.p != null ? Math.round((sw.p - sp.p) * 100) : null;
 const lines = [
-`OpenShelf weekly SAT report for ${prof.name} (${new Date().toLocaleDateString()})`,
+`My OpenShelf weekly SAT report for ${prof.name} (${new Date().toLocaleDateString()})`,
 `Practice: ${wk.length} questions on ${days} day(s), about ${mins} minutes.`,
 `Accuracy: ${pct(sw.p)}${delta != null ? ` (${delta >= 0 ? "+" : ""}${delta} points vs. last week)` : ""}.`,
 skills.length ? `Strongest skill: ${PQ_DOMAINS[skills[skills.length - 1].k]} (${pct(skills[skills.length - 1].st.p)}). Needs work: ${PQ_DOMAINS[skills[0].k]} (${pct(skills[0].st.p)}).` : "",
@@ -5578,7 +5591,7 @@ const f = impFile.files && impFile.files[0], err = $("#impErr"); if(!f) return;
 const r = new FileReader();
 r.onload = () => { const m = String(r.result).match(/OSP1\.[A-Za-z0-9_-]+/);
 if(m){ $("#impCode").value = m[0]; err.textContent = ""; toast("Backup loaded. Choose who it belongs to, then tap Import progress."); }
-else err.textContent = "That file doesn't contain an OpenShelf progress code."; };
+else err.textContent = "That file doesn't contain a My OpenShelf progress code."; };
 r.onerror = () => { err.textContent = "Couldn't read that file."; };
 r.readAsText(f);
 };
@@ -5994,7 +6007,7 @@ ${pb.html}
 <div class="err" id="plErr" role="alert"></div>
 <div class="ractions"><button class="btn" id="plGo">${old ? "Save changes" : "Create my plan"}</button>${old ? `<button class="btn ghost" id="plCancel">Cancel</button>` : ""}</div>
 </div>
-<p class="note">Only official scores (the real SAT or Bluebook practice tests) should be used here. OpenShelf mock tests show percent correct, not SAT scores.</p>`;
+<p class="note">Only official scores (the real SAT or Bluebook practice tests) should be used here. My OpenShelf mock tests show percent correct, not SAT scores.</p>`;
 pb.wire();
 const read = () => ({ m:+$("#plM").value, rw:+$("#plR").value, target:+$("#plT").value, date:$("#plD").value, days:f.days, mins:f.mins, secs:f.secs });
 const preview = () => {
@@ -6064,10 +6077,13 @@ chosen.forEach(q => avoid.add(q.id));
 out.push(...chosen);
 });
 if(sec === "math" && sprTarget != null){
+/* Swap in random order (so type-in questions spread across domains, as on the real test), and prefer
+   a replacement the student hasn't seen before; reuse a seen question only if nothing fresh fits. */
 const swapIn = (wantSpr) => {
-for(let i = 0; i < out.length; i++){
+const order = shuffle(out.map((_, i) => i));
+for(const freshOnly of [true, false]) for(const i of order){
 const q = out[i]; if(isSpr(q) === wantSpr) continue;
-const cands = [x => x.diff === q.diff && !!x.top === !!q.top, x => x.diff === q.diff, () => true].map(ok => TEST_PQ.filter(x => x.sec === sec && x.dom === q.dom && isSpr(x) === wantSpr && ok(x) && (level === "harder" || !x.top) && !avoid.has(x.id)));
+const cands = [x => x.diff === q.diff && !!x.top === !!q.top, x => x.diff === q.diff, () => true].map(ok => TEST_PQ.filter(x => x.sec === sec && x.dom === q.dom && isSpr(x) === wantSpr && ok(x) && (level === "harder" || !x.top) && !avoid.has(x.id) && (!freshOnly || !seen.has(x.id))));
 const pick = freshFirst(cands.find(c => c.length) || [])[0];
 if(pick){ avoid.add(pick.id); out[i] = pick; return true; }
 }
@@ -6084,47 +6100,130 @@ return shuffle(out).sort((a, b) => rank(a) - rank(b));
 }
 const rptRight = x => x.choice === x.q.a;
 const rptAnswered = x => isSpr(x.q) ? String(x.typed || "").trim() !== "" : x.choice !== null;
-function mockReportHTML(completed, format, name, when){
-const prof = { name }, secsOf = S => S.modules.reduce((t, M) => t + (M.secs || 0), 0);
+function mockReportHTML(completed, format, name, when, opt){
+opt = opt || {};   /* opt.sample: hide real mock questions in the public sample report */
+/* The downloadable report (Save as PDF / Download report file): scores, skill areas, difficulty, what to work on,
+   timing, every missed question with its explanation, and a question-by-question table. */
+const secsOf = S => S.modules.reduce((t, M) => t + (M.secs || 0), 0);
 const all = completed.flatMap(S => S.modules.flatMap(M => M.items)), right = all.filter(rptRight).length;
 const kind = format === "sat" ? "Full SAT (Reading and Writing + Math)" : MOCK_SPEC[completed[0].sec].label + (format === "full" ? ", full section" : ", one module");
 const pct = (r, n) => n ? Math.round(r / n * 100) + "%" : "–";
-const result = x => rptRight(x) ? "Correct" : rptAnswered(x) ? "Incorrect" : "Blank";
-let qn = 0;
+const L = "ABCD", totalSecs = completed.reduce((t, S) => t + secsOf(S), 0);
+const allowed = completed.reduce((t, S) => t + MOCK_SPEC[S.sec].minutes * S.modules.length * 60, 0);
+const bar = (r, n, c) => `<span class="rb"><i style="width:${n ? Math.round(r / n * 100) : 0}%;background:${c}"></i></span>`;
+const statRows = (rows, c) => rows.map(([l, r, n]) => `<tr><td>${l}</td><td class="rn">${r} of ${n}</td><td class="rn">${pct(r, n)}</td><td class="rbar">${bar(r, n, c)}</td></tr>`).join("");
+const diffShort = q => q.top ? "T" : q.diff[0];
+const skillOfQ = q => skillName(skillOf(q)) || PQ_DOMAINS[q.dom];
+const given = x => isSpr(x.q) ? (String(x.typed || "").trim() ? "typed " + esc(String(x.typed).trim()) : "no answer") : x.choice == null || x.choice < 0 || x.choice > 3 ? "no answer" : `${L[x.choice]}. ${x.q.o[x.choice]}`;
+const correct = q => isSpr(q) ? esc(q.v != null ? String(q.v) : plainMath(q.o[q.a])) : `${L[q.a]}. ${q.o[q.a]}`;
+const shortAns = x => { const ok = rptRight(x);
+if(isSpr(x.q)) { const t = String(x.typed || "").trim(); return ok ? (t ? esc(t) : "✓") : `${t ? esc(t) : "—"} → ${esc(q2v(x.q))}`; }
+if(x.choice == null || x.choice < 0 || x.choice > 3) return `— → ${L[x.q.a]}`;
+return ok ? L[x.choice] : `${L[x.choice]} → ${L[x.q.a]}`; };
+const q2v = q => q.v != null ? String(q.v) : plainMath(q.o[q.a]);
+const snip = q => { if(opt.sample) return "<span style=\"color:#8A93A8\">(hidden in this sample)</span>"; const t = plainMath(q.q).replace(/Which choice completes the text so that it conforms to the conventions of Standard English\?/i, "").trim(); return esc(t.length > 110 ? t.slice(0, 107) + "…" : t); };
+const multi = completed.length > 1;
+let firstLine = "";
 const sections = completed.map(S => {
 const items = S.modules.flatMap(M => M.items), r = items.filter(rptRight).length;
+const label = MOCK_SPEC[S.sec].label;
+const nums = new Map(); items.forEach((x, i) => nums.set(x, i + 1));
+const modOf = x => S.modules.findIndex(M => M.items.includes(x)) + 1;
+const M1 = S.modules[0], M2 = S.modules[1];
+const mr = M => [M.items.filter(rptRight).length, M.items.length];
 const doms = SAT_DOMS[S.sec].map(dom => { const xs = items.filter(x => x.q.dom === dom); return [PQ_DOMAINS[dom], xs.filter(rptRight).length, xs.length]; }).filter(x => x[2]);
 const diffs = ["Easy", "Medium", "Hard"].map(df => { const xs = items.filter(x => x.q.diff === df); return [df, xs.filter(rptRight).length, xs.length]; }).filter(x => x[2]);
-const spr = items.filter(x => isSpr(x.q)), blank = items.filter(x => !rptAnswered(x)).length;
-qn = 0;
-return `<h2>${MOCK_SPEC[S.sec].label}: ${r} of ${items.length} correct (${pct(r, items.length)})</h2>
-<table><thead><tr><th>Module</th><th>Correct</th><th>Questions</th></tr></thead><tbody>${S.modules.map((M, i) => `<tr><td>Module ${i + 1}${i === 1 && M.level ? ` (${M.level})` : ""}</td><td>${M.items.filter(rptRight).length}</td><td>${M.items.length}</td></tr>`).join("")}</tbody></table>
-<h3>By skill area</h3>
-<table><thead><tr><th>Skill area</th><th>Correct</th><th>Questions</th><th>Percent</th></tr></thead><tbody>${doms.map(([l, a, n]) => `<tr><td>${l}</td><td>${a}</td><td>${n}</td><td>${pct(a, n)}</td></tr>`).join("")}</tbody></table>
-<h3>By difficulty</h3>
-<table><thead><tr><th>Difficulty</th><th>Correct</th><th>Questions</th></tr></thead><tbody>${diffs.map(([l, a, n]) => `<tr><td>${l}</td><td>${a}</td><td>${n}</td></tr>`).join("")}${spr.length ? `<tr><td>Type-in (any difficulty)</td><td>${spr.filter(rptRight).length}</td><td>${spr.length}</td></tr>` : ""}${(() => { const tops = items.filter(x => x.q.top); return tops.length ? `<tr><td>Top difficulty (also counted under Hard)</td><td>${tops.filter(rptRight).length}</td><td>${tops.length}</td></tr>` : ""; })()}</tbody></table>
-${items.some(x => x.q.top) ? `<p>Top-difficulty questions are the hardest ones. They appear only in the harder Module 2 and matter most for scores above about 700 per section.</p>` : ""}
-${blank ? `<p>${blank} question${blank === 1 ? " was" : "s were"} left blank. There's no penalty for guessing on the SAT.</p>` : ""}
-<h3>Question by question</h3>
-<table class="qbq"><thead><tr><th>#</th><th>Module</th><th>Skill area</th><th>Difficulty</th><th>Type</th><th>Result</th></tr></thead><tbody>${S.modules.map((M, mi) => M.items.map(x => { qn++; return `<tr class="${rptRight(x) ? "rpt-ok" : "rpt-no"}"><td>${qn}</td><td>${mi + 1}</td><td>${PQ_DOMAINS[x.q.dom]}</td><td>${x.q.diff}${x.q.top ? " (top)" : ""}</td><td>${isSpr(x.q) ? "Type-in" : "Multiple choice"}</td><td>${result(x)}</td></tr>`; }).join("")).join("")}</tbody></table>`;
+const tops = items.filter(x => x.q.top), spr = items.filter(x => isSpr(x.q));
+if(tops.length) diffs.push(["Top difficulty", tops.filter(rptRight).length, tops.length]);
+if(spr.length) diffs.push(["Type-in", spr.filter(rptRight).length, spr.length]);
+/* a plain-language summary */
+let summary = "";
+if(M2){
+const [a1, n1] = mr(M1), [a2, n2] = mr(M2);
+summary = M2.level === "harder"
+? `Module 1 went well enough (${a1} of ${n1}) to unlock the <strong>harder</strong> Module 2, which is how students reach the top score range on the digital SAT. ${a2} of those ${n2} harder questions were answered correctly.`
+: `Module 1 (${a1} of ${n1}) led to the <strong>easier</strong> Module 2, where ${a2} of ${n2} were correct. Raising Module 1 accuracy is the key to unlocking the harder Module 2 and the higher score range.`;
+} else summary = `${r} of ${items.length} correct on this module.`;
+/* what to work on: skills with misses, worst first, with the trap behind the wrong answers */
+const missedX = items.filter(x => !rptRight(x));
+const bySkill = {};
+missedX.forEach(x => { const k = skillOfQ(x.q); (bySkill[k] = bySkill[k] || []).push(x); });
+const work = Object.entries(bySkill).sort((p, q) => q[1].length - p[1].length).map(([k, xs]) => {
+const n = items.filter(x => skillOfQ(x.q) === k).length;
+const traps = {}; xs.forEach(x => { const t = trapOf(x.q.id, x.choice); if(t) traps[t.label] = t; });
+const t = Object.values(traps)[0];
+return `<li><strong>${esc(k)}</strong> (missed ${xs.length} of ${n}: ${xs.map(x => "Q" + nums.get(x)).join(", ")}).${t ? ` ${t.label}: ${t.tip}` : xs.some(x => x.q.top) ? " These include top-difficulty questions; review the explanations below, then practice this skill." : " Review the explanations below, then practice this skill."}</li>`; }).join("");
+/* timing */
+const timed = items.filter(x => x.secs > 0);
+let timing = "";
+if(timed.length >= 5){
+const sorted = timed.map(x => x.secs).sort((p, q) => p - q), typical = sorted[Math.floor(sorted.length / 2)];
+const slow = timed.slice().sort((p, q) => q.secs - p.secs).slice(0, 4).filter(x => x.secs >= Math.max(150, typical * 3));
+timing = `<h3>Timing</h3><p>A typical question took about <strong>${fmtDur(typical)}</strong>.${slow.length ? ` The longest were ${slow.map(x => `Q${nums.get(x)} (${fmtDur(x.secs)})`).join(", ")}. Very long times on easier questions usually mean a break or rereading. On test day, the best habit is to guess, flag the question and come back to it.` : " Pacing was steady."}</p>`;
+}
+const missedCards = missedX.map(x => `<div class="rmiss"><p class="rmh"><b>Q${nums.get(x)}</b> · ${esc(skillOfQ(x.q))} · <span class="rpill ${x.q.top ? "top" : x.q.diff.toLowerCase()}">${x.q.top ? "Top difficulty" : x.q.diff}</span> · Module ${modOf(x)}${x.secs ? " · " + fmtDur(x.secs) : ""}</p>
+<div class="rq">${opt.sample ? `<p style="color:#8A93A8">The question, the answers and the explanation appear here in a real report. They're hidden in this sample so mock test questions stay private.</p>` : x.q.q}</div>
+${opt.sample ? "" : `<table class="rans"><tr><th>Answer given</th><td class="rbad">${given(x)}</td></tr><tr><th>Correct answer</th><td class="rgood">${correct(x.q)}</td></tr></table>
+${x.q.ex ? `<p class="rex"><strong>Why:</strong> ${x.q.ex}</p>` : ""}`}</div>`).join("");
+const table = items.map(x => `<tr class="${rptRight(x) ? "" : "rwrong"}"><td class="rn">${nums.get(x)}</td><td class="rqc">${snip(x.q)}</td><td>${esc(skillOfQ(x.q))}</td><td class="rc">${diffShort(x.q)}</td><td class="rc">${shortAns(x)}</td><td class="rc ${rptRight(x) ? "rgood" : "rbad"}">${rptRight(x) ? "✓" : rptAnswered(x) ? "✗" : "blank"}</td><td class="rn">${x.secs ? fmtDur(x.secs) : "–"}</td></tr>`).join("");
+const tiles = `<div class="rtiles"><div><span>Correct</span><b>${r} / ${items.length}</b><small>${pct(r, items.length)}</small></div>
+${S.modules.map((M, i) => { const [a, n] = mr(M); return `<div><span>Module ${i + 1}</span><b>${a} / ${n}</b><small>${i === 1 && M.level ? (M.level === "harder" ? "the harder module" : "the easier module") : i === 0 ? "mixed difficulty" : ""}</small></div>`; }).join("")}
+<div><span>Time</span><b>${fmtDur(secsOf(S))}</b><small>allowed: ${MOCK_SPEC[S.sec].minutes * S.modules.length} min</small></div></div>`;
+return `${multi ? `<h2 class="rsec">${label}: ${r} of ${items.length} correct (${pct(r, items.length)})</h2>` : ""}
+${tiles}
+<p class="rnote"><strong>Summary:</strong> ${summary}</p>
+<div class="rtwo"><div><h3>By skill area</h3><table class="rstat">${statRows(doms, "#1E5BD8")}</table></div>
+<div><h3>By difficulty</h3><table class="rstat">${statRows(diffs, "#0F6E56")}</table></div></div>
+${work ? `<h3>What to work on next</h3><ul class="rwork">${work}</ul>` : `<h3>What to work on next</h3><p>No questions missed. Try the harder practice sets or a full SAT.</p>`}
+${timing}
+${missedX.length ? `<h3>${multi ? label + ": q" : "Q"}uestions missed (${missedX.length})</h3>${missedCards}` : ""}
+<h3 class="rbreak">${multi ? label + ": a" : "A"}ll ${items.length} questions</h3>
+<table class="rall"><thead><tr><th>#</th><th>Question</th><th>Skill</th><th>Diff.</th><th>Answer</th><th>Result</th><th>Time</th></tr></thead><tbody>${table}</tbody></table>
+<p class="rsmall">${S.modules.length > 1 ? `Questions 1–${M1.items.length} are Module 1; ${M1.items.length + 1}–${items.length} are Module 2. ` : ""}Difficulty: E = easy, M = medium, H = hard, T = top difficulty (the hardest questions, only in the harder Module 2). Top difficulty questions are also counted under Hard; type-in questions are counted under their difficulty too. In the Answer column, “B → C” means B was chosen and C was correct.</p>`;
 }).join("");
-const next = missedPlan(all.map(x => ({ q:x.q, ok:rptRight(x) })));
 return `<div class="rpt">
-<p class="rpt-brand">${SITE.name} · myopenshelf.org</p>
-<h1>Mock test report</h1>
-<p><strong>Student:</strong> ${esc(prof.name)}<br><strong>Date:</strong> ${when.toLocaleDateString(undefined, { year:"numeric", month:"long", day:"numeric" })}, ${when.toLocaleTimeString(undefined, { hour:"numeric", minute:"2-digit" })}<br><strong>Test:</strong> ${kind}<br><strong>Testing time:</strong> ${mmss(completed.reduce((t, S) => t + secsOf(S), 0))}</p>
-<p class="rpt-score">${right} of ${all.length} correct · ${pct(right, all.length)}</p>
+<p class="rpt-brand">${SITE.name} · SAT practice · myopenshelf.org</p>
+<h1>${format === "sat" ? "SAT Mock Test Report" : MOCK_SPEC[completed[0].sec].label + " Mock Test Report"}</h1>
+<p class="rsub">${name ? `<strong>${esc(name)}</strong> · ` : ""}${when.toLocaleDateString(undefined, { weekday:"long", year:"numeric", month:"long", day:"numeric" })} · started ${when.toLocaleTimeString(undefined, { hour:"numeric", minute:"2-digit" })} · ${kind}, ${all.length} questions</p>
+${multi ? `<p class="rpt-score">${right} of ${all.length} correct · ${pct(right, all.length)} · ${fmtDur(totalSecs)} (allowed: ${Math.round(allowed / 60)} min)</p>` : ""}
 ${sections}
-${next.length ? `<h2>Practice next</h2><p>Skill areas missed on this test, most-missed first. Practice them on ${SITE.name} with similar practice questions.</p>
-<table><thead><tr><th>Skill area</th><th>Section</th><th>Missed</th><th>Specific skills to practice</th></tr></thead><tbody>${next.map(b => `<tr><td>${PQ_DOMAINS[b.dom]}</td><td>${b.sec === "math" ? "Math" : "Reading and Writing"}</td><td>${b.missed} of ${b.n}</td><td>${Object.entries(b.skills || {}).filter(([, v]) => v.missed > 0).sort((x, y) => y[1].missed - x[1].missed).map(([k, v]) => `${skillName(k)} (${v.missed})`).join(", ")}</td></tr>`).join("")}</tbody></table>` : ""}
-<p class="rpt-note">Mock test questions and answers are kept private so future mock tests stay fair, so this report lists skills and results only. Percent correct is not an official SAT score; for a scaled score, take a practice test in College Board's Bluebook app. SAT® is a trademark registered by the College Board, which is not affiliated with, and does not endorse, ${SITE.name}.</p>
+<p class="rpt-note">This is a practice test from ${SITE.name} (myopenshelf.org), not an official SAT score; College Board's scoring isn't public. Official Bluebook practice tests give the best estimate of a real SAT score. Questions in this report won't appear again in this student's future mock tests. SAT® is a trademark registered by the College Board, which is not affiliated with, and does not endorse, ${SITE.name}.</p>
 </div>`;
 }
-const REPORT_CSS = `.rpt{font:14px/1.45 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#111;max-width:760px;margin:0 auto;padding:20px}
-.rpt h1{font-size:24px;margin:2px 0 10px}.rpt h2{font-size:18px;margin:22px 0 8px;border-bottom:2px solid #222;padding-bottom:4px}.rpt h3{font-size:15px;margin:14px 0 6px}
-.rpt table{border-collapse:collapse;width:100%;margin:4px 0 8px;font-size:13px}.rpt th,.rpt td{border:1px solid #bbb;padding:4px 7px;text-align:left}.rpt th{background:#eee}
-.rpt tr.rpt-no td:last-child{font-weight:700}.rpt .rpt-score{font-size:22px;font-weight:700;margin:8px 0 4px}.rpt .rpt-brand{color:#555;margin:0;font-size:12px}
-.rpt .rpt-note{color:#444;font-size:12px;margin-top:20px}.rpt tr{page-break-inside:avoid}`;
+const REPORT_CSS = `@page{size:Letter;margin:.55in .6in}
+.rpt{font:13px/1.45 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#14213D;max-width:780px;margin:0 auto;padding:16px}
+.rpt *{box-sizing:border-box}
+.rpt .rpt-brand{color:#1E5BD8;margin:0;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.rpt h1{font-size:26px;margin:2px 0 2px}.rpt .rsub{color:#4B5875;margin:0 0 12px}
+.rpt h2.rsec{font-size:19px;margin:26px 0 8px;border-bottom:2px solid #14213D;padding-bottom:4px}
+.rpt h3{font-size:15px;margin:20px 0 8px;padding-bottom:4px;border-bottom:2px solid #E3E8F2;break-after:avoid}
+.rpt .rpt-score{font-size:19px;font-weight:700;margin:6px 0}
+.rpt .rtiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0}
+.rpt .rtiles div{border:1px solid #D6DEEC;border-radius:10px;padding:9px 11px;background:#F4F7FC}
+.rpt .rtiles span{display:block;font-size:10px;color:#4B5875;text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+.rpt .rtiles b{display:block;font-size:22px;margin-top:2px}.rpt .rtiles small{color:#4B5875;font-size:11px}
+.rpt .rnote{background:#F4F7FC;border-left:4px solid #1E5BD8;padding:8px 12px;border-radius:6px;margin:10px 0}
+.rpt .rtwo{display:grid;grid-template-columns:1fr 1fr;gap:18px}.rpt .rstat td:first-child{white-space:nowrap}
+.rpt table{border-collapse:collapse;width:100%}
+.rpt .rstat td{padding:5px 6px;border-bottom:1px solid #E3E8F2}
+.rpt .rn{text-align:right;white-space:nowrap}.rpt .rc{text-align:center;white-space:nowrap}
+.rpt .rbar{width:34%}.rpt .rb{display:block;height:9px;background:#E3E8F2;border-radius:5px;overflow:hidden}.rpt .rb i{display:block;height:100%}
+.rpt .rwork{padding-left:18px;margin:6px 0}.rpt .rwork li{margin:0 0 7px}
+.rpt .rmiss{border:1px solid #D6DEEC;border-radius:10px;padding:10px 12px;margin:0 0 10px;break-inside:avoid}
+.rpt .rmh{margin:0 0 6px;font-size:12px;color:#4B5875}.rpt .rmh b{color:#1E5BD8}
+.rpt .rpill{font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px}
+.rpt .rpill.top{background:#14213D;color:#fff}.rpt .rpill.hard{background:#FDE7E4;color:#B42318}.rpt .rpill.medium{background:#FDF1E2;color:#B45309}.rpt .rpill.easy{background:#E1F5EE;color:#0F6E56}
+.rpt .rq p{margin:0 0 4px}.rpt .rq svg{max-width:300px;height:auto}
+.rpt .rans th{text-align:left;width:120px;font-weight:600;color:#4B5875;padding:2px 0;vertical-align:top}.rpt .rans td{padding:2px 0}
+.rpt .rgood{color:#0F6E56;font-weight:700}.rpt .rbad{color:#B42318;font-weight:700}
+.rpt .rex{margin:6px 0 0;font-size:12px}
+.rpt .rall{font-size:11px}.rpt .rall th{text-align:left;background:#F4F7FC;padding:5px;border-bottom:1px solid #D6DEEC;font-size:10px;text-transform:uppercase;color:#4B5875}
+.rpt .rall td{padding:4px 5px;border-bottom:1px solid #EEF1F6;vertical-align:top}.rpt .rall tr{break-inside:avoid}
+.rpt .rwrong td{background:#FFF6F5}.rpt .rqc{width:46%}
+.rpt .rsmall{font-size:11px;color:#4B5875}
+.rpt .rpt-note{color:#4B5875;font-size:11px;margin-top:18px;border-top:1px solid #E3E8F2;padding-top:8px}
+@media print{.rpt .rbreak{break-before:page}.rpt{padding:0}}
+@media (max-width:600px){.rpt .rtiles{grid-template-columns:1fr 1fr}.rpt .rtwo{grid-template-columns:1fr}}`;
 function sampleMockCompleted(){
 const used = new Set(), byId = (a, b) => a.id < b.id ? -1 : 1;
 const pick = (dom, diff, top) => { const q = TEST_PQ.filter(x => x.sec === "math" && x.dom === dom && x.diff === diff && !!x.top === !!top && !used.has(x.id)).sort(byId)[0]; used.add(q.id); return q; };
@@ -6375,7 +6474,7 @@ sess.done = true;
 const prof = activeProf();
 const secs = S => S.modules.reduce((t, M) => t + (M.secs || 0), 0);
 sess.completed.forEach(S => S.modules.forEach(M => M.items.forEach(x => {
-if(hasAnswer(x)) logAttempt({ q:x.q, choice: x.choice === 99 ? -1 : x.choice, t0:Date.now() - x.secs * 1000, stepLog:[], tips:0 }, "test");
+if(hasAnswer(x)) logAttempt({ q:x.q, choice: x.choice === 99 ? -1 : x.choice, typed:x.typed, t0:Date.now() - x.secs * 1000, stepLog:[], tips:0 }, "test");
 })));
 const d = getPD(prof.id);
 sess.completed.forEach(S => {
@@ -6410,7 +6509,7 @@ const rpt = reportHTML();
 $("#mkPdf").onclick = () => { track("mock-report", { how:"print" }); printReport(`<style>${REPORT_CSS}</style>${rpt}`); };
 $("#mkFile").onclick = async () => {
 const prof = activeProf(), doc = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${SITE.name} mock test report</title><style>${REPORT_CSS}</style></head><body>${rpt}</body></html>`;
-const how = await saveFile(`${SITE.name}-mock-test-${fileSafe(prof.name)}-${new Date().toISOString().slice(0, 10)}.html`, doc, "text/html");
+const how = await saveFile(`${SITE.fileName}-mock-test-${fileSafe(prof.name)}-${new Date().toISOString().slice(0, 10)}.html`, doc, "text/html");
 track("mock-report", { how });
 if(how === "download") toast("Report downloaded. Open it in any browser to view or print."); else if(how === "share") toast("Report saved."); else if(how === "fail") toast("Couldn't save a file here. Try Save as PDF or print.");
 };
@@ -6681,12 +6780,13 @@ const ec = $("#apcExam"); if(ec) ec.onchange = () => { track("ap-credit-view", {
 draw();
 }
 const SITE = {
-name: "OpenShelf",
+name: "My OpenShelf",
+fileName: "MyOpenShelf",   // used in downloaded file names (no spaces)
 domain: "myopenshelf.org",
-owner: "",            // e.g. "Jane Doe" or "OpenShelf Learning"
-version: 73,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
+owner: "",            // e.g. "Jane Doe" or "My OpenShelf Learning"
+version: 79,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
-updated: "September 2026",
+updated: "October 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
 };
 SITE.analytics = { goatcounter: "", plausible: "" };
@@ -6778,7 +6878,7 @@ return ok;
 const PAGES = {
 sample: { title:"Sample mock test report", render: el => {
 if(window.QUESTIONS_MISSING){ el.innerHTML = `<h1>Sample mock test report</h1><p>The sample needs the question file, which didn't load. Check your connection and reload.</p>`; return; }
-const rpt = mockReportHTML(sampleMockCompleted(), "full", "Sample student", new Date(2026, 9, 6, 16, 30));
+const rpt = mockReportHTML(sampleMockCompleted(), "full", "Sample student", new Date(2026, 9, 6, 16, 30), { sample:true });
 el.innerHTML = `
 <div class="samplebar" data-en="1"><p style="margin:0 0 8px"><strong>This is a sample report,</strong> with made-up results for a fictional student. After every mock test, ${SITE.name} gives you a report like this to keep or share with a parent or tutor. It shows your score, your results by skill and difficulty, and exactly what to practice next. Mock test questions themselves stay private.</p>
 <div class="ractions"><button class="btn small" data-go="mocktest">Take a mock test</button><button class="btn small ghost" id="smPdf">Save the sample as PDF</button></div></div>
@@ -6954,6 +7054,7 @@ el.innerHTML = `
 <div class="box"><h2>Trademarks</h2>
 <p>SAT<sup>®</sup>, AP<sup>®</sup>, Advanced Placement<sup>®</sup>, PSAT<sup>™</sup> and Bluebook<sup>™</sup> are trademarks registered or owned by the College Board, which is not affiliated with, and does not endorse, this site.</p>
 <p>College and university names are used only to describe their published policies. ${SITE.name} is not affiliated with, sponsored by, or endorsed by any college or university.</p></div>
+<div class="box"><h2>Copyright</h2><p>© 2026 ${SITE.name}. All rights reserved. The questions, explanations, audio walkthroughs, guides, tools and site design are owned by ${SITE.name}. You're welcome to use them for your own study and with your own students, but please don't copy, republish, sell or redistribute them, in whole or in part, without written permission.</p></div>
 <div class="box"><h2>Use of the site</h2><p>${SITE.name} is free for personal and classroom use. The site is provided as is. We work to keep it accurate, and we fix reported mistakes, but we can't promise it is free of errors.</p></div>
 <p class="small muted">Last updated ${SITE.updated}.</p>`;
 }}
@@ -7076,7 +7177,7 @@ ${sc.tiers.map((t, ti) => tierRow(si, ti, t)).join("")}
 ${S.schools.length < 3 ? `<button class="btn ghost" id="mcAdd">${tx("Add another college", "আরেকটি কলেজ যোগ করুন")}</button>` : ""}
 <button class="btn ghost" id="mcExample">${tx("Load an example chart", "একটি উদাহরণ চার্ট দেখুন")}</button></div>
 <div class="box" id="mcSum" hidden></div>
-<details class="box more" id="mcTop"><summary>${tx("Merit aid at the 28 top colleges in OpenShelf", "OpenShelf-এর ২৮টি শীর্ষ কলেজে মেধা বৃত্তি")}</summary>
+<details class="box more" id="mcTop"><summary>${tx("Merit aid at the 28 top colleges in My OpenShelf", "My OpenShelf-এর ২৮টি শীর্ষ কলেজে মেধা বৃত্তি")}</summary>
 <p class="small" style="margin-top:10px">${tx(`None of these colleges publishes an automatic score chart, so there are no steps to enter for them. A higher score can make a student more competitive, but it doesn't guarantee a set amount. Checked ${MERIT_TOP_CHECKED}; rules change, so confirm on each official page.`, `এই কলেজগুলোর কোনোটিই স্বয়ংক্রিয় স্কোর চার্ট প্রকাশ করে না, তাই এদের জন্য কোনো ধাপ লেখার নেই। বেশি স্কোর শিক্ষার্থীকে বেশি প্রতিযোগিতামূলক করতে পারে, কিন্তু নির্দিষ্ট পরিমাণের নিশ্চয়তা দেয় না। যাচাই করা হয়েছে অক্টোবর ২০২৬-এ; নিয়ম বদলায়, তাই প্রতিটি অফিসিয়াল পেজে নিশ্চিত হয়ে নিন।`)}</p>
 ${["need","auto","apply","few"].map(k => `<h3 class="mc-kind">${bn ? MERIT_KIND[k].bn : MERIT_KIND[k].en}</h3><ul class="mc-list">${MERIT_TOP.filter(c => c.k === k).map(c => `<li><strong>${esc(c.n)}:</strong> ${esc(bn ? c.bn : c.en)}${c.url ? ` <a href="${c.url}" target="_blank" rel="noopener">${tx("Official page", "অফিসিয়াল পেজ")} ↗</a>` : ""}</li>`).join("")}</ul>`).join("")}
 </details>
