@@ -897,7 +897,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=83"></script>
+<script src="questions.js?v=85"></script>
 <script>
 /* Bangla (বাংলা) is turned off for now. The translations are kept: set BANGLA_ON to true and restore the header switch to bring it back. */
 const BANGLA_ON = false;
@@ -4552,7 +4552,7 @@ const lastQ = sess.i === N - 1;
 const canNext = sess.mode === "test" ? it.choice !== null : it.locked;
 const canCheck = instantCheck && it.choice !== null && !it.locked;
 el.innerHTML = `
-<div class="pqhead"><span class="small muted">${sess.label ? esc(sess.label) + " · " : ""}Question ${sess.i + 1} of ${N}${(sess.streak || 0) >= 2 && sess.mode === "guided" ? ` <span class="streak" title="Correct answers in a row">🔥 ${sess.streak} in a row</span>` : ""}</span><span class="pqtools">${isStepSec(q.sec) ? SCICALC.button() : ""}${soundBtn("gpSound")}<button class="linkbtn" id="gpEnd">End and see results</button></span></div>
+<div class="pqhead"><span class="small muted">${sess.label ? esc(sess.label) + " · " : ""}Question ${sess.i + 1} of ${N}<span class="savingto"> · saving to ${esc(activeProf().name)}</span>${(sess.streak || 0) >= 2 && sess.mode === "guided" ? ` <span class="streak" title="Correct answers in a row">🔥 ${sess.streak} in a row</span>` : ""}</span><span class="pqtools">${isStepSec(q.sec) ? SCICALC.button() : ""}${soundBtn("gpSound")}<button class="linkbtn" id="gpEnd">End and see results</button></span></div>
 <div class="bar" style="margin:6px 0 16px"><i style="width:${sess.i / N * 100}%;background:var(--c-sat)"></i></div>
 <div class="meta"><span class="mcat" style="color:var(--c-sat)">${SEC_SHORT[q.sec] || "Math"}</span><span>${PQ_DOMAINS[q.dom]}</span>${isCourse(q.sec) ? "" : `<span class="diff-${q.diff.toLowerCase()}">${q.diff}</span>`}</div>
 ${BANGLA_ON && it.q.bn ? (() => { const cur = it.lang || qLang(); return `<div class="qlangsw" role="group" aria-label="Question language" data-noi18n><span class="qlangl" aria-hidden="true">${cur === "bn" ? "প্রশ্নের ভাষা" : "Question language"}</span><button data-ql="en" lang="en" aria-pressed="${cur === "en"}">English</button><button data-ql="bn" lang="bn" aria-pressed="${cur === "bn"}">বাংলা</button></div>`; })() : ""}${guidedMath ? `<p class="qlabel">Question</p>` : ""}<div class="pqstem">${q.q}</div>
@@ -5058,6 +5058,23 @@ if(isStepSec(q.sec) && mode !== "test") e.h = ["solved","hint","shown","skipped"
 if(q.sec === "rw" && mode !== "test") e.tp = it.tips;
 d.attempts.push(e); savePD(prof.id, d);
 }
+/* Every student record saved in this browser, including any no longer in the name list, so lost practice can be found. */
+function savedDataRows(){
+const p = getProfiles(), names = {}; p.list.forEach(x => names[x.id] = x.name);
+let keys = []; try{ keys = Object.keys(localStorage).filter(k => k.startsWith("os_pd_")); }catch(e){}
+return keys.map(k => { const id = k.slice(6), d = getPD(id), A = d.attempts;
+return { id, name: names[id] || null, n: A.length, last: A.length ? Math.max(...A.map(a => a.t)) : 0, mocks: d.mocks.length }; })
+.filter(r => r.n || r.mocks).sort((a, b) => b.last - a.last);
+}
+function savedDataTable(){
+const rows = savedDataRows();
+if(!rows.length) return `<p class="small muted" style="margin-top:10px">No practice is saved in this browser yet.</p>`;
+return `<h3 style="margin-top:14px">Saved practice in this browser</h3><div class="pwtablewrap"><table class="pwtable"><thead><tr><th>Name</th><th>Answers</th><th>Mock tests</th><th>Last answer</th></tr></thead><tbody>${rows.map(r => `<tr><td>${r.name ? esc(r.name) : `<em>Not in the name list</em> <button class="linkbtn" data-restore="${esc(r.id)}">Add it back</button>`}</td><td>${r.n}</td><td>${r.mocks}</td><td>${r.last ? new Date(r.last).toLocaleString([], { month:"short", day:"numeric", hour:"numeric", minute:"2-digit" }) : "–"}</td></tr>`).join("")}</tbody></table></div>
+<p class="small muted">Practice is saved only in this browser on this device. A Home Screen icon, a different browser and a private window each keep their own separate copy.</p>`;
+}
+document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-restore]"); if(!b) return;
+const p = getProfiles(); if(!p.list.some(x => x.id === b.dataset.restore)){ p.list.push({ id:b.dataset.restore, name:`Recovered practice (${p.list.length + 1})`, grade:"" }); saveProfiles(p); }
+toast("Added back. It's in the name list as \"Recovered practice\". You can rename it in Tutor & family view."); b.closest("td").innerHTML = "Recovered practice"; });
 function profileBar(label, onChange){
 const p = getProfiles();
 const html = `<label class="fld profbar"><span>${label}</span><select id="profSel">${p.list.map(x => `<option value="${x.id}" ${x.id === p.active ? "selected" : ""}>${esc(x.name)}${x.grade ? ` (grade ${esc(x.grade)})` : ""}</option>`).join("")}<option value="__manage">Add or manage students…</option></select></label>`;
@@ -6804,7 +6821,7 @@ name: "My OpenShelf",
 fileName: "MyOpenShelf",   // used in downloaded file names (no spaces)
 domain: "myopenshelf.org",
 owner: "",            // e.g. "Jane Doe" or "My OpenShelf Learning"
-version: 83,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
+version: 85,   // shown in the footer; keep it equal to the number in sw.js VERSION ("openshelf-v50")
 email: "hello@myopenshelf.org",   // forwarded to the owner by Cloudflare Email Routing
 updated: "October 2026",
 builder: { name: "Noventra", url: "" }   // add Noventra's website here to make the footer credit a link
@@ -7050,7 +7067,7 @@ ${ANALYTICS.provider ? `<div class="box"><h2>Anonymous usage counts</h2>
 <div class="box"><h2>Links to other sites</h2><p>Some pages link to official college, College Board and government websites, and the deadlines tool can open Google Calendar. Those sites have their own privacy policies.</p></div>
 <div class="box"><h2>Students</h2><p>${SITE.name} is designed for high school students. Because we don't collect personal information from anyone, no personal information from children is collected or stored by us.</p></div>
 <div class="box"><h2>Storage on this device</h2><p>${SITE.name} is using <strong>${storageUsage().kb} KB</strong> of the roughly 5 MB your browser allows for this site (${storageUsage().pct}%). Each student keeps their 3,000 most recent answers; older ones drop off automatically.</p>
-<div class="bar" role="img" aria-label="Storage used: ${storageUsage().pct} percent"><i style="width:${Math.max(1, storageUsage().pct)}%;background:var(--c-sat)"></i></div></div>
+<div class="bar" role="img" aria-label="Storage used: ${storageUsage().pct} percent"><i style="width:${Math.max(1, storageUsage().pct)}%;background:var(--c-sat)"></i></div>${savedDataTable()}</div>
 <div class="box"><h2>Delete your data</h2><p>Clearing your browser's site data removes everything. You can also do it here:</p>
 <button class="btn ghost" id="delAll">Delete all ${SITE.name} data on this device</button></div>
 ${SITE.email ? `<p>Questions about privacy: <a class="callink" href="mailto:${SITE.email}">${esc(SITE.email)}</a></p>` : ""}
