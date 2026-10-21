@@ -323,6 +323,7 @@ details.more summary{cursor:pointer;font-weight:650}
 .pqstem{font-family:var(--serif);font-size:1.1875rem;line-height:1.6;margin:10px 0 16px}
 /* Words in context */
 .vpass{font-family:var(--serif);font-size:1.1875rem;line-height:1.85;margin:6px 0 0}
+.vpass.poem{line-height:1.75;padding-left:4px}
 .vpass .vw{border-radius:4px;transition:background .12s}
 .vpass .vw.on{background:#FFE7A3}
 .vkey,.vkeydemo{font:inherit;line-height:1.2;vertical-align:baseline;display:inline;color:var(--accent);background:#EAF1FD;border:0;border-bottom:2px solid var(--accent);border-radius:4px 4px 0 0;padding:0 2px;margin:0;cursor:pointer;font-weight:600}
@@ -7197,7 +7198,7 @@ const observer = new MutationObserver(() => { if(!document.contains(el) || $("#t
 observer.observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:["hidden"] });
 function card(w){
   const d = cur.words[w]; if(!d) return "";
-  return `<button class="vx" aria-label="Close">×</button><p class="vch"><strong>${esc(w)}</strong> <span class="muted small">${esc(d.pos)}</span> <span class="vst ${status(w)}">${LBL[status(w)]}</span></p>
+  return `<p class="vch"><strong>${esc(w)}</strong> <span class="muted small">${esc(d.pos)}</span> <span class="vst ${status(w)}">${LBL[status(w)]}</span></p>
   <p><strong>Here it means:</strong> ${d.here}</p>
   <p><strong>Fits here:</strong> ${d.fits.map(esc).join(", ")}</p>
   <p><strong>Careful, it doesn't mean:</strong> ${d.not}</p>
@@ -7227,7 +7228,7 @@ function openPop(b){
   if(popFor === b && !pop.hidden){ closePop(); return; }
   if(!W[w]){ W[w] = { r:0, w:0, last:"s", t:Date.now() }; save(); }
   el.querySelectorAll(".vkey.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel");
-  pop.innerHTML = card(w); pop.hidden = false; popFor = b; placePop(b);
+  pop.innerHTML = `<button class="vx" aria-label="Close">×</button>${card(w)}`; pop.hidden = false; popFor = b; placePop(b);
   pop.querySelector(".vx").onclick = () => closePop(true);
   track("word-open", { word:w });
 }
@@ -7241,7 +7242,7 @@ function draw(){
     const m = raw.match(/^(\W*)\[(\w+)\](\W*)$/), idx = i++;
     return m ? `<span class="vw" data-i="${idx}">${esc(m[1])}<button class="vkey ${status(m[2])}" data-w="${esc(m[2])}" aria-label="${esc(m[2])}: show meaning">${esc(m[2])}</button>${esc(m[3])}</span>`
              : `<span class="vw" data-i="${idx}">${esc(raw)}</span>`;
-  }).join(" ")).join(" ");
+  }).join(" ")).join(cur.poem ? "<br>" : " ");
   const keys = Object.keys(cur.words);
   const done = keys.filter(w => W[w] && W[w].last === "r").length;
   const all = list.flatMap(p => Object.keys(p.words));
@@ -7252,7 +7253,7 @@ function draw(){
   <div class="box vbox">
     <p class="small muted vmeta">${esc(cur.topic)} · ${keys.length} words to learn · ${done} learned</p>
     <h2>${esc(cur.title)}</h2>
-    <div class="vpass" id="vPass">${passage}</div>
+    <div class="vpass${cur.poem ? " poem" : ""}" id="vPass">${passage}</div>
     <div class="ractions" style="margin-top:12px">${cur.t ? `<button class="btn small" id="vPlay">▶ Listen</button>` : ""}<button class="btn ghost small" id="vGoQuiz">Check yourself</button></div>
     <p class="small muted" style="margin-top:12px">Tap a highlighted word to see what it means in this passage.</p>
     <div class="vcard vpop" id="vPop" role="dialog" aria-live="polite" hidden></div>
@@ -7295,7 +7296,7 @@ function quiz(){
       ok ? (x.r++, right++) : x.w++; x.last = ok ? "r" : "w"; x.t = Date.now(); save();
       box.querySelectorAll(".qopt").forEach(o => { o.disabled = true; if(+o.dataset.j === q.a) o.classList.add("right"); });
       if(!ok) b.classList.add("wrong");
-      box.querySelector("#vFb").innerHTML = `<div class="vfb"><p><strong>${ok ? "Right." : "Not quite."}</strong> ${q.ex}</p>${ok ? "" : card(q.w)}<button class="btn small" id="vNext" style="margin-top:10px">${n + 1 < qs.length ? "Next" : "See results"}</button></div>`;
+      box.querySelector("#vFb").innerHTML = `<div class="vfb"><p><strong>${ok ? "Right." : "Not quite."}</strong> ${q.ex}</p>${ok ? "" : `<div class="vcard" style="margin-top:10px">${card(q.w)}</div>`}<button class="btn small" id="vNext" style="margin-top:10px">${n + 1 < qs.length ? "Next" : "See results"}</button></div>`;
       box.querySelector("#vNext").onclick = () => { n++; one(); };
     });
   };
