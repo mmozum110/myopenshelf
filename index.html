@@ -4329,9 +4329,22 @@ if(!LENS(cfg.sec).includes(cfg.len)) cfg.len = 10;
 let lastSat = store.get("os_gp_lastSat", "math"), lastCourse = store.get("os_gp_lastCourse", "alg1");
 let sess = null;
 const saveCfg = () => store.set("os_gp", cfg);
-const newItem = q => ({ q, choice:null, locked:false, si:0, tries:0, stepLog:[], stepsDone:false, skipped:false, tips:0, fb:"" });
+const newItem = q => ({ q, choice:null, locked:false, si:0, tries:0, stepLog:[], stepsDone:false, skipped:false, tips:0, fb:"", act:0 });
+/* Active time: the question on screen gets the time only while the student is doing something (tapping, typing, scrolling,
+   moving the mouse). It pauses after 2 minutes without activity or while the page is hidden. */
+const pgen = el._pgen = (el._pgen || 0) + 1;
+let pAct = Date.now(), pTick = Date.now();
+const pMark = () => { if(el._pgen === pgen) pAct = Date.now(); };
+["pointerdown", "pointermove", "keydown", "wheel", "touchstart"].forEach(ev => el.addEventListener(ev, pMark, { passive:true }));
+$("#toolView").addEventListener("scroll", pMark, { passive:true });
+const pTimer = setInterval(() => {
+const now = Date.now(), dt = (now - pTick) / 1000; pTick = now;
+if(el._pgen !== pgen){ clearInterval(pTimer); return; }
+if(!sess || !el.querySelector("#gpEnd") || $("#toolView").hidden || document.hidden || now - pAct > 120000) return;
+const it = sess.items[sess.i]; if(it && !it.locked) it.act = (it.act || 0) + Math.min(dt, 5);
+}, 2000);
 const startSet = ps => {
-track("practice-start", { section:ps.sec, mode:ps.mode, questions:ps.qs.length, source: ps.source || (ps.label ? (ps.label.startsWith("Recommended") || ps.label.startsWith("Starting diagnostic") ? "recommended" : ps.label.startsWith("More like") ? "more-like-these" : "custom") : "setup") }); el.dataset.en = isCourse(ps.sec) ? "" : "1"; sess = { mode:ps.mode, sec:ps.sec, label:ps.label || "", i:0, t0:Date.now(), items: ps.qs.map(newItem), unit:ps.unit || null, unitN:ps.unitN || null,
+track("practice-start", { section:ps.sec, mode:ps.mode, questions:ps.qs.length, source: ps.source || (ps.label ? (ps.label.startsWith("Recommended") || ps.label.startsWith("Starting diagnostic") ? "recommended" : ps.label.startsWith("More like") ? "more-like-these" : "custom") : "setup") }); el.dataset.en = isCourse(ps.sec) ? "" : "1"; sess = { mode:ps.mode, sec:ps.sec, label:ps.label || "", i:0, t0:Date.now(), items: ps.qs.map(newItem), unit:ps.unit || null, unitN:ps.unitN || null, asg:ps.asg || null,
 wasComplete: ps.unit ? unitProgress(activeProf().id, ps.sec, ps.unit).complete : false }; drawItem(); top(); };
 const top = () => { $("#toolView").scrollTop = 0; };
 const drawDrill = k => {
@@ -4368,6 +4381,7 @@ el.innerHTML = `
 </div>
 <p class="muted">${course.blurb} Pick a unit to start. You complete a unit by answering every question correctly on your own, and you can switch units anytime.</p>
 ${pbar.html}
+${qasgWaitingHtml()}
 <div class="box">
 <p class="small" style="margin:0 0 6px"><strong>Course</strong></p>
 <div class="chips">${COURSES.map(c => chip("sec", c.id, c.label)).join("")}</div>
@@ -4429,6 +4443,7 @@ el.innerHTML = `
 : "Practice for the digital SAT with a built-in instructor. In Math, you solve each problem one step at a time. In Reading &amp; Writing, you can ask for coaching tips, and answers and explanations come at the end."}</p>
 ${SAT_NOTE}
 ${pbar.html}
+${qasgWaitingHtml()}
 <div class="box">
 ${course
 ? `<p class="small" style="margin:0 0 6px"><strong>Course</strong></p>
@@ -4678,6 +4693,12 @@ const pctDone = ans.length ? ok / ans.length : 0;
 if(!sess.unit) setTimeout(() => { if(ans.length >= 5 && pctDone >= .8){ FX.fanfare(); FX.confetti(pctDone === 1 ? 80 : 50); } else if(ans.length){ FX.done(); } }, 150);
 }
 sess.items.forEach(it => { if(!it.locked && it.choice !== null){ it.locked = true; logAttempt(it, sess.mode); } });
+if(sess.asg && !sess.asgSaved){   /* record the assignment's result for this student */
+const ans = sess.items.filter(it => it.choice !== null);
+if(ans.length){ sess.asgSaved = true; const pr = activeProf(), dd = getPD(pr.id), x = dd.qasg.find(y => y.id === sess.asg);
+if(x){ x.ans = ans.length; x.r = ans.filter(it => it.choice === it.q.a).length; x.cnt = sess.items.length; x.secs = ans.reduce((t, it) => t + (it.logS || 0), 0);
+if(ans.length === sess.items.length) x.done = Date.now(); savePD(pr.id, dd); } }
+}
 const up = sess.unit ? unitProgress(activeProf().id, sess.sec, sess.unit) : null;
 let unitBox = "", nextUnit = null;
 if(up){
@@ -5057,7 +5078,7 @@ const saveProfiles = p => store.set("os_profiles", p);
 const activeProf = () => { const p = getProfiles(); return p.list.find(x => x.id === p.active); };
 const setActive = id => { const p = getProfiles(); if(p.list.some(x => x.id === id)){ p.active = id; saveProfiles(p); } };
 const vocabOf = v => ({ w: (v && v.w && typeof v.w === "object") ? v.w : {}, log: (v && Array.isArray(v.log)) ? v.log : [], asg: (v && Array.isArray(v.asg)) ? v.asg : [] });
-const getPD = id => { const d = store.get("os_pd_" + id, null) || {}; return { attempts: d.attempts || [], tests: d.tests || [], goal: d.goal || {}, mocks: d.mocks || [], mockSeen: d.mockSeen || [], plan: d.plan || null, mockPlan: d.mockPlan || null, vocab: vocabOf(d.vocab) }; };
+const getPD = id => { const d = store.get("os_pd_" + id, null) || {}; return { attempts: d.attempts || [], tests: d.tests || [], goal: d.goal || {}, mocks: d.mocks || [], mockSeen: d.mockSeen || [], plan: d.plan || null, mockPlan: d.mockPlan || null, vocab: vocabOf(d.vocab), qasg: Array.isArray(d.qasg) ? d.qasg : [] }; };
 const savePD = (id, d) => { if(d.attempts.length > 3000) d.attempts = d.attempts.slice(-3000); if(d.vocab && d.vocab.log.length > 800) d.vocab.log = d.vocab.log.slice(-800); store.set("os_pd_" + id, d); };
 /* Words in context (vocabulary passages), part of Reading & Writing. Each student's record keeps vocab = {
    w: { word: { r, w, last:"r"|"w"|"s", t } },
@@ -5074,10 +5095,56 @@ return { learned: all.filter(w => V.w[w] && V.w[w].last === "r").length, total: 
 passages: new Set(V.log.filter(x => x.qn).map(x => x.p)).size, nPass: VOCAB_LIST().length };
 }
 function openVocabAssignment(a){ PENDING_VOCAB = a; openTool("words"); }
+/* Question-set assignments: qasg = [{ id, n:title, ids:[question ids], mode, sec, t:assigned, ans:answered on the latest try,
+   done:finished time, r:right, cnt:questions, secs:time on the latest try }]. Saved by a tutor on this device or when a code is used. */
+const secLabel = sec => sec === "math" ? "SAT Math" : sec === "rw" ? "SAT Reading & Writing" : sec === "mock" ? "Mock tests" : sec === "vocab" ? "Words in context" : ((COURSES.find(c => c.id === sec) || {}).label || sec);
+function saveQAssignment(profId, a){
+const d = getPD(profId);
+let x = d.qasg.find(y => y.n === a.n && y.ids.join(",") === a.ids.join(",") && !y.done);
+if(!x){ x = { id:"a" + Date.now().toString(36), n:a.n, ids:a.ids.slice(), mode:a.mode || "guided", sec:a.sec, t:Date.now() }; d.qasg.push(x); if(d.qasg.length > 60) d.qasg = d.qasg.slice(-60); savePD(profId, d); }
+return x;
+}
+function startQAssignment(x){ PENDING_SET = { qs:x.ids.map(id => QBY[id]).filter(Boolean), sec:x.sec, mode:x.mode, label:x.n, source:"assignment", asg:x.id }; openTool("practice"); }
+const asgDate = t => new Date(t).toLocaleDateString([], { month:"short", day:"numeric" });
+function qasgWaitingHtml(){
+const d = getPD(activeProf().id), open = d.qasg.filter(x => !x.done).slice(-6).reverse();
+const vOpen = d.vocab.asg.filter(a => a.ids.some(id => !vocabDone(d.vocab, id, a.t))).slice(-3).reverse();
+if(!open.length && !vOpen.length) return "";
+return `<div class="box vasg"><h2 style="margin:0 0 6px">Assignments waiting for ${esc(activeProf().name)}</h2>
+${open.map(x => `<div class="drillrow"><span><strong>${esc(x.n)}</strong><small>${secLabel(x.sec)} · ${x.ids.length} questions · ${x.mode === "test" ? "no help" : "guided"} · assigned ${asgDate(x.t)}${x.ans ? ` · ${x.ans} answered last time, not finished` : ""}</small></span><button class="btn small" data-qasg="${x.id}">${x.ans ? "Start again" : "Start"}</button></div>`).join("")}
+${vOpen.map(a => `<div class="drillrow"><span><strong>${esc(a.n)}</strong><small>Words in context · ${a.ids.filter(id => vocabDone(d.vocab, id, a.t)).length} of ${a.ids.length} passages done · assigned ${asgDate(a.t)}</small></span><button class="btn small" data-vasg="${a.t}">Open</button></div>`).join("")}</div>`;
+}
+document.addEventListener("click", e => {
+const b = e.target.closest && e.target.closest("[data-qasg],[data-vasg]"); if(!b) return;
+const d = getPD(activeProf().id);
+if(b.dataset.qasg){ const x = d.qasg.find(y => y.id === b.dataset.qasg); if(x){ track("assignment-start", { section:x.sec }); startQAssignment(x); } return; }
+const a = d.vocab.asg.find(y => String(y.t) === b.dataset.vasg); if(a) openVocabAssignment({ ids:a.ids, label:a.n });
+});
+function assignmentsBox(d){
+const Q = d.qasg.slice(-10).reverse();
+if(!Q.length) return "";
+return `<div class="box"><h2>Assignments</h2><div class="pwtablewrap"><table class="pwtable"><thead><tr><th>Assignment</th><th>Section</th><th>Assigned</th><th>Status</th><th>Score</th><th>Time</th></tr></thead><tbody>
+${Q.map(x => `<tr><td>${esc(x.n)}</td><td>${secLabel(x.sec)}</td><td>${asgDate(x.t)}</td><td class="${x.done ? "ok" : ""}">${x.done ? `✓ Done ${asgDate(x.done)}` : x.ans ? `Started: ${x.ans} of ${x.ids.length} answered` : "Not started"}</td><td>${x.done || x.ans ? `${x.r} of ${x.ans || x.cnt}` : "—"}</td><td>${x.secs ? fmtDur(x.secs) : "—"}</td></tr>`).join("")}
+</tbody></table></div><p class="small muted" style="margin:8px 0 0">Question-set assignments from a tutor or parent. Vocabulary passage assignments are in the Words in context box below.</p></div>`;
+}
+function timeSpentBox(d){
+const now = Date.now(), wk = now - 7 * DAY, rows = {};
+const add = (k, sec, t) => { const r = rows[k] || (rows[k] = { all:0, wk:0 }); r.all += sec; if(t >= wk) r.wk += sec; };
+d.attempts.forEach(a => { const q = qOf(a); if(q) add(q.pool === "test" ? "mock" : q.sec, a.s || 0, a.t); });
+d.vocab.log.forEach(x => add("vocab", x.s || 0, x.e || x.t));
+const keys = ["math", "rw", "vocab", "mock"].concat(COURSES.map(c => c.id)).filter(k => rows[k] && rows[k].all > 0);
+const tot = keys.reduce((t, k) => t + rows[k].all, 0), twk = keys.reduce((t, k) => t + rows[k].wk, 0);
+return `<div class="box"><h2>Time spent</h2>${keys.length ? `<div class="tiles" style="margin:10px 0">
+<div class="tile"><span>All practice</span><b>${fmtDur(tot)}</b><small>${fmtDur(twk)} this week</small></div>
+${keys.map(k => `<div class="tile"><span>${secLabel(k)}</span><b>${fmtDur(rows[k].all)}</b><small>${fmtDur(rows[k].wk)} this week</small></div>`).join("")}</div>
+<p class="small muted" style="margin:0">Time counts while a question or passage is on screen and the student is active. It pauses after 2 minutes without any activity, so walking away doesn't add time.</p>`
+: `<p class="small muted" style="margin:0">No practice time yet.</p>`}</div>`;
+}
 function startAssignment(code, startSet){
 const a = readAssignCode(code);
 if(a.vocab){ openVocabAssignment({ ids:a.vocab, label:a.label }); return; }
-startSet({ qs:a.qs, sec:a.sec, mode:a.mode, label:a.label, source:"assignment-code" });
+const x = saveQAssignment(activeProf().id, { n:a.label, ids:a.qs.map(q => q.id), mode:a.mode, sec:a.sec });
+startSet({ qs:a.qs, sec:a.sec, mode:a.mode, label:a.label, source:"assignment-code", asg:x.id });
 }
 function vocabPracticeBox(){
 const d = getPD(activeProf().id), S = vocabSummary(d), wk = vocabSummary(d, Date.now() - 7 * DAY);
@@ -5100,18 +5167,18 @@ ${asg.length ? `<p class="small" style="margin:0 0 4px"><strong>Assignments</str
 return `<div class="check"><span class="${left.length ? "" : "ok"}" aria-hidden="true">${left.length ? "○" : "✓"}</span><span><strong>${esc(a.n)}</strong> <span class="muted">(assigned ${new Date(a.t).toLocaleDateString([], { month:"short", day:"numeric" })})</span>: ${a.ids.length - left.length} of ${a.ids.length} passages done${left.length ? `. Still to do: ${left.map(id => esc(vocabTitle(id))).join(", ")}` : ""}</span></div>`; }).join("")}` : ""}
 ${L.length ? `<div class="pwtablewrap" style="margin-top:10px"><table class="pwtable"><thead><tr><th>When</th><th>Passage</th><th>Time</th><th>Words tapped</th><th>Quiz</th></tr></thead><tbody>${L.map(x => `<tr><td>${when(x.t)}</td><td>${esc(vocabTitle(x.p))}</td><td>${fmtDur(x.s || 0)}</td><td>${x.op || 0}</td><td>${x.qn ? `${x.qr} of ${x.qn}` : "—"}</td></tr>`).join("")}</tbody></table></div>`
 : `<p class="small muted" style="margin:0">No vocabulary practice in the last 30 days on this device. <button class="linkbtn" data-go="words">Open the passages</button></p>`}
-<p class="small muted" style="margin:8px 0 0">Time counts while a passage is open and the student is reading, tapping words, listening or answering. It pauses after 90 seconds without activity.</p></div>`;
+<p class="small muted" style="margin:8px 0 0">Time counts while a passage is open and the student is reading, tapping words, listening or answering. It pauses after 2 minutes without activity.</p></div>`;
 }
 function logAttempt(it, mode){
 if(it.logged || it.choice === null) return;
 it.logged = true;
 const q = it.q, prof = activeProf(), d = getPD(prof.id);
-const e = { q:q.id, t:Date.now(), ok: it.choice === q.a ? 1 : 0, p: it.choice, s: Math.max(1, Math.min(900, Math.round((Date.now() - (it.t0 || Date.now())) / 1000))), m: mode === "test" ? "t" : "g" };
+const e = { q:q.id, t:Date.now(), ok: it.choice === q.a ? 1 : 0, p: it.choice, s: Math.max(1, Math.min(900, Math.round(it.act != null ? it.act : (Date.now() - (it.t0 || Date.now())) / 1000))), m: mode === "test" ? "t" : "g" };
 if(it.sol && mode !== "test") e.sol = 1;
 if(it.typed && String(it.typed).trim()) e.ty = String(it.typed).trim().slice(0, 12);   /* a type-in answer, as written */
 if(isStepSec(q.sec) && mode !== "test") e.h = ["solved","hint","shown","skipped"].map(k => it.stepLog.filter(x => x === k).length);
 if(q.sec === "rw" && mode !== "test") e.tp = it.tips;
-d.attempts.push(e); savePD(prof.id, d);
+d.attempts.push(e); savePD(prof.id, d); it.logS = e.s;
 }
 /* Every student record saved in this browser, including any no longer in the name list, so lost practice can be found. */
 function savedDataRows(){
@@ -5262,7 +5329,8 @@ const V = d.vocab, vw = {}; Object.entries(V.w).forEach(([k, x]) => { vw[k] = [x
 const vl = V.log.filter(x => (x.e || x.t) >= since).slice(-300).map(x => [x.p, Math.round(x.t / 60000), x.s || 0, x.op || 0, x.qr == null ? "" : x.qr, x.qn || 0, Math.round((x.e || x.t) / 60000)]);
 const va = V.asg.slice(-20).map(x => [x.n, x.ids, Math.round(x.t / 60000)]);
 const v = vl.length || va.length || Object.keys(vw).length ? { w:vw, l:vl, a:va } : undefined;
-return "OSP1." + b64e(JSON.stringify({ n:prof.name, g:prof.grade, a, ts:d.tests.slice(-30), goal:d.goal, mp, v }));
+const qa = d.qasg.slice(-20).map(x => [x.id, x.n, x.ids, x.mode, x.sec, Math.round(x.t / 60000), x.done ? Math.round(x.done / 60000) : 0, x.r || 0, x.cnt || 0, x.ans || 0, x.secs || 0]);
+return "OSP1." + b64e(JSON.stringify({ n:prof.name, g:prof.grade, a, ts:d.tests.slice(-30), goal:d.goal, mp, v, qa: qa.length ? qa : undefined }));
 }
 function findCode(raw, prefix){
 const s = String(raw || ""), i = s.indexOf(prefix);
@@ -5284,6 +5352,8 @@ vocab:o.v && typeof o.v === "object" ? {
 w:Object.fromEntries(Object.entries(o.v.w || {}).filter(([, r]) => Array.isArray(r)).map(([k, r]) => [k, { r:+r[0] || 0, w:+r[1] || 0, last:r[2] || "s", t:0 }])),
 log:(o.v.l || []).filter(r => Array.isArray(r) && r[0]).map(r => { const x = { p:r[0], t:r[1] * 60000, e:(r[6] || r[1]) * 60000, s:+r[2] || 0, op:+r[3] || 0, qn:+r[5] || 0 }; if(r[4] !== "" && r[4] != null) x.qr = +r[4]; return x; }),
 asg:(o.v.a || []).filter(r => Array.isArray(r) && Array.isArray(r[1])).map(r => ({ n:String(r[0] || "Assignment"), ids:r[1], t:r[2] * 60000 })) } : null,
+qasg:(o.qa || []).filter(r => Array.isArray(r) && Array.isArray(r[2])).map(r => { const x = { id:String(r[0]), n:String(r[1] || "Assignment"), ids:r[2], mode:r[3] || "guided", sec:r[4], t:r[5] * 60000 };
+if(r[6]) x.done = r[6] * 60000; if(r[9]){ x.ans = +r[9]; x.r = +r[7] || 0; x.cnt = +r[8] || 0; x.secs = +r[10] || 0; } return x; }),
 attempts:(o.a || []).filter(r => QBY[r[0]]).map(r => { const e = { q:r[0], t:r[1] * 60000, ok:r[2] ? 1 : 0, p:r[3], s:r[4], m:r[5] }; if(r[6]) e.h = String(r[6]).split(".").map(Number); if(r[7] !== "" && r[7] != null) e.tp = +r[7]; return e; }) };
 }
 function mergeInto(id, imp){
@@ -5304,6 +5374,8 @@ Object.entries(imp.vocab.w).forEach(([k, x]) => { const y = V.w[k]; if(!y || x.r
 const ak = a => a.n + "|" + a.ids.join(","), haveA = new Set(V.asg.map(ak));
 imp.vocab.asg.forEach(a => { if(!haveA.has(ak(a))){ V.asg.push(a); haveA.add(ak(a)); } });
 }
+(imp.qasg || []).forEach(x => { const y = d.qasg.find(z => z.id === x.id);
+if(!y) d.qasg.push(x); else if((x.done && !y.done) || (x.ans || 0) > (y.ans || 0)) Object.assign(y, x); });
 savePD(id, d); return added;
 }
 const makeAssignCode = a => "OSA1." + b64e(JSON.stringify(a));
@@ -5456,6 +5528,8 @@ return `<div class="box planpromo" data-en="1"><p style="margin:0"><strong>SAT s
 <div class="tile"><span>Math steps solved alone</span><b>${steps.all ? Math.round(steps.solo / steps.all * 100) + "%" : "—"}</b><small>In guided practice</small></div>
 <div class="tile"><span>Answered without help</span><b>${(() => { const g = A.filter(x => x.h || x.tp != null); if(!g.length) return "—"; const unaided = g.filter(x => x.h ? (x.h[1] + x.h[2]) === 0 && !x.sol : x.tp === 0).length; return Math.round(unaided / g.length * 100) + "%"; })()}</b><small>No hints or shown steps</small></div>
 </div>
+${timeSpentBox(d)}
+${assignmentsBox(d)}
 <div class="box rec"><h2>What to practice next</h2><p>${rec.why}</p>
 <div class="ractions"><button class="btn" id="dbRec">Start this set (10 questions)</button><button class="btn ghost" id="dbRecTest">Try it in test mode</button></div></div>
 <div class="box"><h2>Skill map</h2><p class="muted small">Mastery over the last 90 days by skill and difficulty. A correct answer counts fully when you solve it on your own, half when you used a hint or tip, and a quarter when the instructor showed a step. Green is 75%+, gold 50–74%, red under 50%.</p>
@@ -5571,6 +5645,9 @@ const clDone = store.get("os_check", {}), clGrade = store.get("os_checkgrade", 9
 const clN = clItems.filter((_, i) => clDone[`${clGrade}-${i}`]).length;
 const delta = sw.p != null && sp.p != null ? Math.round((sw.p - sp.p) * 100) : null;
 const vWk = vocabSummary(d, now - 7 * DAY), vAll = vocabSummary(d);
+const qOpen = d.qasg.filter(x => !x.done), qDoneWk = d.qasg.filter(x => x.done && x.done >= now - 7 * DAY);
+const vOpenN = d.vocab.asg.filter(a => a.ids.some(id => !vocabDone(d.vocab, id, a.t))).length;
+const asgLine = qOpen.length || qDoneWk.length || vOpenN ? `${qDoneWk.length} finished this week${qDoneWk.length ? ` (${qDoneWk.map(x => `${x.n}: ${x.r} of ${x.cnt}`).join("; ")})` : ""}; ${qOpen.length + vOpenN} still waiting${qOpen.length + vOpenN ? ` (${qOpen.map(x => x.n).concat(d.vocab.asg.filter(a => a.ids.some(id => !vocabDone(d.vocab, id, a.t))).map(a => a.n)).join("; ")})` : ""}` : "";
 const lines = [
 `My OpenShelf weekly SAT report for ${prof.name} (${new Date().toLocaleDateString()})`,
 `Practice: ${wk.length} questions on ${days} day(s), about ${mins} minutes.`,
@@ -5579,6 +5656,7 @@ skills.length ? `Strongest skill: ${PQ_DOMAINS[skills[skills.length - 1].k]} (${
 trapTop ? `Most common mistake: ${TRAP_INFO[trapTop[0]].label}.` : "",
 goal.total && last ? `Goal: ${goal.total}. Latest practice test: ${last.math + last.rw}.` : "",
 vWk.secs ? `Words in context (vocabulary): about ${Math.max(1, Math.round(vWk.secs / 60))} minutes this week; ${vAll.learned} of ${vAll.total} words learned.` : "",
+asgLine ? `Assignments: ${asgLine}.` : "",
 `Next focus: ${rec.why}`,
 upcoming.length ? `Coming up: ${upcoming.map(x => `${x.title} (${x.date.toLocaleDateString(undefined, { month:"short", day:"numeric" })})`).join("; ")}.` : ""
 ].filter(Boolean).join("\n");
@@ -5602,6 +5680,7 @@ ${lt ? `<p class="small muted" style="margin-top:8px">College list goal = the mi
 </div>
 ${skills.length ? `<div class="check"><span class="ok" aria-hidden="true">▲</span><span><strong>Strongest:</strong> ${PQ_DOMAINS[skills[skills.length - 1].k]} (${pct(skills[skills.length - 1].st.p)})</span></div><div class="check"><span class="gap" aria-hidden="true">▼</span><span><strong>Needs work:</strong> ${PQ_DOMAINS[skills[0].k]} (${pct(skills[0].st.p)})</span></div>` : `<p class="small">Not enough practice this week to compare skills.</p>`}
 ${trapTop ? `<div class="check"><span class="gap" aria-hidden="true">!</span><span><strong>Most common mistake:</strong> ${TRAP_INFO[trapTop[0]].label} (${trapTop[1]}×). ${TRAP_INFO[trapTop[0]].tip}</span></div>` : ""}
+${asgLine ? `<div class="check"><span aria-hidden="true">📌</span><span><strong>Assignments:</strong> ${esc(asgLine)}.</span></div>` : ""}
 <div class="check"><span aria-hidden="true">→</span><span><strong>Suggested focus:</strong> ${rec.why}</span></div>
 ${upcoming.length ? `<div class="check"><span aria-hidden="true">📅</span><span><strong>Next 30 days:</strong> ${upcoming.map(x => `${esc(x.title)} (${x.date.toLocaleDateString(undefined, { month:"short", day:"numeric" })})`).join("; ")}</span></div>` : ""}
 ${clItems.length ? `<div class="check"><span aria-hidden="true">✓</span><span><strong>Family checklist, grade ${clGrade}:</strong> ${clN} of ${clItems.length} done</span></div>` : ""}
@@ -5648,7 +5727,8 @@ el.innerHTML = `
 <div class="box"><h2>Students</h2>
 ${rows.map(({ pr, d, A, a30, lt, tr, lastT }) => `<div class="stu">
 <div class="srtop"><span>${esc(pr.name)}${pr.grade ? ` <small class="muted">grade ${esc(pr.grade)}</small>` : ""}${pr.id === P.active ? ' <small class="tag within">Active</small>' : ""}</span><span class="small muted">${ago(lastT)}</span></div>
-<p class="small" style="margin:4px 0 0">${A.length} questions · ${pct(stat(a30).p)} accuracy (30 days) · Latest practice test: ${lt ? `<strong>${lt.math + lt.rw}</strong>` : "—"}${tr ? ` · Top mistake: ${TRAP_INFO[tr[0]].label}` : ""}${(() => { const vs = vocabSummary(d); return vs.secs || vs.learned ? ` · Vocabulary: ${vs.learned} words learned${vs.secs ? `, ${fmtDur(vs.secs)}` : ""}` : ""; })()}</p>
+<p class="small" style="margin:4px 0 0">${A.length} questions · ${pct(stat(a30).p)} accuracy (30 days) · Latest practice test: ${lt ? `<strong>${lt.math + lt.rw}</strong>` : "—"}${tr ? ` · Top mistake: ${TRAP_INFO[tr[0]].label}` : ""}${(() => { const vs = vocabSummary(d); return vs.secs || vs.learned ? ` · Vocabulary: ${vs.learned} words learned${vs.secs ? `, ${fmtDur(vs.secs)}` : ""}` : ""; })()}${(() => { const all = d.qasg.length + d.vocab.asg.length; if(!all) return "";
+const dn = d.qasg.filter(x => x.done).length + d.vocab.asg.filter(a => a.ids.every(id => vocabDone(d.vocab, id, a.t))).length; return ` · Assignments: ${dn} of ${all} done`; })()}</p>
 <div class="rowbtns"><button class="linkbtn" data-open="${pr.id}">Open dashboard</button><button class="linkbtn" data-report="${pr.id}">Parent report</button>${P.list.length > 1 ? `<button class="linkbtn" data-del="${pr.id}">Remove</button>` : ""}</div></div>`).join("")}
 <div class="form-row" style="margin-top:14px"><label class="fld"><span>Student name</span><input id="stName" maxlength="40" placeholder="e.g. Aisha"></label><label class="fld"><span>Grade</span><input id="stGrade" maxlength="4" inputmode="numeric" placeholder="e.g. 11"></label></div>
 <div class="err" id="stErr" role="alert"></div>
@@ -5676,7 +5756,8 @@ ${isV ? `<p class="small" style="margin:12px 0 4px"><strong>Passages</strong> <s
 <p class="small" style="margin:12px 0 6px"><strong>Mode</strong></p>
 <div class="chips"><button class="chip" data-as="mode" data-v="guided" aria-pressed="${asg.mode === "guided"}">Instructor guided</button><button class="chip" data-as="mode" data-v="test" aria-pressed="${asg.mode === "test"}">Test mode</button></div>
 <p class="small muted" style="margin:10px 0 0">${n ? `${n} questions available for this assignment.` : "No questions match. Try more skill areas or another difficulty."}</p>
-<div class="ractions"><button class="btn" id="asStart" ${n ? "" : "disabled"}>Start now as ${esc(activeProf().name)}</button><button class="btn ghost" id="asCode" ${n ? "" : "disabled"}>Get assignment code</button></div>`}
+<div class="ractions"><button class="btn" id="asSave" ${n ? "" : "disabled"}>Assign to ${esc(activeProf().name)}</button><button class="btn ghost" id="asStart" ${n ? "" : "disabled"}>Start now as ${esc(activeProf().name)}</button><button class="btn ghost" id="asCode" ${n ? "" : "disabled"}>Get assignment code</button></div>
+<p class="small muted" style="margin:6px 0 0"><strong>Assign</strong> saves it to ${esc(activeProf().name)}'s list on this device: it waits at the top of Practice, and the score and time show on My progress. If they practice on their own phone, send the assignment code instead.</p>`}
 <div id="asOut"></div></div>
 <div class="box"><h2>Import a progress code</h2>
 <p class="small">Students find their code on <strong>My progress</strong> → Share progress. Paste it here to add their results to a student on this device.</p>
@@ -5703,6 +5784,13 @@ const id = "s" + Date.now().toString(36); p.list.push({ id, name, grade }); p.ac
 const saveAsg = () => store.set("os_asg", asg);
 $("#asWho").onchange = e => { if(e.target.value === "__add"){ e.target.value = P.active; const nm = $("#stName"); nm.scrollIntoView({ behavior:"smooth", block:"center" }); nm.focus(); return; } setActive(e.target.value); draw(); };
 const asSave = $("#asSave"); if(asSave) asSave.onclick = () => {
+if(!isV){
+const pr = activeProf(), title = asg.title.trim() || "Assignment";
+const qs = makeQs(), before = getPD(pr.id).qasg.length, x = saveQAssignment(pr.id, { n:title, ids:qs.map(q => q.id), mode:asg.mode, sec:asg.sec });
+track("assignment-save", { section:asg.sec, questions:qs.length });
+toast(getPD(pr.id).qasg.length > before ? `Assigned to ${pr.name}: ${qs.length} questions. It's waiting at the top of their Practice page.` : `${pr.name} already has this assignment.`);
+return;
+}
 const pr = activeProf(), dd = getPD(pr.id), title = asg.title.trim() || "Vocabulary passages";
 const same = dd.vocab.asg.find(a => a.n === title && a.ids.join(",") === asg.vp.join(",") && a.ids.some(id => !vocabDone(dd.vocab, id, a.t)));
 if(same){ toast(`${pr.name} already has this assignment.`); return; }
@@ -5717,7 +5805,7 @@ el.querySelectorAll("[data-vp]").forEach(c => c.onchange = () => { const all = V
 const makeQs = () => buildSet(pool, asg.n, asg.diff);
 $("#asStart").onclick = () => { track("assignment-start-now", { section:asg.sec });
 if(isV){ openVocabAssignment({ ids:asg.vp.slice(), label:asg.title || "Vocabulary passages" }); return; }
-const qs = makeQs(); PENDING_SET = { qs, sec:asg.sec, label: asg.title || "Assignment", mode:asg.mode, source:"tutor-assignment" }; openTool("practice"); };
+const qs = makeQs(), x = saveQAssignment(activeProf().id, { n:asg.title.trim() || "Assignment", ids:qs.map(q => q.id), mode:asg.mode, sec:asg.sec }); startQAssignment(x); };
 $("#asCode").onclick = () => { track("assignment-create", { section:asg.sec, questions: isV ? asg.vp.length : asg.n, mode:asg.mode });
 if(isV){
 $("#asOut").innerHTML = `<div style="margin-top:14px">${copyBlock(makeAssignCode({ n: asg.title || "Vocabulary passages", v: asg.vp }), `Assignment code (${asg.vp.length} passage${asg.vp.length === 1 ? "" : "s"})`)}<p class="small muted">Send this code to the student. They open <strong>Practice</strong> → <strong>Reading &amp; Writing</strong>, tap <strong>“Have an assignment code from your tutor?”</strong>, paste it and tap <strong>Start assignment</strong>. The passages open in Words in context, and their progress and time spent show on their <strong>My progress</strong> page.</p></div>`;
@@ -7290,7 +7378,7 @@ if(PENDING_VOCAB){   /* opened from an assignment */
 let cur = list.find(p => p.id === store.get("os_words_p", "")) || list[0];
 const audio = new Audio(); audio.preload = "none";
 /* Time spent: every 10 seconds, count the time if the page is visible and the student did something in the last
-   90 seconds (or the narration is playing). Time on one passage within 30 minutes is one session. */
+   2 minutes (or the narration is playing). Time on one passage within 30 minutes is one session. */
 const gen = el._vgen = (el._vgen || 0) + 1;
 let sess = null, lastAct = Date.now();
 const act = () => { if(el._vgen === gen) lastAct = Date.now(); };
@@ -7306,7 +7394,7 @@ const sesNow = () => {
 const tick = setInterval(() => {
   if(el._vgen !== gen || !el.querySelector("#vPass")){ clearInterval(tick); return; }
   if($("#toolView").hidden || document.hidden) return;
-  if(audio.paused && Date.now() - lastAct > 90000) return;
+  if(audio.paused && Date.now() - lastAct > 120000) return;
   const x = sesNow(); x.s += 10; x.e = Date.now(); save();
 }, 10000);
 let raf = 0, lastOn = -1;
