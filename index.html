@@ -329,8 +329,16 @@ details.more summary{cursor:pointer;font-weight:650}
 .vkey.learned{border-bottom-color:var(--c-ok);color:var(--c-ok);background:#E6F3EF}
 .vkey.review{border-bottom-color:var(--c-warn);color:var(--c-warn);background:#FBEDEE}
 .vkey.sel{outline:2px solid var(--accent);outline-offset:1px}
-.vcard{margin-top:14px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#FAFBFE}
+.vbox{position:relative}
+.vcard{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#FAFBFE}
 .vcard p{margin:4px 0}
+.vpop{position:absolute;z-index:20;width:min(340px,calc(100% - 16px));box-shadow:0 10px 28px rgba(20,33,61,.18);background:var(--surface);font-size:.9375rem;line-height:1.5;padding-right:36px}
+.vpop[hidden]{display:none}
+.vpop::before{content:"";position:absolute;left:var(--ax,24px);width:12px;height:12px;background:inherit;border:1px solid var(--line);transform:translateX(-50%) rotate(45deg)}
+.vpop.below::before{top:-7px;border-right:0;border-bottom:0}
+.vpop.above::before{bottom:-7px;border-left:0;border-top:0}
+.vpop .vx{position:absolute;top:6px;right:6px;width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:var(--muted);font-size:1.125rem;line-height:1;cursor:pointer}
+.vpop .vx:hover{background:#EEF1F6}
 .vch{font-size:1.125rem}
 .vst,.vchip{display:inline-block;font-size:.75rem;font-weight:700;padding:1px 8px;border-radius:999px;background:#EEF1F6;color:var(--muted);margin-left:4px}
 .vst.learned,.vchip.learned{background:#E6F3EF;color:var(--c-ok)}
@@ -7189,12 +7197,43 @@ const observer = new MutationObserver(() => { if(!document.contains(el) || $("#t
 observer.observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:["hidden"] });
 function card(w){
   const d = cur.words[w]; if(!d) return "";
-  return `<div class="vcard" role="region" aria-live="polite"><p class="vch"><strong>${esc(w)}</strong> <span class="muted small">${esc(d.pos)}</span> <span class="vst ${status(w)}">${LBL[status(w)]}</span></p>
+  return `<button class="vx" aria-label="Close">×</button><p class="vch"><strong>${esc(w)}</strong> <span class="muted small">${esc(d.pos)}</span> <span class="vst ${status(w)}">${LBL[status(w)]}</span></p>
   <p><strong>Here it means:</strong> ${d.here}</p>
   <p><strong>Fits here:</strong> ${d.fits.map(esc).join(", ")}</p>
   <p><strong>Careful, it doesn't mean:</strong> ${d.not}</p>
-  <p class="small muted"><strong>Word family:</strong> ${d.family}</p></div>`;
+  <p class="small muted"><strong>Word family:</strong> ${d.family}</p>`;
 }
+/* Meaning popup: sits just below the tapped word (or above it if there's no room below), kept inside the passage box. */
+let popFor = null;
+function closePop(refocus){
+  const pop = el.querySelector("#vPop"); if(!pop || pop.hidden) return;
+  pop.hidden = true; el.querySelectorAll(".vkey.sel").forEach(x => x.classList.remove("sel"));
+  if(refocus && popFor && document.contains(popFor)) popFor.focus();
+  popFor = null;
+}
+function placePop(b){
+  const pop = el.querySelector("#vPop"), box = el.querySelector(".vbox"); if(!pop || !box) return;
+  const bx = box.getBoundingClientRect(), r = b.getBoundingClientRect(), gap = 10, pad = 8;
+  const pw = pop.offsetWidth, ph = pop.offsetHeight, cx = r.left + r.width / 2 - bx.left;
+  const left = Math.max(pad, Math.min(cx - pw / 2, bx.width - pw - pad));
+  const roomBelow = window.innerHeight - r.bottom, above = roomBelow < ph + gap + 12 && r.top > ph + gap + 12;
+  pop.classList.toggle("above", above); pop.classList.toggle("below", !above);
+  pop.style.left = left + "px";
+  pop.style.top = (above ? r.top - bx.top - ph - gap : r.bottom - bx.top + gap) + "px";
+  pop.style.setProperty("--ax", Math.max(16, Math.min(cx - left, pw - 16)) + "px");
+}
+function openPop(b){
+  const w = b.dataset.w, pop = el.querySelector("#vPop");
+  if(popFor === b && !pop.hidden){ closePop(); return; }
+  if(!W[w]){ W[w] = { r:0, w:0, last:"s", t:Date.now() }; save(); }
+  el.querySelectorAll(".vkey.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel");
+  pop.innerHTML = card(w); pop.hidden = false; popFor = b; placePop(b);
+  pop.querySelector(".vx").onclick = () => closePop(true);
+  track("word-open", { word:w });
+}
+el.addEventListener("keydown", e => { if(e.key === "Escape" && popFor){ e.stopPropagation(); closePop(true); } });
+document.addEventListener("click", e => { if(!document.contains(el)) return; if(popFor && !e.target.closest("#vPop,.vkey")) closePop(); });
+window.addEventListener("resize", () => { if(popFor && document.contains(popFor)) placePop(popFor); });
 function draw(){
   stopRead(); lastOn = -1;
   let i = 0;
@@ -7215,7 +7254,8 @@ function draw(){
     <h2>${esc(cur.title)}</h2>
     <div class="vpass" id="vPass">${passage}</div>
     <div class="ractions" style="margin-top:12px">${cur.t ? `<button class="btn small" id="vPlay">▶ Listen</button>` : ""}<button class="btn ghost small" id="vGoQuiz">Check yourself</button></div>
-    <div id="vCard"><p class="small muted" style="margin-top:12px">Tap a highlighted word to see what it means in this passage.</p></div>
+    <p class="small muted" style="margin-top:12px">Tap a highlighted word to see what it means in this passage.</p>
+    <div class="vcard vpop" id="vPop" role="dialog" aria-live="polite" hidden></div>
   </div>
   <div class="box" id="vQuiz" hidden></div>
   <details class="box more"><summary>My words (${all.filter(w => status(w) === "learned").length} of ${all.length} learned)</summary>
@@ -7223,11 +7263,8 @@ function draw(){
   <p class="small muted">Learned means you got it right the last time it was quizzed. Words marked Review come back first next time.</p></details>
   <p class="small muted">All passages are original and written for ${esc(SITE.name)}. More passages are on the way.</p>`;
   const pick = el.querySelector("#vPick"); if(pick) pick.onchange = () => { cur = list.find(p => p.id === pick.value); store.set("os_words_p", cur.id); draw(); };
-  el.querySelectorAll(".vkey").forEach(b => b.onclick = () => {
-    const w = b.dataset.w; if(!W[w]){ W[w] = { r:0, w:0, last:"s", t:Date.now() }; save(); }
-    el.querySelectorAll(".vkey.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel");
-    el.querySelector("#vCard").innerHTML = card(w); track("word-open", { word:w });
-  });
+  popFor = null;
+  el.querySelectorAll(".vkey").forEach(b => b.onclick = () => openPop(b));
   const play = el.querySelector("#vPlay");
   if(play) play.onclick = () => {
     if(!audio.paused){ stopRead(); return; }
