@@ -2151,7 +2151,7 @@ bio:  { label:"Biology, pre-med, neuroscience",               m:760, rw:750, mT:
 hum:  { label:"Humanities, history, English, political science", m:740, rw:760, mT:"740+",   rwT:"760 to 800" }
 };
 const TOOL_GROUPS = [
-{ label:"Practice & progress", ids:["practice","mocktest","words","calc","scoreplan","dashboard","satcheck"] },
+{ label:"Practice & progress", ids:["practice","mocktest","calc","scoreplan","dashboard","satcheck"] },
 { label:"For parents & tutors", ids:["parent","tutor","checklists"] },
 { label:"Plan & apply", ids:["listbuilder","planner","apcredit","meritcalc","deadlines"] }
 ];
@@ -4401,7 +4401,7 @@ el.querySelectorAll("[data-unit]").forEach(b => b.onclick = () => { FX.unlock();
 wireSound(el, "gpSoundSet");
 const ss = $("#gpSoundSet"); if(ss){ const old = ss.onclick; ss.onclick = () => { old(); drawSetup(); }; }
 const tst = $("#gpSoundTest"); if(tst) tst.onclick = () => { FX.unlock(); FX.test(); };
-$("#gpCodeGo").onclick = () => { track("assignment-code-used"); try{ const a = readAssignCode($("#gpCode").value); startSet({ qs:a.qs, sec:a.sec, mode:a.mode, label:a.label, source:"assignment-code" }); }catch(e){ $("#gpCodeErr").textContent = e.message; } };
+$("#gpCodeGo").onclick = () => { track("assignment-code-used"); try{ startAssignment($("#gpCode").value, startSet); }catch(e){ $("#gpCodeErr").textContent = e.message; } };
 };
 const drawSetup = () => {
 el.dataset.en = isCourse(cfg.sec) ? "" : "1"; el.dataset.bn = ""; el.removeAttribute("lang");
@@ -4450,7 +4450,7 @@ ${n < cfg.len && n > 0 ? `<p class="muted small" style="margin:6px 0 0">This ${u
 <div class="ractions"><button class="btn" id="gpStart" ${n ? "" : "disabled"}>${n ? `Start ${n} question${n === 1 ? "" : "s"}` : "No questions match"}</button><button class="btn ghost" id="gpRecBtn">Practice my weakest ${unitWord}</button></div>
 </div>
 ${cfg.sec === "rw" ? `<div class="box" style="margin-top:20px"><h2 style="margin-top:0">Skill drills</h2><p class="small muted" style="margin:0 0 8px">A short lesson on one rule, then questions that practice just that rule.</p>
-${Object.entries(SKILL_DRILLS).filter(([, D]) => D.sec === "rw").map(([k, D]) => `<div class="drillrow"><span><strong>${D.title}</strong><small>${D.blurb}</small></span><button class="btn small" data-drill="${k}">Open</button></div>`).join("")}</div>` : ""}
+${Object.entries(SKILL_DRILLS).filter(([, D]) => D.sec === "rw").map(([k, D]) => `<div class="drillrow"><span><strong>${D.title}</strong><small>${D.blurb}</small></span><button class="btn small" data-drill="${k}">Open</button></div>`).join("")}</div>${vocabPracticeBox()}` : ""}
 <details class="box more" style="margin-top:20px"><summary>Have an assignment code from your tutor?</summary>
 <label class="fld" style="margin-top:10px"><span>Assignment code</span><textarea id="gpCode" class="codebox" rows="2" placeholder="OSA1…"></textarea></label>
 <div class="err" id="gpCodeErr" role="alert"></div>
@@ -4480,7 +4480,7 @@ $("#gpDom").onchange = e => { cfg.dom = e.target.value; saveCfg(); drawSetup(); 
 el.querySelectorAll("[data-drill]").forEach(b => b.onclick = () => drawDrill(b.dataset.drill));
 pbar.wire();
 $("#gpRecBtn").onclick = () => { track("weakest-skill-set", { section:cfg.sec }); const rec = recommendSet(getPD(activeProf().id).attempts, cfg.sec); toast(rec.label); startSet({ qs:rec.qs, sec:rec.sec, mode:cfg.mode, label:rec.label }); };
-$("#gpCodeGo").onclick = () => { track("assignment-code-used"); try{ const a = readAssignCode($("#gpCode").value); startSet({ qs:a.qs, sec:a.sec, mode:a.mode, label:a.label, source:"assignment-code" }); }catch(e){ $("#gpCodeErr").textContent = e.message; } };
+$("#gpCodeGo").onclick = () => { track("assignment-code-used"); try{ startAssignment($("#gpCode").value, startSet); }catch(e){ $("#gpCodeErr").textContent = e.message; } };
 $("#gpStart").onclick = () => {
 const qs = isCourse(cfg.sec) && cfg.diff === "mix" ? buildCourseSet(pool, cfg.len) : buildSet(pool, cfg.len, cfg.diff);
 startSet({ qs, mode:cfg.mode, sec:cfg.sec, label:"" });
@@ -5054,8 +5054,52 @@ return p;
 const saveProfiles = p => store.set("os_profiles", p);
 const activeProf = () => { const p = getProfiles(); return p.list.find(x => x.id === p.active); };
 const setActive = id => { const p = getProfiles(); if(p.list.some(x => x.id === id)){ p.active = id; saveProfiles(p); } };
-const getPD = id => { const d = store.get("os_pd_" + id, null) || {}; return { attempts: d.attempts || [], tests: d.tests || [], goal: d.goal || {}, mocks: d.mocks || [], mockSeen: d.mockSeen || [], plan: d.plan || null, mockPlan: d.mockPlan || null }; };
-const savePD = (id, d) => { if(d.attempts.length > 3000) d.attempts = d.attempts.slice(-3000); store.set("os_pd_" + id, d); };
+const vocabOf = v => ({ w: (v && v.w && typeof v.w === "object") ? v.w : {}, log: (v && Array.isArray(v.log)) ? v.log : [], asg: (v && Array.isArray(v.asg)) ? v.asg : [] });
+const getPD = id => { const d = store.get("os_pd_" + id, null) || {}; return { attempts: d.attempts || [], tests: d.tests || [], goal: d.goal || {}, mocks: d.mocks || [], mockSeen: d.mockSeen || [], plan: d.plan || null, mockPlan: d.mockPlan || null, vocab: vocabOf(d.vocab) }; };
+const savePD = (id, d) => { if(d.attempts.length > 3000) d.attempts = d.attempts.slice(-3000); if(d.vocab && d.vocab.log.length > 800) d.vocab.log = d.vocab.log.slice(-800); store.set("os_pd_" + id, d); };
+/* Words in context (vocabulary passages), part of Reading & Writing. Each student's record keeps vocab = {
+   w: { word: { r, w, last:"r"|"w"|"s", t } },
+   log: [{ p:passage id, t:start, e:last activity, s:active seconds, op:words tapped, ls:listened, qr/qn:latest quiz score }],
+   asg: [{ n:title, ids:[passage ids], t:assigned } ] }. */
+let PENDING_VOCAB = null;
+const VOCAB_LIST = () => typeof VOCAB !== "undefined" ? VOCAB : [];
+const vocabTitle = id => { const p = VOCAB_LIST().find(x => x.id === id); return p ? p.title : id; };
+const vocabDone = (V, id, since) => V.log.some(x => x.p === id && x.qn && (x.e || x.t) >= (since || 0));
+function vocabSummary(d, since){
+const V = d.vocab, all = VOCAB_LIST().flatMap(p => Object.keys(p.words));
+const L = since ? V.log.filter(x => (x.e || x.t) >= since) : V.log;
+return { learned: all.filter(w => V.w[w] && V.w[w].last === "r").length, total: all.length, secs: L.reduce((t, x) => t + (x.s || 0), 0),
+passages: new Set(V.log.filter(x => x.qn).map(x => x.p)).size, nPass: VOCAB_LIST().length };
+}
+function openVocabAssignment(a){ PENDING_VOCAB = a; openTool("words"); }
+function startAssignment(code, startSet){
+const a = readAssignCode(code);
+if(a.vocab){ openVocabAssignment({ ids:a.vocab, label:a.label }); return; }
+startSet({ qs:a.qs, sec:a.sec, mode:a.mode, label:a.label, source:"assignment-code" });
+}
+function vocabPracticeBox(){
+const d = getPD(activeProf().id), S = vocabSummary(d), wk = vocabSummary(d, Date.now() - 7 * DAY);
+return `<div class="box" style="margin-top:20px"><h2 style="margin-top:0">Words in context: vocabulary passages</h2>
+<p class="small muted" style="margin:0 0 8px">Short passages and poems with SAT words highlighted. Tap a word to see what it means in that sentence, listen along, then check yourself.</p>
+<p class="small" style="margin:0 0 10px">${S.learned} of ${S.total} words learned · ${S.passages} of ${S.nPass} passages checked · ${fmtDur(wk.secs)} this week</p>
+<button class="btn small" data-go="words">Open passages</button></div>`;
+}
+function vocabProgressBox(d){
+const now = Date.now(), V = d.vocab, S = vocabSummary(d), wk = vocabSummary(d, now - 7 * DAY);
+const L = V.log.filter(x => (x.e || x.t) >= now - 30 * DAY && (x.s || x.qn || x.op)).slice().sort((a, b) => b.t - a.t);
+const asg = V.asg.slice(-5).reverse();
+const when = t => new Date(t).toLocaleString([], { month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
+return `<div class="box"><h2>Words in context (vocabulary)</h2>
+<div class="tiles" style="margin:10px 0">
+<div class="tile"><span>Time spent</span><b>${fmtDur(S.secs)}</b><small>${fmtDur(wk.secs)} this week</small></div>
+<div class="tile"><span>Words learned</span><b>${S.learned} of ${S.total}</b><small>Right on the latest check</small></div>
+<div class="tile"><span>Passages checked</span><b>${S.passages} of ${S.nPass}</b><small>Quiz finished at least once</small></div></div>
+${asg.length ? `<p class="small" style="margin:0 0 4px"><strong>Assignments</strong></p>${asg.map(a => { const left = a.ids.filter(id => !vocabDone(V, id, a.t));
+return `<div class="check"><span class="${left.length ? "" : "ok"}" aria-hidden="true">${left.length ? "○" : "✓"}</span><span><strong>${esc(a.n)}</strong> <span class="muted">(assigned ${new Date(a.t).toLocaleDateString([], { month:"short", day:"numeric" })})</span>: ${a.ids.length - left.length} of ${a.ids.length} passages done${left.length ? `. Still to do: ${left.map(id => esc(vocabTitle(id))).join(", ")}` : ""}</span></div>`; }).join("")}` : ""}
+${L.length ? `<div class="pwtablewrap" style="margin-top:10px"><table class="pwtable"><thead><tr><th>When</th><th>Passage</th><th>Time</th><th>Words tapped</th><th>Quiz</th></tr></thead><tbody>${L.map(x => `<tr><td>${when(x.t)}</td><td>${esc(vocabTitle(x.p))}</td><td>${fmtDur(x.s || 0)}</td><td>${x.op || 0}</td><td>${x.qn ? `${x.qr} of ${x.qn}` : "—"}</td></tr>`).join("")}</tbody></table></div>`
+: `<p class="small muted" style="margin:0">No vocabulary practice in the last 30 days on this device. <button class="linkbtn" data-go="words">Open the passages</button></p>`}
+<p class="small muted" style="margin:8px 0 0">Time counts while a passage is open and the student is reading, tapping words, listening or answering. It pauses after 90 seconds without activity.</p></div>`;
+}
 function logAttempt(it, mode){
 if(it.logged || it.choice === null) return;
 it.logged = true;
@@ -5212,7 +5256,11 @@ function makeProgressCode(prof){
 const d = getPD(prof.id), since = Date.now() - 120 * DAY;
 const a = d.attempts.filter(x => x.t >= since).slice(-600).map(x => [x.q, Math.round(x.t / 60000), x.ok, x.p, x.s, x.m, x.h ? x.h.join(".") : "", x.tp == null ? "" : x.tp]);
 const mp = d.mockPlan ? { t:Math.round(d.mockPlan.t / 60000), i:d.mockPlan.items.map(x => [x.sec, x.dom, x.missed, x.n]) } : undefined;
-return "OSP1." + b64e(JSON.stringify({ n:prof.name, g:prof.grade, a, ts:d.tests.slice(-30), goal:d.goal, mp }));
+const V = d.vocab, vw = {}; Object.entries(V.w).forEach(([k, x]) => { vw[k] = [x.r || 0, x.w || 0, x.last || "s"]; });
+const vl = V.log.filter(x => (x.e || x.t) >= since).slice(-300).map(x => [x.p, Math.round(x.t / 60000), x.s || 0, x.op || 0, x.qr == null ? "" : x.qr, x.qn || 0, Math.round((x.e || x.t) / 60000)]);
+const va = V.asg.slice(-20).map(x => [x.n, x.ids, Math.round(x.t / 60000)]);
+const v = vl.length || va.length || Object.keys(vw).length ? { w:vw, l:vl, a:va } : undefined;
+return "OSP1." + b64e(JSON.stringify({ n:prof.name, g:prof.grade, a, ts:d.tests.slice(-30), goal:d.goal, mp, v }));
 }
 function findCode(raw, prefix){
 const s = String(raw || ""), i = s.indexOf(prefix);
@@ -5230,6 +5278,10 @@ throw new Error("That doesn't look like a My OpenShelf progress code.");
 if(!o) throw new Error("The code seems incomplete. Copy the whole code and try again.");
 return { name:o.n || "Student", grade:o.g || "", goal:o.goal || {}, tests:Array.isArray(o.ts) ? o.ts : [],
 mockPlan:o.mp && Array.isArray(o.mp.i) ? { t:o.mp.t * 60000, items:o.mp.i.filter(r => PQ_DOMAINS[r[1]]).map(r => ({ sec:r[0], dom:r[1], missed:r[2], n:r[3] })) } : null,
+vocab:o.v && typeof o.v === "object" ? {
+w:Object.fromEntries(Object.entries(o.v.w || {}).filter(([, r]) => Array.isArray(r)).map(([k, r]) => [k, { r:+r[0] || 0, w:+r[1] || 0, last:r[2] || "s", t:0 }])),
+log:(o.v.l || []).filter(r => Array.isArray(r) && r[0]).map(r => { const x = { p:r[0], t:r[1] * 60000, e:(r[6] || r[1]) * 60000, s:+r[2] || 0, op:+r[3] || 0, qn:+r[5] || 0 }; if(r[4] !== "" && r[4] != null) x.qr = +r[4]; return x; }),
+asg:(o.v.a || []).filter(r => Array.isArray(r) && Array.isArray(r[1])).map(r => ({ n:String(r[0] || "Assignment"), ids:r[1], t:r[2] * 60000 })) } : null,
 attempts:(o.a || []).filter(r => QBY[r[0]]).map(r => { const e = { q:r[0], t:r[1] * 60000, ok:r[2] ? 1 : 0, p:r[3], s:r[4], m:r[5] }; if(r[6]) e.h = String(r[6]).split(".").map(Number); if(r[7] !== "" && r[7] != null) e.tp = +r[7]; return e; }) };
 }
 function mergeInto(id, imp){
@@ -5242,6 +5294,14 @@ const tk = new Set(d.tests.map(t => `${t.date}|${t.math}|${t.rw}`));
 imp.tests.forEach(t => { if(!tk.has(`${t.date}|${t.math}|${t.rw}`)) d.tests.push(t); });
 if(imp.goal && imp.goal.total && !d.goal.total) d.goal = imp.goal;
 if(imp.mockPlan && imp.mockPlan.items.length && (!d.mockPlan || imp.mockPlan.t > d.mockPlan.t)) d.mockPlan = imp.mockPlan;
+if(imp.vocab){
+const V = d.vocab, vk = x => x.p + "@" + Math.round(x.t / 60000), byKey = new Map(V.log.map(x => [vk(x), x]));
+imp.vocab.log.forEach(x => { const y = byKey.get(vk(x)); if(!y){ V.log.push(x); byKey.set(vk(x), x); added++; } else if((x.s || 0) > (y.s || 0) || (x.qn && !y.qn)) Object.assign(y, x); });
+V.log.sort((a, b) => a.t - b.t);
+Object.entries(imp.vocab.w).forEach(([k, x]) => { const y = V.w[k]; if(!y || x.r + x.w > (y.r || 0) + (y.w || 0)) V.w[k] = x; });
+const ak = a => a.n + "|" + a.ids.join(","), haveA = new Set(V.asg.map(ak));
+imp.vocab.asg.forEach(a => { if(!haveA.has(ak(a))){ V.asg.push(a); haveA.add(ak(a)); } });
+}
 savePD(id, d); return added;
 }
 const makeAssignCode = a => "OSA1." + b64e(JSON.stringify(a));
@@ -5252,6 +5312,11 @@ if(String(code).includes("OSP1.")) throw new Error("That's a progress code, not 
 throw new Error("That doesn't look like an assignment code.");
 }
 if(!o) throw new Error("The code seems incomplete. Copy the whole code and try again.");
+if(Array.isArray(o.v)){
+const ids = o.v.filter(id => VOCAB_LIST().some(p => p.id === id));
+if(!ids.length) throw new Error("This assignment has no passages this site recognizes. Refresh the page and try again.");
+return { label:o.n || "Vocabulary passages", vocab:ids };
+}
 const qs = (o.ids || []).map(id => QBY[id]).filter(Boolean);
 if(!qs.length) throw new Error("This assignment has no questions this site recognizes.");
 return { label:o.n || "Assignment", sec:qs[0].sec, mode:o.mode || "guided", qs };
@@ -5417,6 +5482,7 @@ return `<div class="box"><h2>Practice history</h2><p class="muted small" style="
 ${rows}${S.length > 8 ? `<button class="linkbtn small" id="phMore">Show all ${S.length} sessions</button>` : ""}
 <p class="small muted" style="margin:10px 0 0">Practice is saved on the device where it was done. To see a student's practice from their own phone or computer, have them copy their progress code at the bottom of this page, then import it in <button class="linkbtn" data-go="tutor">Tutor &amp; family view</button>.</p></div>`;
 })()}
+${vocabProgressBox(d)}
 <div class="box"><h2>Trends</h2>
 <p class="small" style="margin:0"><strong>Weekly accuracy</strong> <span class="muted">(weeks with 3+ questions)</span></p>
 ${lineChart([{ name:"Math", color:"var(--c-sat)", pts:accWeek("math") }, { name:"Reading & Writing", color:"var(--c-courses)", pts:accWeek("rw") }].concat(COURSES.filter(c => A.some(x => qOf(x) && qOf(x).sec === c.id)).map((c, i) => ({ name:c.label, color:["var(--c-apply)","var(--c-schools)","var(--c-warn)"][i % 3], pts:accWeek(c.id) }))), { min:0, max:100, fmt:v => Math.round(v) + "%", label:"Weekly accuracy by section" })}
@@ -5502,6 +5568,7 @@ const upcoming = (typeof allDeadlines === "function" ? allDeadlines() : []).map(
 const clDone = store.get("os_check", {}), clGrade = store.get("os_checkgrade", 9), clItems = (typeof CHECKLISTS !== "undefined" ? CHECKLISTS[clGrade] : []) || [];
 const clN = clItems.filter((_, i) => clDone[`${clGrade}-${i}`]).length;
 const delta = sw.p != null && sp.p != null ? Math.round((sw.p - sp.p) * 100) : null;
+const vWk = vocabSummary(d, now - 7 * DAY), vAll = vocabSummary(d);
 const lines = [
 `My OpenShelf weekly SAT report for ${prof.name} (${new Date().toLocaleDateString()})`,
 `Practice: ${wk.length} questions on ${days} day(s), about ${mins} minutes.`,
@@ -5509,6 +5576,7 @@ const lines = [
 skills.length ? `Strongest skill: ${PQ_DOMAINS[skills[skills.length - 1].k]} (${pct(skills[skills.length - 1].st.p)}). Needs work: ${PQ_DOMAINS[skills[0].k]} (${pct(skills[0].st.p)}).` : "",
 trapTop ? `Most common mistake: ${TRAP_INFO[trapTop[0]].label}.` : "",
 goal.total && last ? `Goal: ${goal.total}. Latest practice test: ${last.math + last.rw}.` : "",
+vWk.secs ? `Words in context (vocabulary): about ${Math.max(1, Math.round(vWk.secs / 60))} minutes this week; ${vAll.learned} of ${vAll.total} words learned.` : "",
 `Next focus: ${rec.why}`,
 upcoming.length ? `Coming up: ${upcoming.map(x => `${x.title} (${x.date.toLocaleDateString(undefined, { month:"short", day:"numeric" })})`).join("; ")}.` : ""
 ].filter(Boolean).join("\n");
@@ -5528,6 +5596,7 @@ ${lt ? `<p class="small muted" style="margin-top:8px">College list goal = the mi
 <div class="tile"><span>Accuracy</span><b>${pct(sw.p)}</b><small>${delta == null ? "No comparison yet" : (delta >= 0 ? "+" : "") + delta + " pts vs. last week"}</small></div>
 <div class="tile"><span>Days practiced</span><b>${days} of 7</b><small>${days >= 4 ? "Consistent" : "Aim for 4+ days"}</small></div>
 <div class="tile"><span>Time practicing</span><b>${mins} min</b><small>About ${wk.length ? Math.round(mins / Math.max(1, days)) : 0} min per active day</small></div>
+<div class="tile"><span>Vocabulary passages</span><b>${Math.round(vWk.secs / 60)} min</b><small>${vAll.learned} of ${vAll.total} words learned</small></div>
 </div>
 ${skills.length ? `<div class="check"><span class="ok" aria-hidden="true">▲</span><span><strong>Strongest:</strong> ${PQ_DOMAINS[skills[skills.length - 1].k]} (${pct(skills[skills.length - 1].st.p)})</span></div><div class="check"><span class="gap" aria-hidden="true">▼</span><span><strong>Needs work:</strong> ${PQ_DOMAINS[skills[0].k]} (${pct(skills[0].st.p)})</span></div>` : `<p class="small">Not enough practice this week to compare skills.</p>`}
 ${trapTop ? `<div class="check"><span class="gap" aria-hidden="true">!</span><span><strong>Most common mistake:</strong> ${TRAP_INFO[trapTop[0]].label} (${trapTop[1]}×). ${TRAP_INFO[trapTop[0]].tip}</span></div>` : ""}
@@ -5568,15 +5637,16 @@ const doms = Object.keys(PQ_DOMAINS);
 const secDoms = Object.keys(PQ_DOMAINS).filter(k => PRACTICE_PQ.some(q => q.sec === asg.sec && q.dom === k));
 asg.doms = asg.doms.filter(k => secDoms.includes(k));
 const pool = PRACTICE_PQ.filter(q => q.sec === asg.sec && (!asg.doms.length || asg.doms.includes(q.dom)));
+const isV = asg.sec === "vocab"; asg.vp = (asg.vp || []).filter(id => VOCAB_LIST().some(p => p.id === id));
 const n = Math.min(asg.n, asg.diff === "mix" ? pool.length : pool.filter(q => q.diff === asg.diff).length);
 const ago = t => { if(!t) return "No practice yet"; const dd = Math.floor((now - t) / DAY); return dd === 0 ? "Active today" : dd === 1 ? "Active yesterday" : `Active ${dd} days ago`; };
 el.innerHTML = `
 <h1>Tutor &amp; family view</h1>
 <p class="muted">Track several students on this device, compare skills side by side, create assignments, and import progress codes from students practicing on their own phones.</p>
 <div class="box"><h2>Students</h2>
-${rows.map(({ pr, A, a30, lt, tr, lastT }) => `<div class="stu">
+${rows.map(({ pr, d, A, a30, lt, tr, lastT }) => `<div class="stu">
 <div class="srtop"><span>${esc(pr.name)}${pr.grade ? ` <small class="muted">grade ${esc(pr.grade)}</small>` : ""}${pr.id === P.active ? ' <small class="tag within">Active</small>' : ""}</span><span class="small muted">${ago(lastT)}</span></div>
-<p class="small" style="margin:4px 0 0">${A.length} questions · ${pct(stat(a30).p)} accuracy (30 days) · Latest practice test: ${lt ? `<strong>${lt.math + lt.rw}</strong>` : "—"}${tr ? ` · Top mistake: ${TRAP_INFO[tr[0]].label}` : ""}</p>
+<p class="small" style="margin:4px 0 0">${A.length} questions · ${pct(stat(a30).p)} accuracy (30 days) · Latest practice test: ${lt ? `<strong>${lt.math + lt.rw}</strong>` : "—"}${tr ? ` · Top mistake: ${TRAP_INFO[tr[0]].label}` : ""}${(() => { const vs = vocabSummary(d); return vs.secs || vs.learned ? ` · Vocabulary: ${vs.learned} words learned${vs.secs ? `, ${fmtDur(vs.secs)}` : ""}` : ""; })()}</p>
 <div class="rowbtns"><button class="linkbtn" data-open="${pr.id}">Open dashboard</button><button class="linkbtn" data-report="${pr.id}">Parent report</button>${P.list.length > 1 ? `<button class="linkbtn" data-del="${pr.id}">Remove</button>` : ""}</div></div>`).join("")}
 <div class="form-row" style="margin-top:14px"><label class="fld"><span>Student name</span><input id="stName" maxlength="40" placeholder="e.g. Aisha"></label><label class="fld"><span>Grade</span><input id="stGrade" maxlength="4" inputmode="numeric" placeholder="e.g. 11"></label></div>
 <div class="err" id="stErr" role="alert"></div>
@@ -5587,7 +5657,11 @@ ${rows.map(({ pr, A, a30, lt, tr, lastT }) => `<div class="stu">
 <div class="box"><h2>Create an assignment</h2>
 <label class="fld"><span>Title</span><input id="asTitle" maxlength="50" placeholder="e.g. Week 3: data analysis" value="${esc(asg.title)}"></label>
 <p class="small" style="margin:12px 0 6px"><strong>Section</strong></p>
-<div class="chips"><button class="chip" data-as="sec" data-v="math" aria-pressed="${asg.sec === "math"}">SAT Math</button><button class="chip" data-as="sec" data-v="rw" aria-pressed="${asg.sec === "rw"}">SAT Reading &amp; Writing</button>${COURSES.map(c => `<button class="chip" data-as="sec" data-v="${c.id}" aria-pressed="${asg.sec === c.id}">${c.label}</button>`).join("")}</div>
+<div class="chips"><button class="chip" data-as="sec" data-v="math" aria-pressed="${asg.sec === "math"}">SAT Math</button><button class="chip" data-as="sec" data-v="rw" aria-pressed="${asg.sec === "rw"}">SAT Reading &amp; Writing</button><button class="chip" data-as="sec" data-v="vocab" aria-pressed="${isV}">R&amp;W: Words in context (vocabulary)</button>${COURSES.map(c => `<button class="chip" data-as="sec" data-v="${c.id}" aria-pressed="${asg.sec === c.id}">${c.label}</button>`).join("")}</div>
+${isV ? `<p class="small" style="margin:12px 0 4px"><strong>Passages</strong> <span class="muted">(pick one or more)</span></p>
+<div class="checkgrid">${VOCAB_LIST().map(p => `<label><input type="checkbox" data-vp="${p.id}" ${asg.vp.includes(p.id) ? "checked" : ""}> ${esc(p.title)} <small class="muted">${esc(p.topic)}</small></label>`).join("")}</div>
+<p class="small muted" style="margin:10px 0 0">${asg.vp.length ? `${asg.vp.length} passage${asg.vp.length === 1 ? "" : "s"}, ${asg.vp.length * 6} words. A passage counts as done when the student finishes its “Check yourself” quiz. Time spent shows on their My progress page.` : "Pick at least one passage."}</p>
+<div class="ractions"><button class="btn" id="asStart" ${asg.vp.length ? "" : "disabled"}>Start now as ${esc(activeProf().name)}</button><button class="btn ghost" id="asCode" ${asg.vp.length ? "" : "disabled"}>Get assignment code</button></div>` : `
 <p class="small" style="margin:12px 0 4px"><strong>Skill areas</strong> <span class="muted">(none checked = all)</span></p>
 <div class="checkgrid">${secDoms.map(k => `<label><input type="checkbox" data-dom="${k}" ${asg.doms.includes(k) ? "checked" : ""}> ${PQ_DOMAINS[k]}</label>`).join("")}</div>
 <p class="small" style="margin:12px 0 6px"><strong>Difficulty</strong></p>
@@ -5597,7 +5671,7 @@ ${rows.map(({ pr, A, a30, lt, tr, lastT }) => `<div class="stu">
 <p class="small" style="margin:12px 0 6px"><strong>Mode</strong></p>
 <div class="chips"><button class="chip" data-as="mode" data-v="guided" aria-pressed="${asg.mode === "guided"}">Instructor guided</button><button class="chip" data-as="mode" data-v="test" aria-pressed="${asg.mode === "test"}">Test mode</button></div>
 <p class="small muted" style="margin:10px 0 0">${n ? `${n} questions available for this assignment.` : "No questions match. Try more skill areas or another difficulty."}</p>
-<div class="ractions"><button class="btn" id="asStart" ${n ? "" : "disabled"}>Start now as ${esc(activeProf().name)}</button><button class="btn ghost" id="asCode" ${n ? "" : "disabled"}>Get assignment code</button></div>
+<div class="ractions"><button class="btn" id="asStart" ${n ? "" : "disabled"}>Start now as ${esc(activeProf().name)}</button><button class="btn ghost" id="asCode" ${n ? "" : "disabled"}>Get assignment code</button></div>`}
 <div id="asOut"></div></div>
 <div class="box"><h2>Import a progress code</h2>
 <p class="small">Students find their code on <strong>My progress</strong> → Share progress. Paste it here to add their results to a student on this device.</p>
@@ -5625,9 +5699,16 @@ const saveAsg = () => store.set("os_asg", asg);
 $("#asTitle").oninput = e => { asg.title = e.target.value; saveAsg(); };
 el.querySelectorAll("[data-as]").forEach(b => b.onclick = () => { const k = b.dataset.as; asg[k] = k === "n" ? +b.dataset.v : b.dataset.v; if(k === "sec") asg.doms = []; saveAsg(); draw(); });
 el.querySelectorAll("[data-dom]").forEach(c => c.onchange = () => { asg.doms = c.checked ? asg.doms.concat(c.dataset.dom) : asg.doms.filter(k => k !== c.dataset.dom); saveAsg(); draw(); });
+el.querySelectorAll("[data-vp]").forEach(c => c.onchange = () => { const all = VOCAB_LIST().map(p => p.id), on = new Set(c.checked ? asg.vp.concat(c.dataset.vp) : asg.vp.filter(k => k !== c.dataset.vp)); asg.vp = all.filter(id => on.has(id)); saveAsg(); draw(); });
 const makeQs = () => buildSet(pool, asg.n, asg.diff);
-$("#asStart").onclick = () => { track("assignment-start-now", { section:asg.sec }); const qs = makeQs(); PENDING_SET = { qs, sec:asg.sec, label: asg.title || "Assignment", mode:asg.mode, source:"tutor-assignment" }; openTool("practice"); };
-$("#asCode").onclick = () => { track("assignment-create", { section:asg.sec, questions:asg.n, mode:asg.mode });
+$("#asStart").onclick = () => { track("assignment-start-now", { section:asg.sec });
+if(isV){ openVocabAssignment({ ids:asg.vp.slice(), label:asg.title || "Vocabulary passages" }); return; }
+const qs = makeQs(); PENDING_SET = { qs, sec:asg.sec, label: asg.title || "Assignment", mode:asg.mode, source:"tutor-assignment" }; openTool("practice"); };
+$("#asCode").onclick = () => { track("assignment-create", { section:asg.sec, questions: isV ? asg.vp.length : asg.n, mode:asg.mode });
+if(isV){
+$("#asOut").innerHTML = `<div style="margin-top:14px">${copyBlock(makeAssignCode({ n: asg.title || "Vocabulary passages", v: asg.vp }), `Assignment code (${asg.vp.length} passage${asg.vp.length === 1 ? "" : "s"})`)}<p class="small muted">Send this code to the student. They open <strong>Practice</strong> → <strong>Reading &amp; Writing</strong>, tap <strong>“Have an assignment code from your tutor?”</strong>, paste it and tap <strong>Start assignment</strong>. The passages open in Words in context, and their progress and time spent show on their <strong>My progress</strong> page.</p></div>`;
+wireCopy($("#asOut")); return;
+}
 const qs = makeQs();
 $("#asOut").innerHTML = `<div style="margin-top:14px">${copyBlock(makeAssignCode({ n: asg.title || "Assignment", ids: qs.map(q => q.id), mode: asg.mode }), `Assignment code (${qs.length} questions)`)}<p class="small muted">Send this code to the student. They open <strong>Practice</strong>${COURSES.some(c => c.id === asg.sec) ? " → <strong>Math courses</strong>" : ""}, tap <strong>“Have an assignment code from your tutor?”</strong>, paste it and tap <strong>Start assignment</strong>. Everyone who uses the code gets the same questions.</p></div>`;
 wireCopy($("#asOut"));
@@ -7176,13 +7257,44 @@ return { cur, next, pts: next ? next.min - score : null, gain: next ? next.amt -
 }
 /* Words in context: read a short original passage (or listen, with each word lit up as it's spoken), tap the
    highlighted words to see what they mean in that sentence, then check yourself on new sentences.
-   Progress per word is kept on this device in os_words: { word: { r:right, w:wrong, last:"r"|"w"|"s", t:time } }. */
+   Progress per word, time spent and assignments are kept in each student's record (os_pd_<id>.vocab; see vocabOf). */
 function renderWords(el){
-const W = store.get("os_words", {});
-const save = () => store.set("os_words", W);
-const list = typeof VOCAB !== "undefined" ? VOCAB : [];
+const list = VOCAB_LIST();
+let prof = activeProf(), V = getPD(prof.id).vocab, W = V.w;
+const save = () => { const dd = getPD(prof.id); dd.vocab = V; savePD(prof.id, dd); };
+{ /* word progress used to be kept for the whole device; move it to the active student once */
+  const old = store.get("os_words", null);
+  if(old && typeof old === "object" && Object.keys(old).length){ Object.entries(old).forEach(([k, x]) => { if(!W[k]) W[k] = x; }); save(); }
+  if(old) store.del("os_words");
+}
+if(PENDING_VOCAB){   /* opened from an assignment */
+  const a = PENDING_VOCAB; PENDING_VOCAB = null;
+  let x = V.asg.find(y => y.n === a.label && y.ids.join(",") === a.ids.join(","));
+  if(!x){ x = { n:a.label, ids:a.ids.slice(), t:Date.now() }; V.asg.push(x); save(); track("vocab-assignment-open", { passages:a.ids.length }); }
+  store.set("os_words_p", x.ids.find(id => !vocabDone(V, id, x.t)) || x.ids[0]);
+}
 let cur = list.find(p => p.id === store.get("os_words_p", "")) || list[0];
 const audio = new Audio(); audio.preload = "none";
+/* Time spent: every 10 seconds, count the time if the page is visible and the student did something in the last
+   90 seconds (or the narration is playing). Time on one passage within 30 minutes is one session. */
+const gen = el._vgen = (el._vgen || 0) + 1;
+let sess = null, lastAct = Date.now();
+const act = () => { if(el._vgen === gen) lastAct = Date.now(); };
+["pointerdown", "keydown", "wheel", "touchstart"].forEach(ev => el.addEventListener(ev, act, { passive:true }));
+const sesNow = () => {
+  const now = Date.now();
+  if(sess && sess.p === cur.id && now - sess.e < 30 * 60000 && V.log.includes(sess)) return sess;
+  const last = V.log[V.log.length - 1];
+  sess = last && last.p === cur.id && now - (last.e || last.t) < 30 * 60000 ? last : null;
+  if(!sess){ sess = { p:cur.id, t:now, e:now, s:0, op:0 }; V.log.push(sess); }
+  return sess;
+};
+const tick = setInterval(() => {
+  if(el._vgen !== gen || !el.querySelector("#vPass")){ clearInterval(tick); return; }
+  if($("#toolView").hidden || document.hidden) return;
+  if(audio.paused && Date.now() - lastAct > 90000) return;
+  const x = sesNow(); x.s += 10; x.e = Date.now(); save();
+}, 10000);
 let raf = 0, lastOn = -1;
 const status = w => { const x = W[w]; return !x ? "new" : x.last === "r" ? "learned" : x.last === "w" ? "review" : "seen"; };
 const LBL = { new:"New", seen:"Seen", learned:"Learned", review:"Review" };
@@ -7226,7 +7338,8 @@ function placePop(b){
 function openPop(b){
   const w = b.dataset.w, pop = el.querySelector("#vPop");
   if(popFor === b && !pop.hidden){ closePop(); return; }
-  if(!W[w]){ W[w] = { r:0, w:0, last:"s", t:Date.now() }; save(); }
+  if(!W[w]) W[w] = { r:0, w:0, last:"s", t:Date.now() };
+  const x = sesNow(); x.op = (x.op || 0) + 1; x.e = Date.now(); save();
   el.querySelectorAll(".vkey.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel");
   pop.innerHTML = `<button class="vx" aria-label="Close">×</button>${card(w)}`; pop.hidden = false; popFor = b; placePop(b);
   pop.querySelector(".vx").onclick = () => closePop(true);
@@ -7246,12 +7359,22 @@ function draw(){
   const keys = Object.keys(cur.words);
   const done = keys.filter(w => W[w] && W[w].last === "r").length;
   const all = list.flatMap(p => Object.keys(p.words));
+  const pb = profileBar("Practicing as", () => { prof = activeProf(); V = getPD(prof.id).vocab; W = V.w; sess = null; draw(); });
+  const asgShow = V.asg.filter(a => a.ids.some(id => !vocabDone(V, id, a.t)) || Date.now() - a.t < 7 * DAY).slice(-3).reverse();
+  const asgHtml = asgShow.map(a => { const dn = a.ids.filter(id => vocabDone(V, id, a.t)).length;
+    return `<div class="box vasg"><p class="small" style="margin:0 0 8px"><strong>Assignment: ${esc(a.n)}</strong> · ${dn} of ${a.ids.length} passages done${dn === a.ids.length ? " ✓" : ""}</p>
+    <div class="chips">${a.ids.map(id => `<button class="chip" data-vp="${esc(id)}" aria-pressed="${id === cur.id}">${vocabDone(V, id, a.t) ? "✓ " : ""}${esc(vocabTitle(id))}</button>`).join("")}</div>
+    <p class="small muted" style="margin:8px 0 0">A passage is done when you finish its “Check yourself” quiz.</p></div>`; }).join("");
+  const mySecs = V.log.filter(x => x.p === cur.id).reduce((t, x) => t + (x.s || 0), 0);
   el.innerHTML = `
+  <p class="small" style="margin:0 0 6px"><button class="linkbtn" id="vToRW">← Reading &amp; Writing practice</button></p>
   <h1>Words in context</h1>
   <p class="muted">The SAT doesn't test word lists. It asks what a word means <em>in a particular sentence</em>, often a common word used in a less common way. Read (or listen to) the passage, tap each <span class="vkeydemo">highlighted word</span> to see what it means here, then check yourself.</p>
-  ${list.length > 1 ? `<label class="fld"><span>Passage</span><select id="vPick">${list.map(p => `<option value="${p.id}"${p === cur ? " selected" : ""}>${esc(p.title)}</option>`).join("")}</select></label>` : ""}
+  ${pb.html}
+  ${asgHtml}
+  ${list.length > 1 ? `<label class="fld"><span>Passage</span><select id="vPick">${list.map(p => `<option value="${p.id}"${p === cur ? " selected" : ""}>${vocabDone(V, p.id) ? "✓ " : ""}${esc(p.title)}</option>`).join("")}</select></label>` : ""}
   <div class="box vbox">
-    <p class="small muted vmeta">${esc(cur.topic)} · ${keys.length} words to learn · ${done} learned</p>
+    <p class="small muted vmeta">${esc(cur.topic)} · ${keys.length} words to learn · ${done} learned${mySecs >= 60 ? ` · ${fmtDur(mySecs)} spent` : ""}</p>
     <h2>${esc(cur.title)}</h2>
     <div class="vpass${cur.poem ? " poem" : ""}" id="vPass">${passage}</div>
     <div class="ractions" style="margin-top:12px">${cur.t ? `<button class="btn small" id="vPlay">▶ Listen</button>` : ""}<button class="btn ghost small" id="vGoQuiz">Check yourself</button></div>
@@ -7262,7 +7385,15 @@ function draw(){
   <details class="box more"><summary>My words (${all.filter(w => status(w) === "learned").length} of ${all.length} learned)</summary>
   <div class="vmy">${all.map(w => `<span class="vchip ${status(w)}">${esc(w)} · ${LBL[status(w)]}</span>`).join("")}</div>
   <p class="small muted">Learned means you got it right the last time it was quizzed. Words marked Review come back first next time.</p></details>
-  <p class="small muted">All passages are original and written for ${esc(SITE.name)}. More passages are on the way.</p>`;
+  <details class="box more"><summary>Have an assignment code from your tutor?</summary>
+  <label class="fld" style="margin-top:10px"><span>Assignment code</span><textarea id="vCode" class="codebox" rows="2" placeholder="OSA1…"></textarea></label>
+  <div class="err" id="vCodeErr" role="alert"></div>
+  <button class="btn small" id="vCodeGo">Start assignment</button></details>
+  <p class="small muted">All passages are original and written for ${esc(SITE.name)}. Time spent and quiz results show on <button class="linkbtn" data-go="dashboard">My progress</button>.</p>`;
+  pb.wire();
+  el.querySelector("#vToRW").onclick = () => { stopRead(); const c = store.get("os_gp", { sec:"math", len:10, diff:"mix", mode:"guided", dom:"all" }); c.sec = "rw"; c.dom = "all"; store.set("os_gp", c); store.set("os_gp_lastSat", "rw"); openTool("practice"); };
+  el.querySelectorAll("[data-vp]").forEach(b => b.onclick = () => { cur = list.find(p => p.id === b.dataset.vp) || cur; store.set("os_words_p", cur.id); draw(); });
+  el.querySelector("#vCodeGo").onclick = () => { track("assignment-code-used"); try{ startAssignment(el.querySelector("#vCode").value, ps => { PENDING_SET = ps; openTool("practice"); }); }catch(e){ el.querySelector("#vCodeErr").textContent = e.message; } };
   const pick = el.querySelector("#vPick"); if(pick) pick.onchange = () => { cur = list.find(p => p.id === pick.value); store.set("os_words_p", cur.id); draw(); };
   popFor = null;
   el.querySelectorAll(".vkey").forEach(b => b.onclick = () => openPop(b));
@@ -7270,7 +7401,7 @@ function draw(){
   if(play) play.onclick = () => {
     if(!audio.paused){ stopRead(); return; }
     if(!audio.src.endsWith(`audio/${cur.id}.mp3`)) audio.src = `audio/${cur.id}.mp3`;
-    audio.play().then(() => { play.innerHTML = "❚❚ Pause"; raf = requestAnimationFrame(lightUp); track("word-listen", { passage:cur.id }); })
+    audio.play().then(() => { play.innerHTML = "❚❚ Pause"; const x = sesNow(); x.ls = 1; x.e = Date.now(); save(); raf = requestAnimationFrame(lightUp); track("word-listen", { passage:cur.id }); })
       .catch(() => toast("The narration couldn't load. Check your connection and try again."));
   };
   el.querySelector("#vGoQuiz").onclick = () => { stopRead(); quiz(); };
@@ -7285,6 +7416,7 @@ function quiz(){
       box.innerHTML = `<h2>Done: ${right} of ${qs.length}</h2><p>${right === qs.length ? "Every word learned. Nice work." : "Words you missed are marked Review. They'll come first next time, so try this check again in a day or two."}</p>
       <div class="ractions"><button class="btn small" id="vAgain">Try again</button><button class="btn ghost small" id="vBack">Back to the passage</button></div>`;
       box.querySelector("#vAgain").onclick = quiz; box.querySelector("#vBack").onclick = draw;
+      { const x = sesNow(); x.qr = right; x.qn = qs.length; x.e = Date.now(); save(); }
       track("word-quiz", { passage:cur.id, right, of:qs.length }); return;
     }
     const q = qs[n], order = shuffle([0, 1, 2, 3]);
