@@ -422,6 +422,8 @@ details.more summary{cursor:pointer;font-weight:650}
 .checkgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin:6px 0}
 .checkgrid label{display:flex;gap:8px;align-items:flex-start;font-size:.9375rem;line-height:1.25}
 .checkgrid input{width:18px;height:18px;accent-color:var(--c-sat);flex:0 0 auto;margin-top:1px}
+.checkgrid.vpgrid label small{margin-left:auto;padding-left:8px;white-space:nowrap}
+@media (max-width:560px){.checkgrid.vpgrid{grid-template-columns:1fr}}
 .gaprow{margin:10px 0}
 .gapbar{position:relative;height:12px;border-radius:6px;background:var(--line);margin:6px 0 2px;overflow:hidden}
 .gapbar i{position:absolute;left:0;top:0;bottom:0;background:var(--c-sat);border-radius:6px}
@@ -5655,13 +5657,16 @@ ${rows.map(({ pr, d, A, a30, lt, tr, lastT }) => `<div class="stu">
 <div class="tablewrap"><table class="heat wide-heat"><thead><tr><th>Student</th>${doms.map(k => `<th>${SKILL_SHORT[k]}</th>`).join("")}</tr></thead>
 <tbody>${rows.map(({ pr, A }) => { const r = A.filter(x => x.t >= now - 90 * DAY); return `<tr><th>${esc(pr.name)}</th>${doms.map(k => heatCell(mstat(r, x => qOf(x) && qOf(x).dom === k))).join("")}</tr>`; }).join("")}</tbody></table></div></div>
 <div class="box"><h2>Create an assignment</h2>
-<label class="fld"><span>Title</span><input id="asTitle" maxlength="50" placeholder="e.g. Week 3: data analysis" value="${esc(asg.title)}"></label>
+<div class="form-row"><label class="fld"><span>Student</span><select id="asWho">${P.list.map(x => `<option value="${x.id}" ${x.id === P.active ? "selected" : ""}>${esc(x.name)}${x.grade ? ` (grade ${esc(x.grade)})` : ""}</option>`).join("")}<option value="__add">Add a student…</option></select></label>
+<label class="fld"><span>Title</span><input id="asTitle" maxlength="50" placeholder="e.g. Week 3: data analysis" value="${esc(asg.title)}"></label></div>
+${P.list.length < 2 ? `<p class="small muted" style="margin:6px 0 0">Only one student so far. Add each child or student in <strong>Students</strong> above, then choose who this assignment is for.</p>` : ""}
 <p class="small" style="margin:12px 0 6px"><strong>Section</strong></p>
 <div class="chips"><button class="chip" data-as="sec" data-v="math" aria-pressed="${asg.sec === "math"}">SAT Math</button><button class="chip" data-as="sec" data-v="rw" aria-pressed="${asg.sec === "rw"}">SAT Reading &amp; Writing</button><button class="chip" data-as="sec" data-v="vocab" aria-pressed="${isV}">R&amp;W: Words in context (vocabulary)</button>${COURSES.map(c => `<button class="chip" data-as="sec" data-v="${c.id}" aria-pressed="${asg.sec === c.id}">${c.label}</button>`).join("")}</div>
 ${isV ? `<p class="small" style="margin:12px 0 4px"><strong>Passages</strong> <span class="muted">(pick one or more)</span></p>
-<div class="checkgrid">${VOCAB_LIST().map(p => `<label><input type="checkbox" data-vp="${p.id}" ${asg.vp.includes(p.id) ? "checked" : ""}> ${esc(p.title)} <small class="muted">${esc(p.topic)}</small></label>`).join("")}</div>
+<div class="checkgrid vpgrid">${VOCAB_LIST().map(p => `<label><input type="checkbox" data-vp="${p.id}" ${asg.vp.includes(p.id) ? "checked" : ""}> ${esc(p.title)} <small class="muted">${esc(p.topic)}</small></label>`).join("")}</div>
 <p class="small muted" style="margin:10px 0 0">${asg.vp.length ? `${asg.vp.length} passage${asg.vp.length === 1 ? "" : "s"}, ${asg.vp.length * 6} words. A passage counts as done when the student finishes its “Check yourself” quiz. Time spent shows on their My progress page.` : "Pick at least one passage."}</p>
-<div class="ractions"><button class="btn" id="asStart" ${asg.vp.length ? "" : "disabled"}>Start now as ${esc(activeProf().name)}</button><button class="btn ghost" id="asCode" ${asg.vp.length ? "" : "disabled"}>Get assignment code</button></div>` : `
+<div class="ractions"><button class="btn" id="asSave" ${asg.vp.length ? "" : "disabled"}>Assign to ${esc(activeProf().name)}</button><button class="btn ghost" id="asStart" ${asg.vp.length ? "" : "disabled"}>Start now as ${esc(activeProf().name)}</button><button class="btn ghost" id="asCode" ${asg.vp.length ? "" : "disabled"}>Get assignment code</button></div>
+<p class="small muted" style="margin:6px 0 0"><strong>Assign</strong> saves it to ${esc(activeProf().name)}'s list on this device: it appears at the top of Words in context and on My progress. If they practice on their own phone, send the assignment code instead.</p>` : `
 <p class="small" style="margin:12px 0 4px"><strong>Skill areas</strong> <span class="muted">(none checked = all)</span></p>
 <div class="checkgrid">${secDoms.map(k => `<label><input type="checkbox" data-dom="${k}" ${asg.doms.includes(k) ? "checked" : ""}> ${PQ_DOMAINS[k]}</label>`).join("")}</div>
 <p class="small" style="margin:12px 0 6px"><strong>Difficulty</strong></p>
@@ -5696,6 +5701,15 @@ const p = getProfiles(); if(p.list.some(x => x.name.toLowerCase() === name.toLow
 const id = "s" + Date.now().toString(36); p.list.push({ id, name, grade }); p.active = id; saveProfiles(p); toast(`Added ${name}.`); draw();
 };
 const saveAsg = () => store.set("os_asg", asg);
+$("#asWho").onchange = e => { if(e.target.value === "__add"){ e.target.value = P.active; const nm = $("#stName"); nm.scrollIntoView({ behavior:"smooth", block:"center" }); nm.focus(); return; } setActive(e.target.value); draw(); };
+const asSave = $("#asSave"); if(asSave) asSave.onclick = () => {
+const pr = activeProf(), dd = getPD(pr.id), title = asg.title.trim() || "Vocabulary passages";
+const same = dd.vocab.asg.find(a => a.n === title && a.ids.join(",") === asg.vp.join(",") && a.ids.some(id => !vocabDone(dd.vocab, id, a.t)));
+if(same){ toast(`${pr.name} already has this assignment.`); return; }
+dd.vocab.asg.push({ n:title, ids:asg.vp.slice(), t:Date.now() }); savePD(pr.id, dd);
+track("vocab-assignment-save", { passages:asg.vp.length });
+toast(`Assigned to ${pr.name}. It's at the top of their Words in context page and on My progress.`);
+};
 $("#asTitle").oninput = e => { asg.title = e.target.value; saveAsg(); };
 el.querySelectorAll("[data-as]").forEach(b => b.onclick = () => { const k = b.dataset.as; asg[k] = k === "n" ? +b.dataset.v : b.dataset.v; if(k === "sec") asg.doms = []; saveAsg(); draw(); });
 el.querySelectorAll("[data-dom]").forEach(c => c.onchange = () => { asg.doms = c.checked ? asg.doms.concat(c.dataset.dom) : asg.doms.filter(k => k !== c.dataset.dom); saveAsg(); draw(); });
