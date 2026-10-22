@@ -50,7 +50,7 @@ color-scheme:light;
 color-scheme:light;
 }
 *{box-sizing:border-box}
-html{font-size:100%}
+html{font-size:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%;scrollbar-gutter:stable}
 html,body{margin:0}
 body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:1.0625rem;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 img{max-width:100%}
@@ -223,7 +223,10 @@ a.btn{text-decoration:none}
 .muted{color:var(--muted)}
 .linkbtn{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:.9375rem}
 footer{margin:56px 0 30px;color:var(--muted);font-size:.875rem;border-top:1px solid var(--line);padding-top:18px}
-.reader{position:fixed;inset:0;background:var(--paper);overflow-y:auto;z-index:40}
+.reader{position:fixed;inset:0;background:var(--paper);overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;z-index:40}
+/* Page-size fixes: long buttons wrap instead of pushing the page sideways, and text boxes are at least 16px on phones and tablets so iPhones don't zoom in when you tap them */
+.reader .btn{white-space:normal;max-width:100%;overflow-wrap:anywhere}
+@media (pointer:coarse){input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea,.codebox{font-size:16px !important}}
 .reader[hidden]{display:none}
 .rbar{position:sticky;top:0;background:var(--paper);border-top:8px solid var(--c);border-bottom:1px solid var(--line);z-index:2}
 .rbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:10px;padding-bottom:10px;max-width:760px}
@@ -908,7 +911,7 @@ html[lang="bn"] .hero h1{letter-spacing:0;line-height:1.25}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="questions.js?v=85"></script>
+<script src="questions.js?v=88"></script>
 <script>
 /* Bangla (বাংলা) is turned off for now. The translations are kept: set BANGLA_ON to true and restore the header switch to bring it back. */
 const BANGLA_ON = false;
@@ -2872,25 +2875,25 @@ m_area:"Area and volume", m_lat:"Lines, angles and triangles", m_trig:"Right tri
 };
 const MATH_SKILL_MAP = (() => {
 const g = {
-m_lin1:"m1 m5 m23 m41 m44 m45 m47 m52 m53 m118 m133 mx10 mx11 mx15 mx49 mx50 mx51 mx52 m141 m146 m151 m201 m202 m213 m216",
-m_linfn:"m3 m24 m42 m55 m60 m115 m119 m134 m137 mx1 mx12 mx53 mx54 mx55 mx56 m142 m147 m152",
-m_lin2:"m2 m26 m43 m46 m51 m91 mx2 mx8 mx14 mx57 mx58 mx59 mx60 m143 m148 m153",
-m_sys:"m4 m6 m48 m54 m56 m120 m135 m136 mx3 mx4 mx6 mx7 mx13 mx61 mx62 mx63 mx64 m145 m154",
-m_ineq:"m25 m49 mx5 mx9 mx16 mx65 mx66 mx67 mx68 m144 m149 m150 m155",
-m_nlfn:"m7 m10 m11 m30 m32 m57 m62 m64 m67 m71 m117 m138 m140 mx17 mx20 mx22 mx24 mx25 mx27 mx28 mx29 mx32 mx81 mx82 m158 m160 m164 m165 m170 m203 m204 m205 m206 m210 m215 m218",
-m_nleq:"m8 m28 m29 m31 m50 m61 m63 m65 m68 m69 m70 m139 mx18 mx19 mx21 mx23 mx26 mx31 mx83 m159 m163 m168 m169",
-m_equiv:"m9 m27 m58 m59 m66 m116 mx30 mx84 m156 m157 m161 m162 m166 m167 m209 m211",
-m_ratio:"m14 m33 m72 m75 m86 m114 m129 m130 m131 mx38 m171 m176 m217",
-m_pct:"m12 m15 m17 m34 m74 m76 m79 m81 m85 m112 m132 mx34 mx36 mx85 m172 m177",
-m_data1:"m13 m16 m36 m73 m78 m82 m113 mx37 mx86 m173 m178 m182 m207 m214",
-m_data2:"m77 mx33 mx39 m175 m179 m183",
-m_prob:"m35 m83 m111 mx35 mx87 m174 m181",
-m_infer:"m80 m84 mx88 m180 m184",
+m_lin1:"m1 m5 m23 m41 m44 m45 m47 m52 m53 m118 m133 mx10 mx11 mx15 mx49 mx50 mx51 mx52 m141 m146 m151 m201 m202 m213 m216 mh1 mh2 mh17 mh26",
+m_linfn:"m3 m24 m42 m55 m60 m115 m119 m134 m137 mx1 mx12 mx53 mx54 mx55 mx56 m142 m147 m152 mh5 mh6 mh7 mh21 mh25 mh28",
+m_lin2:"m2 m26 m43 m46 m51 m91 mx2 mx8 mx14 mx57 mx58 mx59 mx60 m143 m148 m153 mh8 mh9 mh10 mh18 mh19 mh22",
+m_sys:"m4 m6 m48 m54 m56 m120 m135 m136 mx3 mx4 mx6 mx7 mx13 mx61 mx62 mx63 mx64 m145 m154 mh3 mh4 mh14 mh15 mh23 mh27",
+m_ineq:"m25 m49 mx5 mx9 mx16 mx65 mx66 mx67 mx68 m144 m149 m150 m155 mh11 mh12 mh13 mh16 mh20 mh24",
+m_nlfn:"m7 m10 m11 m30 m32 m57 m62 m64 m67 m71 m117 m138 m140 mx17 mx20 mx22 mx24 mx25 mx27 mx28 mx29 mx32 mx81 mx82 m158 m160 m164 m165 m170 m203 m204 m205 m206 m210 m215 m218 mh38 mh39 mh40 mh41 mh42 mh43 mh44 mh45 mh56 mh57",
+m_nleq:"m8 m28 m29 m31 m50 m61 m63 m65 m68 m69 m70 m139 mx18 mx19 mx21 mx23 mx26 mx31 mx83 m159 m163 m168 m169 mh29 mh30 mh31 mh32 mh33 mh34 mh35 mh36 mh37 mh46 mh47 mh54 mh55 mh60",
+m_equiv:"m9 m27 m58 m59 m66 m116 mx30 mx84 m156 m157 m161 m162 m166 m167 m209 m211 mh48 mh49 mh50 mh51 mh52 mh53 mh58 mh59",
+m_ratio:"m14 m33 m72 m75 m86 m114 m129 m130 m131 mx38 m171 m176 m217 mh64 mh65 mh66 mh80",
+m_pct:"m12 m15 m17 m34 m74 m76 m79 m81 m85 m112 m132 mx34 mx36 mx85 m172 m177 mh61 mh62 mh63 mh79 mh82",
+m_data1:"m13 m16 m36 m73 m78 m82 m113 mx37 mx86 m173 m178 m182 m207 m214 mh67 mh68 mh69 mh70 mh78",
+m_data2:"m77 mx33 mx39 m175 m179 m183 mh76 mh77",
+m_prob:"m35 m83 m111 mx35 mx87 m174 m181 mh71 mh72 mh73 mh74",
+m_infer:"m80 m84 mx88 m180 m184 mh75 mh81",
 m_claims:"mx40 m185",
-m_area:"m37 m38 m88 m89 m96 m98 m101 m104 m107 m121 m122 m125 m128 mx45 mx46 mx69 mx70 mx71 m186 m191 m195 m200 m212",
-m_lat:"m20 m39 m87 m97 m100 m106 m124 mx41 mx48 mx72 mx73 mx74 m187 m190 m194 m199",
-m_trig:"m18 m21 m90 m92 m95 m103 m108 m123 m127 mx44 mx75 mx76 mx77 m189 m193 m198",
-m_circ:"m19 m22 m40 m93 m94 m99 m102 m105 m109 m110 m126 mx42 mx43 mx47 mx78 mx79 mx80 m188 m192 m196 m197 m208"
+m_area:"m37 m38 m88 m89 m96 m98 m101 m104 m107 m121 m122 m125 m128 mx45 mx46 mx69 mx70 mx71 m186 m191 m195 m200 m212 mh105 mh106 mh107 mh108 mh109 mh110",
+m_lat:"m20 m39 m87 m97 m100 m106 m124 mx41 mx48 mx72 mx73 mx74 m187 m190 m194 m199 mh98 mh99 mh100 mh101 mh102 mh103 mh104",
+m_trig:"m18 m21 m90 m92 m95 m103 m108 m123 m127 mx44 mx75 mx76 mx77 m189 m193 m198 mh91 mh92 mh93 mh94 mh95 mh96 mh97",
+m_circ:"m19 m22 m40 m93 m94 m99 m102 m105 m109 m110 m126 mx42 mx43 mx47 mx78 mx79 mx80 m188 m192 m196 m197 m208 mh83 mh84 mh85 mh86 mh87 mh88 mh89 mh90"
 };
 const m = {}; Object.entries(g).forEach(([k, ids]) => ids.split(" ").forEach(id => { m[id] = k; })); return m;
 })();
