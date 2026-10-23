@@ -4149,6 +4149,15 @@ COURSES.forEach(c => { SEC_LABEL[c.id] = SEC_LABEL[c.id] || c.label; SEC_SHORT[c
 const isStepSec = sec => sec === "math" || COURSES.some(c => c.id === sec);
 const LETTERS = "ABCD";
 const shuffle = arr => { const a = arr.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+/* Practice sets show questions the student hasn't seen first, then ones they missed, then ones they got right
+   (longest ago first). Order is random within each group, so sets don't repeat from one day to the next. */
+function freshShuffle(list){
+const last = {};
+try{ getPD(activeProf().id).attempts.forEach(x => { if(!last[x.q] || x.t >= last[x.q].t) last[x.q] = x; }); }catch(e){}
+const group = q => { const a = last[q.id]; return !a ? 0 : a.ok ? 2 : 1; };
+const age = q => last[q.id] ? last[q.id].t : 0;
+return shuffle(list).sort((a, b) => (group(a) - group(b)) || (group(a) === 2 ? age(a) - age(b) : 0));
+}
 function parseNum(str){
 const s = String(str).replace(/[০-৯]/g, d => "০১২৩৪৫৬৭৮৯".indexOf(d)).trim().replace(/[−–]/g, "-").replace(/,/g, "").replace(/\s+/g, "");
 if(!s) return NaN;
@@ -4165,12 +4174,12 @@ for(let k = 0; rem > 0; k = (k + 1) % 3){ fl[order[k]]++; rem--; }
 return { Easy:fl[0], Medium:fl[1], Hard:fl[2] };
 }
 function buildSet(pool, n, diffMode){
-if(diffMode === "challenge") return shuffle(pool.filter(q => q.ch)).slice(0, n).sort((a, b) => (a.dom > b.dom) - (a.dom < b.dom));
-if(diffMode !== "mix") return shuffle(pool.filter(q => q.diff === diffMode)).slice(0, n);
+if(diffMode === "challenge") return freshShuffle(pool.filter(q => q.ch)).slice(0, n).sort((a, b) => (a.dom > b.dom) - (a.dom < b.dom));
+if(diffMode !== "mix") return freshShuffle(pool.filter(q => q.diff === diffMode)).slice(0, n);
 const want = mixCounts(Math.min(n, pool.length)), picked = [];
-["Easy","Medium","Hard"].forEach(d => picked.push(...shuffle(pool.filter(q => q.diff === d)).slice(0, want[d])));
+["Easy","Medium","Hard"].forEach(d => picked.push(...freshShuffle(pool.filter(q => q.diff === d)).slice(0, want[d])));
 if(picked.length < Math.min(n, pool.length)){
-const rest = shuffle(pool.filter(q => !picked.includes(q)));
+const rest = freshShuffle(pool.filter(q => !picked.includes(q)));
 picked.push(...rest.slice(0, Math.min(n, pool.length) - picked.length));
 }
 return picked.sort((a, b) => PQ_ORDER[a.diff] - PQ_ORDER[b.diff]);
@@ -4317,9 +4326,9 @@ function buildCourseSet(pool, n){
 const want = courseMix(Math.min(n, pool.length)), order = ["Easy","Medium","Hard"];
 const shuffle = a => a.map(x => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
 let picked = [];
-order.forEach(d => { picked = picked.concat(shuffle(pool.filter(q => q.diff === d)).slice(0, want[d])); });
+order.forEach(d => { picked = picked.concat(freshShuffle(pool.filter(q => q.diff === d)).slice(0, want[d])); });
 // top up from anything left if a difficulty ran short (small units)
-const rest = shuffle(pool.filter(q => !picked.includes(q)));
+const rest = freshShuffle(pool.filter(q => !picked.includes(q)));
 while(picked.length < Math.min(n, pool.length) && rest.length) picked.push(rest.shift());
 return picked.sort((a, b) => order.indexOf(a.diff) - order.indexOf(b.diff));
 }
