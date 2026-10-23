@@ -5233,7 +5233,7 @@ return L ? (a.ok ? L : `${L} <span class="muted">(right: ${right})</span>`) : (a
 const SUPS = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","−":"⁻","-":"⁻","/":"ᐟ" };
 /* question text as plain readable math: x<sup>2</sup> → x², tags removed without breaking "xy-plane", entities decoded */
 const plainMath = s => { const t = document.createElement("textarea");
-t.innerHTML = String(s || "").replace(/<figure.*?<\/figure>/gs, " ").replace(/<sup>([^<]{1,4})<\/sup>/g, (m, x) => [...x].every(c => SUPS[c]) ? [...x].map(c => SUPS[c]).join("") : "^" + x)
+t.innerHTML = String(s || "").replace(/<figure.*?<\/figure>/gs, " ").replace(/<sup>(.*?)<\/sup>/gs, (m, x) => { x = x.replace(/<[^>]+>/g, ""); return x && [...x].every(c => SUPS[c]) ? [...x].map(c => SUPS[c]).join("") : x.length > 1 ? "^(" + x + ")" : "^" + x; })
 .replace(/<\/?(i|em|b|strong|span|sub|sup)\b[^>]*>/g, "").replace(/<[^>]+>/g, " ");
 return t.value.replace(/\s+/g, " ").trim(); };
 const qSnippet = q => { const t = plainMath(q.q).replace(/Which choice completes the text so that it conforms to the conventions of Standard English\?/i, "").trim();
